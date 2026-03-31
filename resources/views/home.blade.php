@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@php use Illuminate\Support\Str; @endphp
+
 @section('title', 'SD N 2 Dermolo - Sekolah Dasar Negeri 2 Dermolo')
 
 @push('styles')
@@ -379,8 +381,12 @@
 
     .visi-misi {
         display: grid;
-        gap: 1rem;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.5rem;
         margin-top: 2rem;
+    }
+    @media (max-width: 768px) {
+        .visi-misi { grid-template-columns: 1fr; }
     }
     .visi-misi-item {
         display: flex;
@@ -417,6 +423,32 @@
         grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
         gap: 1.5rem;
         margin-top: 3rem;
+    }
+
+    /* Program Sekolah: 3 card sama besar sejajar */
+    .program-grid-extras {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .program-card-extras {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    .program-card-extras .program-card-header {
+        height: 180px;
+    }
+    .program-card-extras .program-card-body {
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+        flex: 1 1 auto;
+    }
+    .program-card-extras .program-card-body p {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 
     .program-card {
@@ -457,6 +489,48 @@
         margin-bottom: .5rem;
     }
     .program-card-body p { color: var(--text-muted); font-size: .9rem; line-height: 1.6; }
+
+    /* Prestasi: foto fill di header card */
+    .prestasi-card .program-card-header img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    /* ——— NEWS ——— */
+    .news-home-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2.5rem;
+    }
+    .news-home-card {
+        background: #fff;
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--border);
+        transition: all .4s cubic-bezier(.34,1.56,.64,1);
+        text-decoration: none;
+        display: block;
+    }
+    .news-home-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-lg);
+        border-color: transparent;
+    }
+    .news-home-thumb {
+        height: 180px;
+        background: #e2e8f0;
+    }
+    .news-home-chip {
+        background: rgba(26,86,219,.08);
+        color: #1a56db;
+        padding: .25rem .6rem;
+        border-radius: 999px;
+        font-size: .7rem;
+        font-weight: 700;
+    }
 
     /* ── GURU ── */
     .guru-section { background: var(--dark); }
@@ -598,15 +672,6 @@
         position: relative;
         overflow: hidden;
     }
-    .fasilitas-card-top-emoji {
-        position: relative;
-        z-index: 2;
-        transition: transform .4s cubic-bezier(.34,1.56,.64,1);
-        filter: drop-shadow(0 8px 16px rgba(0,0,0,.15));
-    }
-    .fasilitas-card:hover .fasilitas-card-top-emoji {
-        transform: scale(1.2) translateY(-6px);
-    }
     .fasilitas-card-body { padding: 1.5rem; padding-bottom: 3rem; }
     .fasilitas-card-body h3 {
         font-weight: 800;
@@ -639,20 +704,22 @@
     }
     .kontak-card {
         background: #fff;
-        border-radius: var(--radius);
-        padding: 2.5rem 2rem;
-        text-align: center;
-        border: 1px solid var(--border);
-        transition: all .4s cubic-bezier(.34,1.56,.64,1);
+        border-radius: 1.25rem;
+        padding: 1.5rem;
+        text-align: left;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
         position: relative;
         overflow: hidden;
+        transition: all .35s ease;
     }
     .kontak-card::before {
         content: '';
         position: absolute;
         inset: 0;
+        background: linear-gradient(135deg, rgba(26,86,219,.06), rgba(59,130,246,.06));
         opacity: 0;
-        transition: opacity .4s ease;
+        transition: opacity .35s ease;
     }
     .kontak-card-blue::before   { background: linear-gradient(135deg, rgba(26,86,219,.04), rgba(59,130,246,.04)); }
     .kontak-card-green::before  { background: linear-gradient(135deg, rgba(16,185,129,.04), rgba(52,211,153,.04)); }
@@ -660,28 +727,136 @@
     .kontak-card:hover::before  { opacity: 1; }
     .kontak-card:hover {
         transform: translateY(-6px);
-        box-shadow: var(--shadow-lg);
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
         border-color: transparent;
     }
     .kontak-icon {
-        width: 4rem;
-        height: 4rem;
-        border-radius: 1.25rem;
+        width: 2.75rem;
+        height: 2.75rem;
+        border-radius: 0.85rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
-        margin: 0 auto 1.25rem;
+        font-size: 1.2rem;
+        margin: 0 0 1rem;
+        border: 1px solid rgba(15, 23, 42, 0.08);
     }
-    .kontak-card h3 { font-weight: 700; font-size: 1.05rem; color: var(--dark); margin-bottom: .6rem; }
+    .kontak-card h3 { font-weight: 800; font-size: 1.05rem; color: var(--dark); margin-bottom: .4rem; }
     .kontak-card p  { color: var(--text-muted); font-size: .9rem; line-height: 1.7; }
+    .kontak-meta {
+        font-size: .75rem;
+        text-transform: uppercase;
+        letter-spacing: .12em;
+        color: #94a3b8;
+        font-weight: 700;
+        margin-bottom: .5rem;
+    }
+    .kontak-body {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: .9rem;
+        padding: 1rem;
+    }
+    .kontak-extra {
+        margin-top: 2.5rem;
+        display: grid;
+        grid-template-columns: 1.3fr 0.7fr;
+        gap: 1.5rem;
+        align-items: stretch;
+    }
+    .kontak-map {
+        background: #fff;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        min-height: 320px;
+    }
+    .kontak-map iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        display: block;
+    }
+    .kontak-form {
+        background: #fff;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .kontak-form h3 {
+        font-weight: 800;
+        font-size: 1.2rem;
+        color: var(--dark);
+    }
+    .kontak-form p {
+        color: var(--text-muted);
+        font-size: .92rem;
+        line-height: 1.6;
+    }
+    .kontak-field {
+        display: flex;
+        flex-direction: column;
+        gap: .4rem;
+    }
+    .kontak-field label {
+        font-weight: 700;
+        font-size: .85rem;
+        color: var(--dark);
+    }
+    .kontak-field input,
+    .kontak-field textarea {
+        border: 1px solid var(--border);
+        border-radius: .9rem;
+        padding: .75rem .9rem;
+        font-size: .9rem;
+        color: var(--text);
+        background: #f8fafc;
+        transition: border .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+    .kontak-field input:focus,
+    .kontak-field textarea:focus {
+        outline: none;
+        border-color: rgba(26,86,219,.5);
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(26,86,219,.12);
+    }
+    .kontak-field textarea {
+        min-height: 140px;
+        resize: vertical;
+    }
+    .kontak-submit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .6rem;
+        padding: .75rem 1rem;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        color: #fff;
+        font-weight: 700;
+        font-size: .9rem;
+        border: none;
+        cursor: pointer;
+        transition: transform .2s ease, box-shadow .2s ease;
+        box-shadow: 0 10px 25px rgba(26,86,219,.25);
+    }
+    .kontak-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 30px rgba(26,86,219,.3);
+    }
 
     /* ── RESPONSIVE FIXES ── */
     @media (max-width: 640px) {
         .hero-title  { font-size: 2.5rem; }
         .section     { padding: 4rem 1.25rem; }
         .info-grid   { padding: 0 1.25rem; }
-        .program-grid, .fasilitas-grid, .kontak-grid { grid-template-columns: 1fr; }
+        .program-grid, .fasilitas-grid, .kontak-grid, .kontak-extra { grid-template-columns: 1fr; }
+        .program-grid.program-grid-extras { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
 
     /* ── CUSTOM SCROLLBAR ── */
@@ -788,21 +963,21 @@
                     </p>
                 @endforeach
 
-                <div class="visi-misi">
-                    <div class="visi-misi-item">
-                        <div class="visi-misi-icon">V</div>
-                        <div>
-                            <div style="font-weight:700; color:var(--dark); margin-bottom:.25rem;">Visi</div>
-                            <div style="color:var(--text-muted); font-size:.92rem;">Mewujudkan siswa yang cerdas, berakhlak mulia, dan berprestasi tinggi.</div>
-                        </div>
-                    </div>
-                    <div class="visi-misi-item">
-                        <div class="visi-misi-icon">M</div>
-                        <div>
-                            <div style="font-weight:700; color:var(--dark); margin-bottom:.25rem;">Misi</div>
-                            <div style="color:var(--text-muted); font-size:.92rem;">Memberikan pendidikan berkualitas dengan pendekatan inovatif dan berbasis karakter.</div>
-                        </div>
-                    </div>
+            </div>
+        </div>
+        <div class="visi-misi reveal" style="margin-top: 2.5rem;">
+            <div class="visi-misi-item">
+                <div class="visi-misi-icon">V</div>
+                <div>
+                    <div style="font-weight:700; color:var(--dark); margin-bottom:.25rem;">Visi</div>
+                    <div style="color:var(--text-muted); font-size:.92rem;">Mewujudkan siswa yang cerdas, berakhlak mulia, dan berprestasi tinggi.</div>
+                </div>
+            </div>
+            <div class="visi-misi-item">
+                <div class="visi-misi-icon">M</div>
+                <div>
+                    <div style="font-weight:700; color:var(--dark); margin-bottom:.25rem;">Misi</div>
+                    <div style="color:var(--text-muted); font-size:.92rem;">Memberikan pendidikan berkualitas dengan pendekatan inovatif dan berbasis karakter.</div>
                 </div>
             </div>
         </div>
@@ -821,23 +996,24 @@
         </div>
         @php
         $programData = [
-            'blue'   => ['gradient' => 'linear-gradient(135deg,#1a56db,#3b82f6)', 'emoji' => 'P'],
-            'green'  => ['gradient' => 'linear-gradient(135deg,#059669,#34d399)', 'emoji' => 'U'],
-            'yellow' => ['gradient' => 'linear-gradient(135deg,#d97706,#fbbf24)', 'emoji' => 'D'],
+            'blue'   => ['gradient' => 'linear-gradient(135deg,#1a56db,#3b82f6)'],
+            'green'  => ['gradient' => 'linear-gradient(135deg,#059669,#34d399)'],
+            'yellow' => ['gradient' => 'linear-gradient(135deg,#d97706,#fbbf24)'],
         ];
         @endphp
 
-        <div class="program-grid">
+        <div class="program-grid program-grid-extras">
             @foreach($program as $i => $item)
             @php $pd = $programData[$item['color']]; @endphp
-            <a href="{{ route($item['route']) }}" class="program-card reveal" style="transition-delay: {{ $i * 0.08 }}s;">
-                <div class="program-card-header" style="background: {{ $pd['gradient'] }};">
-                    @if(!empty($item['foto']))
-                        <img src="{{ asset('storage/' . $item['foto']) }}" alt="{{ $item['title'] }}"
-                             style="position:relative;z-index:2;width:64px;height:64px;object-fit:cover;border-radius:9999px;box-shadow:0 6px 16px rgba(0,0,0,.2);">
-                    @else
-                        <span style="position:relative;z-index:2;filter:drop-shadow(0 4px 8px rgba(0,0,0,.2));">{{ $pd['emoji'] }}</span>
-                    @endif
+            <a href="{{ route($item['route']) }}" class="program-card program-card-extras reveal" style="transition-delay: {{ $i * 0.08 }}s;">
+                @php
+                    $programBg = !empty($item['card_bg_image'])
+                        ? "background-image: url('" . asset('storage/' . $item['card_bg_image']) . "'); background-size: cover; background-position: center; background-repeat: no-repeat;"
+                        : (!empty($item['foto'])
+                            ? "background-image: url('" . asset('storage/' . $item['foto']) . "'); background-size: cover; background-position: center; background-repeat: no-repeat;"
+                            : '');
+                @endphp
+                <div class="program-card-header" style="background: {{ $pd['gradient'] }}; {{ $programBg }}">
                 </div>
                 <div class="program-card-body">
                     <h3>{{ $item['title'] }}</h3>
@@ -846,13 +1022,57 @@
                         Lihat Dokumentasi <span>-></span>
                     </div>
                 </div>
-            </a>
+            </div>
             @endforeach
         </div>
+        
+    </div>
+</section>
+
+{{-- ===== BERITA ===== --}}
+<section id="berita" class="section" style="background: #fff;">
+    <div class="section-inner">
+        <div class="text-center reveal">
+            <div class="section-label" style="justify-content:center;">BERITA</div>
+            <h2 class="section-title">Berita Terbaru</h2>
+            <p class="section-desc" style="margin: 1rem auto 0;">
+                Informasi kegiatan dan cerita terbaru dari SD N 2 Dermolo.
+            </p>
+        </div>
+        <div class="news-home-grid">
+            @forelse($berita as $i => $item)
+                <a href="{{ route('news.show', $item) }}" class="news-home-card reveal" style="transition-delay: {{ $i * 0.08 }}s;">
+                    <div class="news-home-thumb">
+                        @if ($item->featured_image)
+                            <img src="{{ asset('storage/' . $item->featured_image) }}" alt="{{ $item->title }}"
+                                 class="w-full h-full object-cover">
+                        @endif
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 text-xs text-slate-500">
+                            <span class="news-home-chip">{{ $item->category?->name ?? 'Umum' }}</span>
+                            <span>{{ optional($item->published_at)->format('d M Y') }}</span>
+                        </div>
+                        <h3 class="mt-3 font-semibold text-slate-900">{{ $item->title }}</h3>
+                        <p class="text-sm text-slate-500 mt-2">{{ $item->summary ?? Str::limit(strip_tags($item->content), 110) }}</p>
+                    </div>
+            </div>
+            @empty
+                <div class="news-home-card reveal">
+                    <div class="news-home-thumb flex items-center justify-center text-slate-500 text-sm">
+                        Belum ada berita terbaru.
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-semibold text-slate-900">Belum Ada Berita</h3>
+                        <p class="text-sm text-slate-500 mt-2">Tambah berita di panel admin agar tampil di sini.</p>
+                    </div>
+                </div>
+            @endforelse
+        </div>
         <div class="text-center reveal" style="margin-top: 2rem;">
-            <a href="{{ route('program.index') }}"
-               class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition">
-                Lihat Selengkapnya <span>-></span>
+            <a href="{{ route('news.index') }}"
+               class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition">
+                Lihat Semua Berita <span>-></span>
             </a>
         </div>
     </div>
@@ -870,11 +1090,10 @@
         </div>
         <div class="program-grid" style="margin-top:2rem;">
             @forelse($prestasi as $i => $item)
-                <div class="program-card reveal" style="transition-delay: {{ $i * 0.08 }}s;">
+                <div class="program-card prestasi-card reveal" style="transition-delay: {{ $i * 0.08 }}s;">
                     <div class="program-card-header" style="background: linear-gradient(135deg,#7c3aed,#a78bfa);">
                         @if (!empty($item['foto']))
-                            <img src="{{ asset('storage/' . $item['foto']) }}" alt="{{ $item['judul'] }}"
-                                 style="position:relative;z-index:2;width:96px;height:96px;object-fit:cover;border-radius:1rem;box-shadow:0 8px 20px rgba(0,0,0,.25);">
+                            <img src="{{ asset('storage/' . $item['foto']) }}" alt="{{ $item['judul'] }}">
                         @else
                             <span style="position:relative;z-index:2;filter:drop-shadow(0 4px 8px rgba(0,0,0,.2));">
                                 {{ strtoupper(substr($item['judul'] ?? 'P', 0, 1)) }}
@@ -891,7 +1110,7 @@
                     </div>
                 </div>
             @empty
-                <div class="program-card reveal">
+                <div class="program-card prestasi-card reveal">
                     <div class="program-card-header" style="background: linear-gradient(135deg,#7c3aed,#a78bfa);">
                         <span style="position:relative;z-index:2;filter:drop-shadow(0 4px 8px rgba(0,0,0,.2));">A</span>
                     </div>
@@ -902,18 +1121,7 @@
                 </div>
             @endforelse
 
-            <a href="{{ route('prestasi.index') }}" class="program-card reveal" style="transition-delay: .32s;">
-                <div class="program-card-header" style="background: linear-gradient(135deg,#7c3aed,#a78bfa);">
-                    <span style="position:relative;z-index:2;filter:drop-shadow(0 4px 8px rgba(0,0,0,.2));">></span>
-                </div>
-                <div class="program-card-body">
-                    <h3>Galeri Prestasi</h3>
-                    <p>Halaman khusus untuk menampilkan foto dan riwayat prestasi siswa maupun sekolah.</p>
-                    <div style="margin-top:.85rem; color:#7c3aed; font-size:.82rem; font-weight:700;">
-                        Buka Halaman Prestasi <span>-></span>
-                    </div>
-                </div>
-            </a>
+            
         </div>
         <div class="text-center reveal" style="margin-top: 2rem;">
             <a href="{{ route('prestasi.index') }}"
@@ -939,7 +1147,14 @@
         {{-- Kepala Sekolah --}}
         @if ($kepsek)
         <div class="kepsek-card reveal">
-            <div class="kepsek-avatar">👤</div>
+            <div class="kepsek-avatar">
+                @if ($kepsek->photo)
+                    <img src="{{ asset('storage/' . $kepsek->photo) }}" alt="{{ $kepsek->nama }}"
+                         class="w-full h-full rounded-full object-cover object-center">
+                @else
+                    👤
+                @endif
+            </div>
             <div>
                 <div class="kepsek-name">{{ $kepsek->nama }}</div>
                 <div class="kepsek-role">⭐ {{ $kepsek->jabatan }}</div>
@@ -975,7 +1190,14 @@
             @foreach($guruLain->take(6) as $i => $g)
             @php $gc = $guruColors[$i % count($guruColors)]; @endphp
             <div class="guru-card reveal" style="transition-delay: {{ $i * 0.07 }}s;">
-                <div class="guru-avatar" style="background: {{ $gc['avatar'] }};">👤</div>
+                <div class="guru-avatar" style="background: {{ $gc['avatar'] }};">
+                    @if ($g->photo)
+                        <img src="{{ asset('storage/' . $g->photo) }}" alt="{{ $g->nama }}"
+                             class="w-full h-full rounded-full object-cover object-center">
+                    @else
+                        👤
+                    @endif
+                </div>
                 <div class="guru-name">{{ $g->nama }}</div>
                 <div class="guru-jabatan" style="color: {{ $gc['jabatan'] }};">{{ $g->jabatan }}</div>
                 <div class="guru-nip">NIP: {{ $g->nip }}</div>
@@ -1015,16 +1237,10 @@
             <div class="section-label" style="justify-content:center;">🏫 Infrastruktur</div>
             <h2 class="section-title">Fasilitas Sekolah</h2>
             <p class="section-desc" style="margin: 1rem auto 0;">
-                Fasilitas modern untuk mendukung proses belajar yang optimal. Klik untuk detail!
+                Fasilitas modern untuk mendukung proses belajar yang optimal.
             </p>
         </div>
         @php
-        $namaToRoute = [
-            'Ruang Kelas'       => 'fasilitas.ruang-kelas',
-            'Perpustakaan'      => 'fasilitas.perpustakaan',
-            'Musholla'          => 'fasilitas.musholla',
-            'Lapangan Olahraga' => 'fasilitas.lapangan-olahraga',
-        ];
         $warnaDesign = [
             'blue'   => ['gradient' => 'linear-gradient(135deg,#eff6ff,#dbeafe)', 'arrow' => '#1a56db'],
             'green'  => ['gradient' => 'linear-gradient(135deg,#f0fdf4,#dcfce7)', 'arrow' => '#059669'],
@@ -1043,30 +1259,19 @@
                 $warna  = $isObj ? ($item->warna ?? 'blue') : ($item['color'] ?? 'blue');
                 $nama   = $isObj ? $item->nama      : $item['title'];
                 $desk   = $isObj ? $item->deskripsi : $item['description'];
-                $icon   = $isObj ? ($item->icon ?? 'ðŸ«') : ($item['emoji'] ?? 'ðŸ«');
-                $iconImage = $isObj ? ($item->icon_image ?? null) : ($item['icon_image'] ?? null);
-                $route  = $isObj ? ($namaToRoute[$item->nama] ?? null) : ($item['route'] ?? null);
+                $cardBg = $isObj ? ($item->card_bg_image ?? null) : ($item['card_bg_image'] ?? null);
                 $fd     = $warnaDesign[$warna] ?? $warnaDesign['blue'];
+                $bgStyle = $cardBg ? "background-image: url('" . asset('storage/' . $cardBg) . "'); background-size: cover; background-position: center; background-repeat: no-repeat;" : '';
             @endphp
-            <a href="{{ $route ? route($route) : '#' }}"
-               class="fasilitas-card reveal"
-               style="transition-delay: {{ $i * 0.1 }}s;">
-                <div class="fasilitas-card-top" style="background: {{ $fd['gradient'] }};">
-                    @if (!empty($iconImage))
-                        <img src="{{ asset('storage/' . $iconImage) }}" alt="{{ $nama }}"
-                             class="fasilitas-card-top-emoji" style="width:72px;height:72px;object-fit:cover;border-radius:1rem;">
-                    @else
-                        <span class="fasilitas-card-top-emoji">{{ $icon }}</span>
-                    @endif
+            <div class="fasilitas-card reveal"
+                 style="transition-delay: {{ $i * 0.1 }}s;">
+                <div class="fasilitas-card-top" style="background: {{ $fd['gradient'] }}; {{ $bgStyle }}">
                 </div>
                 <div class="fasilitas-card-body">
                     <h3>{{ $nama }}</h3>
                     <p>{{ $desk }}</p>
-                    <div class="fasilitas-card-arrow" style="color: {{ $fd['arrow'] }};">
-                        Lihat Detail <span>→</span>
-                    </div>
                 </div>
-            </a>
+            </div>
             @endforeach
         </div>
         <div class="text-center reveal" style="margin-top: 2rem;">
@@ -1089,22 +1294,118 @@
             </p>
         </div>
 
+        @php
+            $alamatLines = collect(explode("\n", $kontak['address'] ?? ''))
+                ->map(fn ($line) => trim($line))
+                ->filter()
+                ->values();
+            $phoneRaw = $kontak['phone'] ?? '';
+            $phoneLink = preg_replace('/[^0-9+]/', '', $phoneRaw);
+            $emailRaw = $kontak['email'] ?? '';
+            $mapsUrl = $kontak['maps_url'] ?? '';
+            $mapsEmbed = $mapsUrl;
+            if ($mapsUrl && !Str::contains($mapsUrl, 'embed')) {
+                $mapsEmbed = 'https://www.google.com/maps?q=' . urlencode($mapsUrl) . '&output=embed';
+            }
+        @endphp
+
         <div class="kontak-grid">
             <div class="kontak-card kontak-card-blue reveal">
                 <div class="kontak-icon" style="background: rgba(26,86,219,.1);">📍</div>
-                <h3>Alamat</h3>
-                <p>Desa Dermolo, Kecamatan Kembang<br>Kabupaten Jepara, Jawa Tengah</p>
+                <div class="kontak-meta">Alamat Sekolah</div>
+                <div class="kontak-body">
+                    <h3>Alamat</h3>
+                    @if ($mapsUrl)
+                        <p>
+                            <a href="{{ $mapsUrl }}" target="_blank" rel="noopener" class="text-slate-700 hover:text-blue-600 transition">
+                                {!! $alamatLines->implode('<br>') !!}
+                            </a>
+                        </p>
+                    @else
+                        <p>{!! $alamatLines->implode('<br>') !!}</p>
+                    @endif
+                </div>
             </div>
             <div class="kontak-card kontak-card-green reveal reveal-delay-1">
                 <div class="kontak-icon" style="background: rgba(16,185,129,.1);">📞</div>
-                <h3>Telepon</h3>
-                <p>(0291) 123-456<br>WhatsApp: 0812-3456-7890</p>
+                <div class="kontak-meta">Kontak Cepat</div>
+                <div class="kontak-body">
+                    <h3>Telepon</h3>
+                    @if ($phoneLink)
+                        <p>
+                            <a href="tel:{{ $phoneLink }}" class="text-slate-700 hover:text-emerald-600 transition">
+                                {{ $phoneRaw }}
+                            </a>
+                        </p>
+                    @else
+                        <p>-</p>
+                    @endif
+                </div>
             </div>
             <div class="kontak-card kontak-card-purple reveal reveal-delay-2">
                 <div class="kontak-icon" style="background: rgba(124,58,237,.1);">✉️</div>
-                <h3>Email</h3>
-                <p>sdn2dermolo@gmail.com<br>Senin – Sabtu: 07.00 – 14.00</p>
+                <div class="kontak-meta">Informasi</div>
+                <div class="kontak-body">
+                    <h3>Email</h3>
+                    @if ($emailRaw)
+                        <p>
+                            <a href="mailto:{{ $emailRaw }}" class="text-slate-700 hover:text-purple-600 transition">
+                                {{ $emailRaw }}
+                            </a>
+                        </p>
+                    @else
+                        <p>-</p>
+                    @endif
+                </div>
             </div>
+        </div>
+
+        {{-- Map & Additional Info --}}
+        <div class="kontak-extra reveal">
+            <div class="kontak-map">
+                @if ($mapsUrl)
+                    <iframe
+                        src="{{ $mapsEmbed }}"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="Lokasi SD N 2 Dermolo">
+                    </iframe>
+                @else
+                    <div class="h-full w-full flex items-center justify-center text-sm text-slate-500">
+                        Tautan Google Maps belum tersedia.
+                    </div>
+                @endif
+            </div>
+            <form class="kontak-form" method="POST" action="{{ url('/kirim-pesan') }}">
+                @csrf
+                <h3>Kirim Pesan</h3>
+                <p>Isi formulir di bawah ini dan kami akan segera menghubungi Anda.</p>
+                @if (session('success'))
+                    <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                <div class="kontak-field">
+                    <label for="contact-name">Nama Lengkap <span class="text-rose-500">*</span></label>
+                    <input id="contact-name" name="name" type="text" placeholder="Masukkan nama lengkap Anda" required>
+                </div>
+                <div class="kontak-field">
+                    <label for="contact-email">Email <span class="text-rose-500">*</span></label>
+                    <input id="contact-email" name="email" type="email" placeholder="email@contoh.com" required>
+                </div>
+                <div class="kontak-field">
+                    <label for="contact-subject">Subjek <span class="text-rose-500">*</span></label>
+                    <input id="contact-subject" name="subject" type="text" placeholder="Subjek pesan" required>
+                </div>
+                <div class="kontak-field">
+                    <label for="contact-message">Pesan <span class="text-rose-500">*</span></label>
+                    <textarea id="contact-message" name="message" placeholder="Tulis pesan Anda di sini..." required></textarea>
+                </div>
+                <button type="submit" class="kontak-submit">
+                    Kirim Pesan <span>→</span>
+                </button>
+            </form>
         </div>
     </div>
 </section>
@@ -1168,5 +1469,9 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 </script>
 @endpush
+
+
+
+
 
 

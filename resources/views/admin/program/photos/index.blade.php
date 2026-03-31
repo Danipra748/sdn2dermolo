@@ -33,7 +33,7 @@
                             <a href="{{ route('admin.program-sekolah.photos.edit', [$programSekolah, $photo]) }}"
                                class="px-3 py-1 rounded-xl bg-slate-900 text-white text-xs">Edit</a>
                             <form action="{{ route('admin.program-sekolah.photos.destroy', [$programSekolah, $photo]) }}"
-                                  method="POST" onsubmit="return confirm('Hapus foto ini?')">
+                                  method="POST" data-confirm="Hapus foto ini?">
                                 @csrf
                                 @method('DELETE')
                                 <button class="px-3 py-1 rounded-xl bg-white border border-slate-200 text-xs">
@@ -49,3 +49,4 @@
         </div>
     </div>
 @endsection
+

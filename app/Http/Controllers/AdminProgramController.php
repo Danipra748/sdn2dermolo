@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Program;
+use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -49,6 +50,10 @@ class AdminProgramController extends Controller
             $data['foto'] = $request->file('foto')->store('program', 'public');
         }
 
+        if ($request->hasFile('card_bg_image')) {
+            $data['card_bg_image'] = $request->file('card_bg_image')->store('program/card', 'public');
+        }
+
         if ($request->hasFile('logo')) {
             $data['logo'] = $request->file('logo')->store('program/logo', 'public');
         }
@@ -91,12 +96,25 @@ class AdminProgramController extends Controller
             $data['foto'] = null;
         }
 
+        if ($request->boolean('remove_card_bg_image') && $program->card_bg_image) {
+            Storage::disk('public')->delete($program->card_bg_image);
+            $data['card_bg_image'] = null;
+        }
+
         if ($request->hasFile('foto')) {
             if ($program->foto) {
                 Storage::disk('public')->delete($program->foto);
             }
 
             $data['foto'] = $request->file('foto')->store('program', 'public');
+        }
+
+        if ($request->hasFile('card_bg_image')) {
+            if ($program->card_bg_image) {
+                Storage::disk('public')->delete($program->card_bg_image);
+            }
+
+            $data['card_bg_image'] = $request->file('card_bg_image')->store('program/card', 'public');
         }
 
         if ($request->boolean('remove_logo') && $program->logo) {
@@ -130,6 +148,9 @@ class AdminProgramController extends Controller
         if ($program->foto) {
             Storage::disk('public')->delete($program->foto);
         }
+        if ($program->card_bg_image) {
+            Storage::disk('public')->delete($program->card_bg_image);
+        }
         if ($program->logo) {
             Storage::disk('public')->delete($program->logo);
         }
@@ -146,11 +167,12 @@ class AdminProgramController extends Controller
             'slug' => ['required', 'in:pramuka,seni-ukir,drumband', 'unique:programs,slug,' . $ignoreId],
             'title' => ['required', 'string', 'max:255'],
             'desc' => ['nullable', 'string'],
-            'emoji' => ['nullable', 'string', 'max:10'],
-            'hero_color' => ['nullable', 'string', 'max:255'],
+            'emoji' => ['nullable', 'string', 'max:20'],
             'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'card_bg_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
             'remove_foto' => ['nullable', 'boolean'],
+            'remove_card_bg_image' => ['nullable', 'boolean'],
             'remove_logo' => ['nullable', 'boolean'],
         ]);
     }
@@ -189,5 +211,83 @@ class AdminProgramController extends Controller
 
         return redirect()->route('admin.program-sekolah.index')
             ->with('status', 'Highlight program berhasil diperbarui.');
+    }
+
+    public function updateIcon(Request $request, string $programSekolah)
+    {
+        if (! Schema::hasTable('programs')) {
+            return redirect()->route('admin.dashboard')
+                ->with('status', 'Tabel program belum tersedia. Jalankan: php artisan migrate');
+        }
+
+        $program = Program::findOrFail($programSekolah);
+
+        $data = $request->validate([
+            'emoji' => ['nullable', 'string', 'max:20'],
+        ]);
+
+        $program->update([
+            'emoji' => $data['emoji'] ?? null,
+        ]);
+
+        return redirect()->route('admin.program-sekolah.index')
+            ->with('status', 'Icon program berhasil diperbarui.');
+    }
+
+    public function updateHeroBackground(Request $request)
+    {
+        $validated = $request->validate([
+            'hero_bg_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'remove_hero_bg_image' => ['nullable', 'boolean'],
+        ]);
+
+        $currentHero = SiteSetting::getValue('program_hero_bg_image');
+
+        if ($request->boolean('remove_hero_bg_image') && $currentHero) {
+            Storage::disk('public')->delete($currentHero);
+            SiteSetting::setValue('program_hero_bg_image', '');
+        }
+
+        if ($request->hasFile('hero_bg_image')) {
+            if ($currentHero) {
+                Storage::disk('public')->delete($currentHero);
+            }
+            $path = $request->file('hero_bg_image')->store('program/hero', 'public');
+            SiteSetting::setValue('program_hero_bg_image', $path);
+        }
+
+        return redirect()->route('admin.program-sekolah.index')
+            ->with('status', 'Background program berhasil diperbarui.');
+    }
+
+    public function updateCardBackground(Request $request, string $programSekolah)
+    {
+        if (! Schema::hasTable('programs')) {
+            return redirect()->route('admin.dashboard')
+                ->with('status', 'Tabel program belum tersedia. Jalankan: php artisan migrate');
+        }
+
+        $program = Program::findOrFail($programSekolah);
+
+        $data = $request->validate([
+            'card_bg_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'remove_card_bg_image' => ['nullable', 'boolean'],
+        ]);
+
+        if ($request->boolean('remove_card_bg_image') && $program->card_bg_image) {
+            Storage::disk('public')->delete($program->card_bg_image);
+            $program->update(['card_bg_image' => null]);
+        }
+
+        if ($request->hasFile('card_bg_image')) {
+            if ($program->card_bg_image) {
+                Storage::disk('public')->delete($program->card_bg_image);
+            }
+            $path = $request->file('card_bg_image')->store('program/card', 'public');
+            $program->update(['card_bg_image' => $path]);
+        }
+
+        return redirect()->route('admin.program-sekolah.index')
+            ->with('status', 'Background kartu program berhasil diperbarui.');
     }
 }

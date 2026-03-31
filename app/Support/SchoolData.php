@@ -12,28 +12,24 @@ final class SchoolData
                 'description' => '18 ruang kelas yang nyaman dan ber-AC',
                 'icon'        => 'building',
                 'color'       => 'blue',
-                'route'       => 'fasilitas.ruang-kelas',
             ],
             [
                 'title'       => 'Perpustakaan',
                 'description' => 'Koleksi buku lengkap dan ruang baca yang nyaman',
                 'icon'        => 'book-open',
                 'color'       => 'green',
-                'route'       => 'fasilitas.perpustakaan',
             ],
             [
                 'title'       => 'Musholla',
                 'description' => 'Sarana ibadah yang nyaman dan terawat',
                 'icon'        => 'building-library',
                 'color'       => 'yellow',
-                'route'       => 'fasilitas.musholla',
             ],
             [
                 'title'       => 'Lapangan Olahraga',
                 'description' => 'Lapangan basket, voli, dan futsal',
                 'icon'        => 'trophy',
                 'color'       => 'pink',
-                'route'       => 'fasilitas.lapangan-olahraga',
             ],
         ];
     }

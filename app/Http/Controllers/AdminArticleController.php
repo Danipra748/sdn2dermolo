@@ -46,7 +46,7 @@ class AdminArticleController extends Controller
                 ->with('status', 'Tabel artikel belum tersedia. Jalankan migrasi terlebih dahulu.');
         }
 
-        $article = new Article(['status' => 'draft']);
+        $article = new Article(['status' => 'draft', 'type' => 'artikel']);
         $categories = Schema::hasTable('categories') ? Category::orderBy('name')->get() : collect();
 
         return view('admin.articles.form', [
@@ -218,6 +218,7 @@ class AdminArticleController extends Controller
             'featured_image' => ['nullable', 'image', 'max:2048'],
             'category_id' => ['nullable', 'exists:categories,id'],
             'status' => ['required', 'in:draft,published'],
+            'type' => ['required', 'in:berita,artikel'],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:500'],
             'published_at' => ['nullable', 'date'],

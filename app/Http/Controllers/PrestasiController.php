@@ -13,8 +13,8 @@ class PrestasiController extends Controller
         $data = [
             'title' => 'Prestasi Sekolah',
             'subtitle' => 'Dokumentasi capaian akademik dan non-akademik SD N 2 Dermolo.',
-            'hero_color' => 'from-purple-600 to-fuchsia-700',
             'initial' => 'A',
+            'hero_bg_image' => null,
             'items' => [
                 'Juara lomba akademik tingkat kecamatan.',
                 'Prestasi seni dan budaya tingkat kabupaten.',
@@ -25,6 +25,7 @@ class PrestasiController extends Controller
 
         if (Schema::hasTable('site_settings')) {
             $saved = SiteSetting::getValue('prestasi_ringkasan');
+            $heroBg = SiteSetting::getValue('prestasi_hero_bg_image');
 
             if ($saved) {
                 $decoded = json_decode($saved, true);
@@ -32,6 +33,10 @@ class PrestasiController extends Controller
                 if (is_array($decoded) && ! empty($decoded)) {
                     $data['items'] = $decoded;
                 }
+            }
+
+            if ($heroBg) {
+                $data['hero_bg_image'] = $heroBg;
             }
         }
 

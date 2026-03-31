@@ -42,7 +42,7 @@
                                 <a href="{{ route('admin.categories.edit', $category) }}"
                                     class="px-3 py-1 rounded-xl bg-slate-900 text-white text-xs">Edit</a>
                                 <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="inline"
-                                    onsubmit="return confirm('Hapus kategori ini?')">
+                                    data-confirm="Hapus kategori ini?">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="px-3 py-1 rounded-xl bg-red-500 text-white text-xs">Hapus</button>
@@ -63,3 +63,4 @@
         </div>
     </div>
 @endsection
+

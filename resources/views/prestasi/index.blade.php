@@ -3,8 +3,16 @@
 @section('title', 'Prestasi Sekolah - SD N 2 Dermolo')
 
 @section('content')
-<section class="pt-32 pb-16 px-4 bg-gradient-to-r {{ $data['hero_color'] }}">
-    <div class="max-w-7xl mx-auto text-center animate-fadeIn">
+<section class="pt-32 pb-16 px-4 relative overflow-hidden"
+    @if (!empty($data['hero_bg_image']))
+        style="background-image: url('{{ asset('storage/' . $data['hero_bg_image']) }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"
+    @else
+        style="background: #0f172a;"
+    @endif>
+    @if (!empty($data['hero_bg_image']))
+        <div class="absolute inset-0 bg-slate-900/40"></div>
+    @endif
+    <div class="max-w-7xl mx-auto text-center animate-fadeIn relative z-10">
         <div class="inline-block mb-4">
             <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto shadow-2xl">
                 <span class="text-5xl">{{ $data['initial'] }}</span>

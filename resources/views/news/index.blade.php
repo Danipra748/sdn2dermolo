@@ -94,11 +94,20 @@
                 <p class="section-desc" style="margin-top:.75rem;">
                     Update kegiatan, prestasi, dan cerita inspiratif dari lingkungan sekolah.
                 </p>
-                <form action="{{ route('news.search') }}" method="GET" class="mt-6 flex flex-col md:flex-row gap-3">
+                <form action="{{ route('news.index') }}" method="GET" class="mt-6 flex flex-col md:flex-row gap-3">
                     <input type="text" name="q" placeholder="Cari artikel..."
+                        value="{{ $queryText ?? '' }}"
                         class="news-input">
+                    <select name="category" class="news-input">
+                        <option value="">Semua Kategori</option>
+                        @foreach ($categories as $category)
+                            <option value="{{ $category->slug }}" @selected(($selectedCategory?->id) === $category->id)>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
                     <button class="px-6 py-3 rounded-full bg-slate-900 text-white text-sm font-semibold hover:opacity-90">
-                        Cari
+                        Filter
                     </button>
                 </form>
             </section>
@@ -132,25 +141,7 @@
                         <div class="col-span-3 text-slate-500 text-center">Belum ada berita terbaru.</div>
                     @endforelse
                 </div>
-            </section>
-
-            <section class="section" style="padding-top:0;">
-                <div class="text-center" style="margin-bottom: 1rem;">
-                    <div class="section-label" style="justify-content:center;">KATEGORI</div>
-                    <h2 class="section-title">Kategori Berita</h2>
-                    <p class="section-desc" style="margin: 1rem auto 0;">Pilih kategori untuk menjelajahi artikel.</p>
-                </div>
-                <div class="flex flex-wrap justify-center gap-3">
-                    @foreach ($categories as $category)
-                        <a href="{{ route('news.category', $category) }}"
-                            class="px-4 py-2 rounded-full bg-white border border-slate-200 text-sm text-slate-700 hover:border-slate-400 transition">
-                            {{ $category->name }} ({{ $category->articles_count }})
-                        </a>
-                    @endforeach
-                </div>
-            </section>
-
-            <section class="section" style="padding-top:0;">
+            </section><section class="section" style="padding-top:0;">
                 <div class="text-center" style="margin-bottom: 1rem;">
                     <div class="section-label" style="justify-content:center;">SEMUA ARTIKEL</div>
                     <h2 class="section-title">Semua Artikel</h2>
@@ -189,3 +180,4 @@
         </div>
     </div>
 @endsection
+

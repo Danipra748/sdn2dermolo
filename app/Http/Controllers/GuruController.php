@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Guru;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class GuruController extends Controller
 {
@@ -27,6 +28,9 @@ class GuruController extends Controller
     public function store(Request $request)
     {
         $data = $this->validateGuru($request);
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('guru', 'public');
+        }
         Guru::create($data);
 
         return redirect()->route('admin.guru.index')->with('status', 'Data guru berhasil ditambahkan.');
@@ -45,6 +49,17 @@ class GuruController extends Controller
     public function update(Request $request, Guru $guru)
     {
         $data = $this->validateGuru($request);
+        if ($request->boolean('remove_photo') && $guru->photo) {
+            Storage::disk('public')->delete($guru->photo);
+            $data['photo'] = null;
+        }
+
+        if ($request->hasFile('photo')) {
+            if ($guru->photo) {
+                Storage::disk('public')->delete($guru->photo);
+            }
+            $data['photo'] = $request->file('photo')->store('guru', 'public');
+        }
         $guru->update($data);
 
         return redirect()->route('admin.guru.index')->with('status', 'Data guru berhasil diperbarui.');
@@ -52,6 +67,9 @@ class GuruController extends Controller
 
     public function destroy(Guru $guru)
     {
+        if ($guru->photo) {
+            Storage::disk('public')->delete($guru->photo);
+        }
         $guru->delete();
 
         return redirect()->route('admin.guru.index')->with('status', 'Data guru berhasil dihapus.');
@@ -62,6 +80,7 @@ class GuruController extends Controller
         return $request->validate([
             'no' => ['nullable', 'integer', 'min:1'],
             'nama' => ['required', 'string', 'max:255'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'nip' => ['nullable', 'string', 'max:255'],
             'karpeg' => ['nullable', 'string', 'max:255'],
             'nuptk' => ['nullable', 'string', 'max:255'],
@@ -77,13 +96,11 @@ class GuruController extends Controller
             'tmt' => ['nullable', 'string', 'max:255'],
             'gaji_pokok' => ['nullable', 'string', 'max:255'],
             'gr_kls_mp' => ['nullable', 'string', 'max:255'],
-            'absen_s' => ['nullable', 'string', 'max:255'],
-            'absen_i' => ['nullable', 'string', 'max:255'],
-            'absen_a' => ['nullable', 'string', 'max:255'],
             'sk_akhir_tanggal' => ['nullable', 'string', 'max:255'],
             'sertifikasi_nmr_psrt' => ['nullable', 'string', 'max:255'],
             'sertifikasi_tahun' => ['nullable', 'string', 'max:255'],
             'sertifikasi_nrg' => ['nullable', 'string', 'max:255'],
+            'remove_photo' => ['nullable', 'boolean'],
         ]);
     }
 }

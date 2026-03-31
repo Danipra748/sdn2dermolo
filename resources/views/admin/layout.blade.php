@@ -41,6 +41,62 @@
             display: inline-block;
             margin-right: 8px;
         }
+        .sidebar-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #94a3b8;
+            font-weight: 600;
+            padding: 0 0.5rem;
+        }
+        .sidebar-summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0.65rem 1rem;
+            border-radius: 1rem;
+            color: #475569;
+            font-weight: 600;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .sidebar-summary:hover {
+            background: rgba(15, 23, 42, 0.06);
+            color: #0f172a;
+        }
+        .sidebar-summary svg {
+            width: 0.9rem;
+            height: 0.9rem;
+            transition: transform 0.2s ease;
+        }
+        .sidebar-summary::-webkit-details-marker { display: none; }
+        summary.sidebar-summary::marker { content: ""; }
+        details[open] > .sidebar-summary svg {
+            transform: rotate(180deg);
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 1rem;
+            border-radius: 0.95rem;
+            color: #64748b;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .sidebar-link:hover {
+            background: rgba(15, 23, 42, 0.06);
+            color: #0f172a;
+        }
+        .sidebar-link.is-active {
+            background: #0f172a;
+            color: #fff;
+        }
+        .sidebar-sub {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            padding: 0.4rem 0.25rem 0.6rem 0.25rem;
+        }
     </style>
     @stack('styles')
 </head>
@@ -56,46 +112,123 @@
                     </div>
                 </div>
 
-                <nav class="flex flex-col gap-3 text-sm">
-                    <a href="{{ route('admin.dashboard') }}"
-                       class="flex items-center justify-between px-4 py-3 rounded-2xl {{ request()->routeIs('admin.dashboard') ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 transition' }}">
-                        <span>Dashboard</span>
-                        @if (request()->routeIs('admin.dashboard'))
-                            <span class="text-xs bg-white/20 px-2 py-1 rounded-full">Utama</span>
-                        @endif
-                    </a>
-                    <a href="{{ route('admin.fasilitas.index') }}"
-                       class="px-4 py-3 rounded-2xl {{ request()->routeIs('admin.fasilitas.*') ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 transition' }}">
-                        Data Fasilitas
-                    </a>
-                    <a href="{{ route('admin.guru.index') }}"
-                       class="px-4 py-3 rounded-2xl {{ request()->routeIs('admin.guru.*') ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 transition' }}">
-                        Data Guru
-                    </a>
-                    <a href="{{ route('admin.program-sekolah.index') }}"
-                       class="px-4 py-3 rounded-2xl {{ request()->routeIs('admin.program-sekolah.*') ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 transition' }}">
-                        Program Sekolah
-                    </a>
-                    <a href="{{ route('admin.prestasi-sekolah.index') }}"
-                       class="px-4 py-3 rounded-2xl {{ request()->routeIs('admin.prestasi-sekolah.*') ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 transition' }}">
-                        Prestasi Sekolah
-                    </a>
-                    <a href="{{ route('admin.articles.index') }}"
-                       class="px-4 py-3 rounded-2xl {{ request()->routeIs('admin.articles.*') ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 transition' }}">
-                        Artikel & News
-                    </a>
-                    <a href="{{ route('admin.categories.index') }}"
-                       class="px-4 py-3 rounded-2xl {{ request()->routeIs('admin.categories.*') ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 transition' }}">
-                        Kategori Artikel & News
-                    </a>
-                    <a href="{{ route('admin.sambutan-kepsek.edit') }}"
-                       class="px-4 py-3 rounded-2xl {{ request()->routeIs('admin.sambutan-kepsek.*') ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 transition' }}">
-                        Sambutan Kepsek
-                    </a>
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="w-full text-left px-4 py-3 rounded-2xl text-slate-600 hover:bg-slate-100 transition">Logout</button>
-                    </form>
+                @php
+                    $ringkasanOpen = request()->routeIs('admin.dashboard');
+                    $landingOpen = request()->routeIs('admin.sambutan-kepsek.*') || request()->routeIs('admin.kontak.*');
+                    $kontenOpen = request()->routeIs('admin.fasilitas.*')
+                        || request()->routeIs('admin.guru.*')
+                        || request()->routeIs('admin.program-sekolah.*')
+                        || request()->routeIs('admin.prestasi-sekolah.*')
+                        || request()->routeIs('admin.articles.*')
+                        || request()->routeIs('admin.categories.*')
+                        || request()->routeIs('admin.messages.*');
+                @endphp
+
+                <nav class="flex flex-col gap-4 text-sm">
+                    <div class="flex flex-col gap-2">
+                        <div class="sidebar-label">Ringkasan</div>
+                        <details class="rounded-2xl" {{ $ringkasanOpen ? 'open' : '' }}>
+                            <summary class="sidebar-summary cursor-pointer">
+                                <span>Dashboard</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </summary>
+                            <div class="sidebar-sub">
+                                <a href="{{ route('admin.dashboard') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">
+                                    <span>Dashboard</span>
+                                    @if (request()->routeIs('admin.dashboard'))
+                                        <span class="text-xs bg-white/20 px-2 py-1 rounded-full">Utama</span>
+                                    @endif
+                                </a>
+                            </div>
+                        </details>
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <div class="sidebar-label">Landing Page</div>
+                        <details class="rounded-2xl" {{ $landingOpen ? 'open' : '' }}>
+                            <summary class="sidebar-summary cursor-pointer">
+                                <span>Pengantar</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </summary>
+                            <div class="sidebar-sub">
+                                <a href="{{ route('admin.sambutan-kepsek.edit') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.sambutan-kepsek.*') ? 'is-active' : '' }}">
+                                    Sambutan Kepsek
+                                </a>
+                                <a href="{{ route('admin.kontak.edit') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.kontak.*') ? 'is-active' : '' }}">
+                                    Kontak Sekolah
+                                </a>
+                            </div>
+                        </details>
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <div class="sidebar-label">Konten Publik</div>
+                        <details class="rounded-2xl" {{ $kontenOpen ? 'open' : '' }}>
+                            <summary class="sidebar-summary cursor-pointer">
+                                <span>Kelola Konten</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </summary>
+                            <div class="sidebar-sub">
+                                <a href="{{ route('admin.fasilitas.index') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.fasilitas.*') ? 'is-active' : '' }}">
+                                    Data Fasilitas
+                                </a>
+                                <a href="{{ route('admin.guru.index') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.guru.*') ? 'is-active' : '' }}">
+                                    Data Guru
+                                </a>
+                                <a href="{{ route('admin.program-sekolah.index') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.program-sekolah.*') ? 'is-active' : '' }}">
+                                    Program Sekolah
+                                </a>
+                                <a href="{{ route('admin.prestasi-sekolah.index') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.prestasi-sekolah.*') ? 'is-active' : '' }}">
+                                    Prestasi Sekolah
+                                </a>
+                                <a href="{{ route('admin.articles.index') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.articles.*') ? 'is-active' : '' }}">
+                                    Artikel & News
+                                </a>
+                                <a href="{{ route('admin.categories.index') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.categories.*') ? 'is-active' : '' }}">
+                                    Kategori Artikel & News
+                                </a>
+                                <a href="{{ route('admin.messages.index') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.messages.*') ? 'is-active' : '' }}">
+                                    Pesan Masuk
+                                </a>
+                            </div>
+                        </details>
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <div class="sidebar-label">Sistem</div>
+                        <details class="rounded-2xl">
+                            <summary class="sidebar-summary cursor-pointer">
+                                <span>Pengaturan</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </summary>
+                            <div class="sidebar-sub">
+                                <form action="{{ route('logout') }}" method="POST" data-confirm="Yakin ingin logout?">
+                                    @csrf
+                                    <button type="submit" class="sidebar-link w-full text-left">
+                                        Logout
+                                    </button>
+                                </form>
+                            </div>
+                        </details>
+                    </div>
                 </nav>
 
                 <div class="mt-auto">
@@ -130,6 +263,63 @@
             </section>
         </main>
     </div>
+
+    <div id="confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/60" data-confirm-close="true"></div>
+        <div class="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+            <h3 class="text-lg font-semibold text-slate-900">Konfirmasi Hapus</h3>
+            <p id="confirm-message" class="mt-2 text-sm text-slate-600">Apakah Anda yakin ingin menghapus data ini?</p>
+            <div class="mt-6 flex items-center justify-end gap-2">
+                <button type="button" id="confirm-cancel"
+                        class="px-4 py-2 rounded-2xl border border-slate-300 text-sm text-slate-700 hover:bg-slate-50 transition">
+                    Batal
+                </button>
+                <button type="button" id="confirm-ok"
+                        class="px-4 py-2 rounded-2xl bg-rose-600 text-white text-sm hover:bg-rose-700 transition">
+                    Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('confirm-modal');
+            const message = document.getElementById('confirm-message');
+            const confirmOk = document.getElementById('confirm-ok');
+            const confirmCancel = document.getElementById('confirm-cancel');
+            let pendingForm = null;
+
+            document.querySelectorAll('form[data-confirm]').forEach((form) => {
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    pendingForm = form;
+                    message.textContent = form.dataset.confirm || 'Apakah Anda yakin?';
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                });
+            });
+
+            const closeModal = () => {
+                pendingForm = null;
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            };
+
+            confirmCancel?.addEventListener('click', closeModal);
+            modal?.addEventListener('click', (event) => {
+                if (event.target?.dataset?.confirmClose) {
+                    closeModal();
+                }
+            });
+            confirmOk?.addEventListener('click', () => {
+                if (pendingForm) {
+                    pendingForm.submit();
+                }
+                closeModal();
+            });
+        });
+    </script>
 
     @stack('scripts')
 </body>

@@ -17,7 +17,14 @@
         @if ($kepsek)
             <div class="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-sm">
                 <div class="flex flex-col md:flex-row md:items-center gap-5">
-                    <div class="h-20 w-20 rounded-full bg-slate-900 text-white flex items-center justify-center text-3xl">👤</div>
+                    <div class="h-20 w-20 rounded-full bg-slate-900 text-white flex items-center justify-center text-3xl overflow-hidden">
+                        @if ($kepsek->photo)
+                            <img src="{{ asset('storage/' . $kepsek->photo) }}" alt="{{ $kepsek->nama }}"
+                                 class="w-full h-full object-cover object-center">
+                        @else
+                            👤
+                        @endif
+                    </div>
                     <div>
                         <div class="text-sm text-slate-500">Kepala Sekolah</div>
                         <div class="text-2xl font-semibold text-slate-900">{{ $kepsek->nama }}</div>
@@ -34,7 +41,14 @@
             @forelse ($guruLain as $g)
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
                     <div class="flex items-center gap-4">
-                        <div class="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center">👤</div>
+                        <div class="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden">
+                            @if ($g->photo)
+                                <img src="{{ asset('storage/' . $g->photo) }}" alt="{{ $g->nama }}"
+                                     class="w-full h-full object-cover object-center">
+                            @else
+                                👤
+                            @endif
+                        </div>
                         <div>
                             <div class="font-semibold text-slate-900">{{ $g->nama }}</div>
                             <div class="text-sm text-slate-600">{{ $g->jabatan }}</div>

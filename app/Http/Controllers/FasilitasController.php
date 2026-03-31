@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Fasilitas;
+use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\ValidationException;
 
 class FasilitasController extends Controller
 {
@@ -38,8 +38,6 @@ class FasilitasController extends Controller
             'method' => 'POST',
             'title' => 'Tambah Fasilitas',
             'kontenValue' => '',
-            'kontenTemplate' => $this->encodePrettyJson($this->getDefaultKontenTemplate('')),
-            'kontenTemplates' => $this->getKontenTemplateMap(),
         ]);
     }
 
@@ -68,9 +66,7 @@ class FasilitasController extends Controller
             'action' => route('admin.fasilitas.update', $fasilita),
             'method' => 'PUT',
             'title' => 'Edit Fasilitas',
-            'kontenValue' => $this->encodePrettyJson($fasilita->konten ?? []),
-            'kontenTemplate' => $this->encodePrettyJson($this->getDefaultKontenTemplate($fasilita->nama ?? '')),
-            'kontenTemplates' => $this->getKontenTemplateMap(),
+            'kontenValue' => $fasilita->konten ?? '',
         ]);
     }
 
@@ -113,39 +109,41 @@ class FasilitasController extends Controller
             ->with('status', 'Data fasilitas berhasil dihapus.');
     }
 
+    public function updateHeroBackground(Request $request)
+    {
+        $validated = $request->validate([
+            'hero_bg_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'remove_hero_bg_image' => ['nullable', 'boolean'],
+        ]);
+
+        $currentHero = SiteSetting::getValue('fasilitas_hero_bg_image');
+
+        if ($request->boolean('remove_hero_bg_image') && $currentHero) {
+            Storage::disk('public')->delete($currentHero);
+            SiteSetting::setValue('fasilitas_hero_bg_image', '');
+        }
+
+        if ($request->hasFile('hero_bg_image')) {
+            if ($currentHero) {
+                Storage::disk('public')->delete($currentHero);
+            }
+            $path = $request->file('hero_bg_image')->store('fasilitas/hero', 'public');
+            SiteSetting::setValue('fasilitas_hero_bg_image', $path);
+        }
+
+        return redirect()->route('admin.fasilitas.index')
+            ->with('status', 'Background fasilitas berhasil diperbarui.');
+    }
+
     private function validateFasilitas(Request $request): array
     {
         $data = $request->validate([
             'nama' => ['required', 'string', 'max:255'],
             'deskripsi' => ['nullable', 'string'],
-            'icon' => ['nullable', 'string', 'max:10'],
-            'icon_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
-            'warna' => ['required', 'in:blue,green,yellow,pink,purple,orange'],
-            'konten' => ['nullable', 'string'],
+            'icon' => ['nullable', 'string', 'max:32'],
+            'icon_image' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
             'remove_icon_image' => ['nullable', 'boolean'],
         ]);
-
-        $kontenRaw = trim((string) ($data['konten'] ?? ''));
-        if ($kontenRaw === '') {
-            $data['konten'] = null;
-            return $data;
-        }
-
-        try {
-            $decoded = json_decode($kontenRaw, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $exception) {
-            throw ValidationException::withMessages([
-                'konten' => 'JSON tidak valid: ' . $exception->getMessage(),
-            ]);
-        }
-
-        if (! is_array($decoded)) {
-            throw ValidationException::withMessages([
-                'konten' => 'JSON konten harus berbentuk object/array.',
-            ]);
-        }
-
-        $data['konten'] = $decoded;
 
         return $data;
     }
@@ -190,45 +188,26 @@ class FasilitasController extends Controller
     {
         $item = Fasilitas::where('nama', $nama)->first();
         $default = $this->getDefaultPublicData($nama);
-        $konten = is_array($item?->konten) ? $item->konten : [];
-        $data = array_replace_recursive($default, $konten);
+        $data = $default;
+        $kontenValue = $item?->konten;
+
+        if (is_array($kontenValue)) {
+            $data = array_replace_recursive($data, $kontenValue);
+            $data['konten_html'] = null;
+        } elseif (is_string($kontenValue) && trim($kontenValue) !== '') {
+            $data['konten_html'] = $kontenValue;
+        } else {
+            $data['konten_html'] = null;
+        }
 
         $warna = $item?->warna ?? 'blue';
         $defaultSubtitle = $default['subtitle'] ?? '';
 
         $data['title'] = $item?->nama ?? $nama;
         $data['subtitle'] = ($item && filled($item->deskripsi)) ? $item->deskripsi : $defaultSubtitle;
-        $data['emoji'] = $item?->icon ?: ($default['emoji'] ?? '??');
-        $data['icon_image'] = $item?->icon_image;
+        $data['card_bg_image'] = $item?->card_bg_image;
         $data['hero_color'] = self::WARNA_TO_HERO[$warna] ?? self::WARNA_TO_HERO['blue'];
-
         return $data;
-    }
-
-    private function encodePrettyJson(array $value): string
-    {
-        return json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '';
-    }
-
-    private function getDefaultKontenTemplate(string $nama): array
-    {
-        $default = $this->getDefaultPublicData($nama);
-
-        unset($default['title'], $default['subtitle'], $default['emoji'], $default['hero_color']);
-
-        return $default;
-    }
-
-    private function getKontenTemplateMap(): array
-    {
-        $names = ['Ruang Kelas', 'Perpustakaan', 'Musholla', 'Lapangan Olahraga'];
-        $result = [];
-
-        foreach ($names as $name) {
-            $result[$name] = $this->encodePrettyJson($this->getDefaultKontenTemplate($name));
-        }
-
-        return $result;
     }
 
     private function getDefaultPublicData(string $nama): array

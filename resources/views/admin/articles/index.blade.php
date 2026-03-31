@@ -69,7 +69,7 @@
                                 <a href="{{ route('admin.articles.edit', $article) }}"
                                     class="px-3 py-1 rounded-xl bg-slate-900 text-white text-xs">Edit</a>
                                 <form action="{{ route('admin.articles.destroy', $article) }}" method="POST" class="inline"
-                                    onsubmit="return confirm('Hapus artikel ini?')">
+                                    data-confirm="Hapus artikel ini?">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="px-3 py-1 rounded-xl bg-red-500 text-white text-xs">Hapus</button>
@@ -90,3 +90,4 @@
         </div>
     </div>
 @endsection
+

@@ -72,6 +72,7 @@ class ProgramController extends Controller
                     'title' => $program->title,
                     'desc' => $program->desc,
                     'foto' => $program->foto,
+                    'card_bg_image' => $program->card_bg_image,
                     'logo' => $program->logo,
                     'emoji' => $program->emoji,
                     'hero_color' => $program->hero_color,
@@ -100,7 +101,11 @@ class ProgramController extends Controller
     private function renderProgram(array $data)
     {
         $data['subtitle'] = $data['desc'] ?? ($data['subtitle'] ?? '');
-        $data['initial'] = $data['initial'] ?? strtoupper(substr($data['title'] ?? 'P', 0, 1));
+        if (! empty($data['emoji'])) {
+            $data['initial'] = $data['emoji'];
+        } else {
+            $data['initial'] = $data['initial'] ?? strtoupper(substr($data['title'] ?? 'P', 0, 1));
+        }
         $data['photos'] = $data['photos'] ?? [];
 
         return view('program.show', compact('data'));

@@ -17,6 +17,7 @@ class Program extends Model
         'highlight_2',
         'highlight_3',
         'foto',
+        'card_bg_image',
         'logo',
         'emoji',
         'hero_color',

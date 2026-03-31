@@ -26,6 +26,7 @@
                 <thead class="text-left text-slate-500">
                     <tr>
                         <th class="py-2">No</th>
+                        <th class="py-2">Foto</th>
                         <th class="py-2">Nama</th>
                         <th class="py-2">Jabatan</th>
                         <th class="py-2">NIP</th>
@@ -37,6 +38,16 @@
                     @forelse ($guru as $item)
                         <tr class="border-t border-slate-200/60">
                             <td class="py-3">{{ $item->no }}</td>
+                            <td class="py-3">
+                                @if ($item->photo)
+                                    <img src="{{ asset('storage/' . $item->photo) }}" alt="{{ $item->nama }}"
+                                         class="h-10 w-10 rounded-full object-cover object-center border border-slate-200">
+                                @else
+                                    <div class="h-10 w-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 text-xs">
+                                        -
+                                    </div>
+                                @endif
+                            </td>
                             <td class="py-3 font-semibold">{{ $item->nama }}</td>
                             <td class="py-3">{{ $item->jabatan }}</td>
                             <td class="py-3">{{ $item->nip }}</td>
@@ -44,7 +55,7 @@
                             <td class="py-3">
                                 <div class="flex gap-2">
                                     <a href="{{ route('admin.guru.edit', $item) }}" class="px-3 py-1 rounded-xl bg-slate-900 text-white text-xs">Edit</a>
-                                    <form action="{{ route('admin.guru.destroy', $item) }}" method="POST" onsubmit="return confirm('Hapus data guru ini?')">
+                                    <form action="{{ route('admin.guru.destroy', $item) }}" method="POST" data-confirm="Hapus data guru ini?">
                                         @csrf
                                         @method('DELETE')
                                         <button class="px-3 py-1 rounded-xl bg-white border border-slate-200 text-xs">Hapus</button>
@@ -54,7 +65,7 @@
                         </tr>
                     @empty
                         <tr class="border-t border-slate-200/60">
-                            <td colspan="6" class="py-6 text-center text-slate-500">Data guru belum tersedia.</td>
+                            <td colspan="7" class="py-6 text-center text-slate-500">Data guru belum tersedia.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -62,3 +73,4 @@
         </div>
     </div>
 @endsection
+

@@ -3,21 +3,14 @@
 @section('title', $data['title'].' - SD N 2 Dermolo')
 
 @section('content')
-<section class="pt-32 pb-16 px-4 bg-gradient-to-r {{ $data['hero_color'] }}">
-    <div class="max-w-7xl mx-auto text-center animate-fadeIn">
-        <div class="inline-block mb-4">
-            <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto shadow-2xl">
-                @if (!empty($data['logo']))
-                    <img src="{{ asset('storage/' . $data['logo']) }}" alt="Logo {{ $data['title'] }}"
-                         class="w-20 h-20 rounded-full object-cover">
-                @elseif (!empty($data['foto']))
-                    <img src="{{ asset('storage/' . $data['foto']) }}" alt="{{ $data['title'] }}"
-                         class="w-20 h-20 rounded-full object-cover">
-                @else
-                    <span class="text-5xl">{{ $data['initial'] }}</span>
-                @endif
-            </div>
-        </div>
+<section class="pt-32 pb-16 px-4 bg-gradient-to-r {{ $data['hero_color'] }} relative overflow-hidden"
+    @if (!empty($data['card_bg_image']))
+        style="background-image: url('{{ asset('storage/' . $data['card_bg_image']) }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"
+    @endif>
+    @if (!empty($data['card_bg_image']))
+        <div class="absolute inset-0 bg-slate-900/45"></div>
+    @endif
+    <div class="max-w-7xl mx-auto text-center animate-fadeIn relative z-10">
         <h1 class="text-5xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">{{ $data['title'] }}</h1>
         <p class="text-xl text-white/80 max-w-3xl mx-auto">{{ $data['subtitle'] }}</p>
     </div>

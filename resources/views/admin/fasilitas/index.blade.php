@@ -22,41 +22,68 @@
             </a>
         </div>
 
-        <div class="mt-5 overflow-x-auto">
+        <details class="mt-6 rounded-2xl border border-slate-200 bg-white/70 p-4">
+            <summary class="cursor-pointer text-sm font-semibold text-slate-700">Pengaturan Tampilan</summary>
+            <form action="{{ route('admin.fasilitas.hero-background.update') }}" method="POST"
+                  enctype="multipart/form-data" class="mt-4">
+                @csrf
+                @method('PUT')
+                <div class="grid md:grid-cols-2 gap-4 items-center">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Background Halaman Fasilitas</label>
+                        <input type="file" name="hero_bg_image" accept=".jpg,.jpeg,.png,.webp"
+                               class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-300">
+                        @error('hero_bg_image')
+                            <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="flex items-center gap-4">
+                        @if (!empty(\App\Models\SiteSetting::getValue('fasilitas_hero_bg_image')))
+                            <img src="{{ asset('storage/' . \App\Models\SiteSetting::getValue('fasilitas_hero_bg_image')) }}"
+                                 alt="Background Fasilitas" class="h-20 w-full max-w-xs rounded-xl object-cover border border-slate-200">
+                            <label class="inline-flex items-center gap-2 text-xs text-slate-600">
+                                <input type="checkbox" name="remove_hero_bg_image" value="1"
+                                       class="rounded border-slate-300 text-slate-900 focus:ring-slate-300">
+                                Hapus background
+                            </label>
+                        @else
+                            <p class="text-xs text-slate-500">Belum ada background.</p>
+                        @endif
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button type="submit"
+                            class="px-4 py-2 rounded-2xl bg-slate-900 text-white text-sm hover:opacity-90 transition">
+                        Simpan Background
+                    </button>
+                </div>
+            </form>
+        </details>
+
+        <div class="mt-6 overflow-x-auto rounded-2xl border border-slate-200 bg-white/70">
             <table class="w-full text-sm">
                 <thead class="text-left text-slate-500">
                     <tr>
-                        <th class="py-2">No</th>
-                        <th class="py-2">Icon</th>
-                        <th class="py-2">Nama</th>
-                        <th class="py-2">Deskripsi</th>
-                        <th class="py-2">Warna</th>
-                        <th class="py-2">Aksi</th>
+                        <th class="px-4 py-3">No</th>
+                        <th class="px-4 py-3">Nama</th>
+                        <th class="px-4 py-3">Deskripsi</th>
+                        <th class="px-4 py-3">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="text-slate-700">
                     @forelse ($fasilitas as $item)
                         <tr class="border-t border-slate-200/60">
-                            <td class="py-3">{{ $loop->iteration }}</td>
-                            <td class="py-3">
-                                @if ($item->icon_image)
-                                    <img src="{{ asset('storage/' . $item->icon_image) }}" alt="{{ $item->nama }}"
-                                         class="h-10 w-10 rounded-xl object-cover border border-slate-200">
-                                @else
-                                    <span class="text-lg">{{ $item->icon ?: '🏫' }}</span>
-                                @endif
-                            </td>
-                            <td class="py-3 font-semibold">{{ $item->nama }}</td>
-                            <td class="py-3">{{ $item->deskripsi }}</td>
-                            <td class="py-3 capitalize">{{ $item->warna }}</td>
-                            <td class="py-3">
+                            <td class="px-4 py-3">{{ $loop->iteration }}</td>
+                            <td class="px-4 py-3 font-semibold">{{ $item->nama }}</td>
+                            <td class="px-4 py-3">{{ $item->deskripsi }}</td>
+                            <td class="px-4 py-3">
                                 <div class="flex gap-2">
                                     <a href="{{ route('admin.fasilitas.edit', $item) }}"
                                        class="px-3 py-1 rounded-xl bg-slate-900 text-white text-xs">
                                         Edit
                                     </a>
                                     <form action="{{ route('admin.fasilitas.destroy', $item) }}" method="POST"
-                                          onsubmit="return confirm('Hapus data fasilitas ini?')">
+                                          data-confirm="Hapus data fasilitas ini?">
                                         @csrf
                                         @method('DELETE')
                                         <button class="px-3 py-1 rounded-xl bg-white border border-slate-200 text-xs">
@@ -68,7 +95,7 @@
                         </tr>
                     @empty
                         <tr class="border-t border-slate-200/60">
-                            <td colspan="6" class="py-6 text-center text-slate-500">
+                            <td colspan="4" class="px-4 py-6 text-center text-slate-500">
                                 Data fasilitas belum tersedia.
                             </td>
                         </tr>

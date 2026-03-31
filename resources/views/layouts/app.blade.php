@@ -7,6 +7,7 @@
     @if (trim($__env->yieldContent('meta_description')))
         <meta name="description" content="@yield('meta_description')">
     @endif
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @keyframes fadeInUp {
@@ -33,9 +34,173 @@
         .card-hover:hover   { transform: translateY(-10px); box-shadow: 0 20px 25px -5px rgba(0,0,0,.1); }
         .teacher-card       { transition: all 0.3s ease; }
         .teacher-card:hover { transform: scale(1.05); }
-        .nav-link           { position: relative; transition: color 0.3s ease; }
-        .nav-link::after    { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: #fbbf24; transition: width 0.3s ease; }
-        .nav-link:hover::after { width: 100%; }
+        :root {
+            --nav-bg: #f8fafc;
+            --nav-border: #e2e8f0;
+            --nav-text: #0f172a;
+            --nav-muted: #64748b;
+            --nav-accent: #1a56db;
+            --nav-accent-2: #10b981;
+            --nav-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        }
+        .navbar {
+            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+            border-bottom: 1px solid var(--nav-border);
+            position: fixed;
+            inset: 0 0 auto 0;
+            z-index: 50;
+            box-shadow: var(--nav-shadow);
+        }
+        .navbar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem 0 3.5rem;
+            height: 76px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.9rem;
+        }
+        .brand-badge {
+            width: 44px;
+            height: 44px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, var(--nav-accent), #3b82f6);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            box-shadow: 0 8px 20px rgba(26, 86, 219, 0.25);
+        }
+        .brand-title { font-weight: 800; color: var(--nav-text); line-height: 1.1; }
+        .brand-sub { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--nav-muted); }
+        .nav-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.4rem;
+            font-weight: 600;
+            color: var(--nav-muted);
+            margin-left: 2.5rem;
+        }
+        .nav-link {
+            position: relative;
+            padding: 0.45rem 0.65rem;
+            transition: color 0.25s ease, background 0.25s ease;
+            border-radius: 999px;
+        }
+        .nav-link--caret {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .nav-link:hover,
+        .nav-link:focus-visible {
+            color: var(--nav-accent);
+            background: rgba(26, 86, 219, 0.08);
+        }
+        .nav-link--active {
+            color: var(--nav-accent);
+            background: rgba(16, 185, 129, 0.12);
+        }
+        .nav-item {
+            position: relative;
+        }
+        .nav-caret {
+            margin-left: 0;
+            width: 0.8rem;
+            height: 0.8rem;
+            display: block;
+        }
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 0.6rem);
+            left: 50%;
+            transform: translateX(-50%) translateY(8px);
+            min-width: 220px;
+            background: #f1f5f9;
+            color: #0f172a;
+            border-radius: 0.9rem;
+            padding: 0.6rem;
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 30;
+        }
+        .dropdown-menu a {
+            display: block;
+            padding: 0.55rem 0.75rem;
+            border-radius: 0.6rem;
+            font-size: 0.9rem;
+            color: inherit;
+            transition: background 0.2s ease;
+        }
+        .dropdown-menu a:hover {
+            background: rgba(15, 23, 42, 0.06);
+        }
+        .nav-item:hover .dropdown-menu,
+        .nav-item:focus-within .dropdown-menu {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+        .nav-user {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .nav-user-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--nav-text);
+        }
+        .nav-user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 999px;
+            background: #0f172a;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        .mobile-menu {
+            border-top: 1px solid var(--nav-border);
+            background: #ffffff;
+            padding: 0.75rem 1rem 1rem;
+        }
+        .mobile-menu a,
+        .mobile-menu button,
+        .mobile-menu summary {
+            color: #475569;
+            font-weight: 600;
+        }
+        .mobile-menu details {
+            border-radius: 0.75rem;
+            background: #f8fafc;
+            padding: 0.6rem 0.8rem;
+        }
+        .mobile-menu details[open] summary {
+            color: var(--nav-accent);
+        }
+        .mobile-sub a {
+            display: block;
+            padding: 0.4rem 0.5rem 0.4rem 1rem;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
         .hero-pattern {
             background-color: #1e293b;
             position: relative;
@@ -55,37 +220,38 @@
 <body class="smooth-scroll bg-gray-50">
 
     {{-- ===== NAVBAR ===== --}}
-    <nav class="bg-white shadow-sm fixed w-full top-0 z-50 border-b border-gray-100">
-        <div class="max-w-7xl mx-auto px-4 h-20 flex justify-between items-center">
+    <nav class="navbar">
+        <div class="navbar-inner">
 
             {{-- Logo --}}
-            <a href="{{ route('home') }}" class="flex items-center">
-                <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-md">
-                    <span class="text-white font-bold">SD</span>
-                </div>
-                <div class="ml-4 text-gray-800">
-                    <h1 class="font-bold text-lg leading-none">SD N 2 Dermolo</h1>
-                    <p class="text-[10px] uppercase tracking-widest text-gray-500">Unggul & Berkarakter</p>
+            <a href="{{ route('home') }}" class="brand">
+                <div class="brand-badge">SD</div>
+                <div>
+                    <h1 class="brand-title">SD N 2 Dermolo</h1>
+                    <p class="brand-sub">Unggul & Berkarakter</p>
                 </div>
             </a>
 
             {{-- Menu Desktop --}}
-            <div class="hidden md:flex space-x-8 text-gray-600 font-medium">
-                <a href="{{ route('home') }}#home"      class="nav-link hover:text-blue-600 transition-colors">Beranda</a>
-                <a href="{{ route('home') }}#tentang"   class="nav-link hover:text-blue-600 transition-colors">Tentang</a>
-                <a href="{{ route('program.index') }}" class="nav-link hover:text-blue-600 transition-colors">Program</a>
-                <a href="{{ route('prestasi.index') }}" class="nav-link hover:text-blue-600 transition-colors">Prestasi</a>
-                <a href="{{ route('fasilitas.index') }}" class="nav-link hover:text-blue-600 transition-colors">Fasilitas</a>
-                <a href="{{ route('guru.index') }}" class="nav-link hover:text-blue-600 transition-colors">Guru Pendidik</a>
-                <a href="{{ route('news.index') }}" class="nav-link hover:text-blue-600 transition-colors">Berita</a>
-                <a href="{{ route('home') }}#kontak"    class="nav-link hover:text-blue-600 transition-colors">Kontak</a>
-                @auth
-                    <a href="{{ route('admin.dashboard') }}" class="nav-link hover:text-blue-600 transition-colors">Admin</a>
-                    <form action="{{ route('logout') }}" method="POST" class="inline">
-                        @csrf
-                        <button type="submit" class="nav-link hover:text-blue-600 transition-colors">Logout</button>
-                    </form>
-                @endauth
+            <div class="hidden md:flex nav-group">
+                <a href="{{ route('home') }}#home" class="nav-link nav-link--active">Beranda</a>
+                <div class="nav-item">
+                    <button class="nav-link nav-link--caret" type="button">
+                        Profil
+                        <svg class="nav-caret" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="{{ route('home') }}#tentang">Identitas Sekolah</a>
+                        <a href="{{ route('fasilitas.index') }}">Sarana Prasarana</a>
+                        <a href="{{ route('program.index') }}">Ekstrakurikuler</a>
+                    </div>
+                </div>
+                <a href="{{ route('guru.index') }}" class="nav-link">Data Guru</a>
+                <a href="{{ route('news.index') }}" class="nav-link">Berita</a>
+                <a href="{{ route('prestasi.index') }}" class="nav-link">Prestasi</a>
+                <a href="{{ route('home') }}#kontak" class="nav-link">Kontak</a>
             </div>
 
             {{-- Tombol Hamburger (Mobile) --}}
@@ -97,22 +263,20 @@
         </div>
 
         {{-- Menu Mobile --}}
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t px-4 py-3 space-y-2">
-            <a href="{{ route('home') }}#home"      class="block text-gray-600 hover:text-blue-600 py-2">Beranda</a>
-            <a href="{{ route('home') }}#tentang"   class="block text-gray-600 hover:text-blue-600 py-2">Tentang</a>
-            <a href="{{ route('program.index') }}" class="block text-gray-600 hover:text-blue-600 py-2">Program</a>
-            <a href="{{ route('prestasi.index') }}" class="block text-gray-600 hover:text-blue-600 py-2">Prestasi</a>
-            <a href="{{ route('fasilitas.index') }}" class="block text-gray-600 hover:text-blue-600 py-2">Fasilitas</a>
-            <a href="{{ route('guru.index') }}" class="block text-gray-600 hover:text-blue-600 py-2">Guru Pendidik</a>
-            <a href="{{ route('news.index') }}" class="block text-gray-600 hover:text-blue-600 py-2">Berita</a>
-            <a href="{{ route('home') }}#kontak"    class="block text-gray-600 hover:text-blue-600 py-2">Kontak</a>
-            @auth
-                <a href="{{ route('admin.dashboard') }}" class="block text-gray-600 hover:text-blue-600 py-2">Admin</a>
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="block text-gray-600 hover:text-blue-600 py-2">Logout</button>
-                </form>
-            @endauth
+        <div id="mobile-menu" class="hidden md:hidden mobile-menu space-y-3">
+            <a href="{{ route('home') }}#home" class="block py-2">Beranda</a>
+            <details>
+                <summary class="cursor-pointer">Profil</summary>
+                <div class="mobile-sub mt-2">
+                    <a href="{{ route('home') }}#tentang">Identitas Sekolah</a>
+                    <a href="{{ route('fasilitas.index') }}">Sarana Prasarana</a>
+                    <a href="{{ route('program.index') }}">Ekstrakurikuler</a>
+                </div>
+            </details>
+            <a href="{{ route('guru.index') }}" class="block py-2">Data Guru</a>
+            <a href="{{ route('news.index') }}" class="block py-2">Berita</a>
+            <a href="{{ route('prestasi.index') }}" class="block py-2">Prestasi</a>
+            <a href="{{ route('home') }}#kontak" class="block py-2">Kontak</a>
         </div>
     </nav>
 
@@ -173,6 +337,24 @@
         </div>
     </footer>
 
+    <div id="public-confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/60" data-confirm-close="true"></div>
+        <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <h3 class="text-lg font-semibold text-slate-900">Konfirmasi</h3>
+            <p id="public-confirm-message" class="mt-2 text-sm text-slate-600">Apakah Anda yakin?</p>
+            <div class="mt-6 flex items-center justify-end gap-2">
+                <button type="button" id="public-confirm-cancel"
+                        class="px-4 py-2 rounded-2xl border border-slate-300 text-sm text-slate-700 hover:bg-slate-50 transition">
+                    Batal
+                </button>
+                <button type="button" id="public-confirm-ok"
+                        class="px-4 py-2 rounded-2xl bg-slate-900 text-white text-sm hover:opacity-90 transition">
+                    Lanjutkan
+                </button>
+            </div>
+        </div>
+    </div>
+
     {{-- ===== TOMBOL SCROLL TO TOP ===== --}}
     <button id="scrollToTop"
         class="fixed bottom-8 right-8 bg-blue-600 hover:bg-blue-700 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition duration-300 transform hover:scale-110 hidden z-50">
@@ -188,7 +370,57 @@
             document.getElementById('mobile-menu').classList.toggle('hidden');
         });
 
-        // Scroll to top — tampilkan tombol setelah scroll 300px
+                // Avatar dropdown
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenu = document.getElementById('user-menu');
+        if (userMenuButton && userMenu) {
+            userMenuButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                userMenu.classList.toggle('hidden');
+            });
+            document.addEventListener('click', (event) => {
+                if (!userMenu.contains(event.target) && !userMenuButton.contains(event.target)) {
+                    userMenu.classList.add('hidden');
+                }
+            });
+        }
+
+        // Konfirmasi aksi (logout)
+        const publicModal = document.getElementById('public-confirm-modal');
+        const publicMessage = document.getElementById('public-confirm-message');
+        const publicOk = document.getElementById('public-confirm-ok');
+        const publicCancel = document.getElementById('public-confirm-cancel');
+        let pendingPublicForm = null;
+
+        document.querySelectorAll('form[data-confirm]').forEach((form) => {
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                pendingPublicForm = form;
+                publicMessage.textContent = form.dataset.confirm || 'Apakah Anda yakin?';
+                publicModal.classList.remove('hidden');
+                publicModal.classList.add('flex');
+            });
+        });
+
+        const closePublicModal = () => {
+            pendingPublicForm = null;
+            publicModal.classList.add('hidden');
+            publicModal.classList.remove('flex');
+        };
+
+        publicCancel?.addEventListener('click', closePublicModal);
+        publicModal?.addEventListener('click', (event) => {
+            if (event.target?.dataset?.confirmClose) {
+                closePublicModal();
+            }
+        });
+        publicOk?.addEventListener('click', () => {
+            if (pendingPublicForm) {
+                pendingPublicForm.submit();
+            }
+            closePublicModal();
+        });
+// Scroll to top — tampilkan tombol setelah scroll 300px
         const scrollToTopBtn = document.getElementById('scrollToTop');
         window.addEventListener('scroll', () => {
             scrollToTopBtn.classList.toggle('hidden', window.pageYOffset <= 300);
@@ -218,3 +450,4 @@
     @stack('scripts')
 </body>
 </html>
+

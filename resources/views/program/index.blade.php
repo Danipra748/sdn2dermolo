@@ -3,8 +3,16 @@
 @section('title', 'Program Sekolah - SD N 2 Dermolo')
 
 @section('content')
-<section class="pt-28 pb-12 px-4 bg-gradient-to-r from-blue-600 to-sky-600">
-    <div class="max-w-6xl mx-auto text-center text-white">
+<section class="pt-28 pb-12 px-4 relative overflow-hidden"
+    @if (!empty($heroBg))
+        style="background-image: url('{{ asset('storage/' . $heroBg) }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"
+    @else
+        style="background: linear-gradient(90deg, #2563eb, #0284c7);"
+    @endif>
+    @if (!empty($heroBg))
+        <div class="absolute inset-0 bg-slate-900/40"></div>
+    @endif
+    <div class="max-w-6xl mx-auto text-center text-white relative z-10">
         <h1 class="text-4xl md:text-5xl font-bold">Program Sekolah</h1>
         <p class="mt-3 text-white/80 max-w-2xl mx-auto">
             Daftar program unggulan yang mendukung pengembangan karakter dan bakat siswa.
@@ -21,6 +29,8 @@
                 $desc  = $isObj ? $item->desc  : ($item['desc'] ?? '');
                 $logo  = $isObj ? ($item->logo ?? null) : null;
                 $foto  = $isObj ? ($item->foto ?? null) : ($item['foto'] ?? null);
+                $emoji = $isObj ? ($item->emoji ?? null) : ($item['emoji'] ?? null);
+                $cardBg = $isObj ? ($item->card_bg_image ?? null) : ($item['card_bg_image'] ?? null);
                 $slug  = $isObj ? ($item->slug ?? null) : null;
                 $routeName = $isObj ? ($slug ? 'program.' . $slug : null) : ($item['route'] ?? null);
                 $link = $routeName ? route($routeName) : '#';
@@ -36,15 +46,25 @@
                 $gradient = $gradients[$colorKey] ?? $gradients['blue'];
             @endphp
             <a href="{{ $link }}" class="group bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition">
-                <div class="h-36 flex items-center justify-center bg-gradient-to-r {{ $gradient }}">
-                    @if (!empty($logo))
-                        <img src="{{ asset('storage/' . $logo) }}" alt="Logo {{ $title }}"
-                             class="h-16 w-16 rounded-full object-cover border border-white/40 shadow-md">
-                    @elseif (!empty($foto))
-                        <img src="{{ asset('storage/' . $foto) }}" alt="{{ $title }}"
-                             class="h-16 w-16 rounded-full object-cover border border-white/40 shadow-md">
-                    @else
-                        <span class="text-3xl text-white font-bold">{{ strtoupper(substr($title, 0, 1)) }}</span>
+                @php
+                    $bgStyle = !empty($cardBg)
+                        ? "background-image: url('" . asset('storage/' . $cardBg) . "'); background-size: cover; background-position: center; background-repeat: no-repeat;"
+                        : '';
+                @endphp
+                <div class="h-36 flex items-center justify-center bg-gradient-to-r {{ $gradient }}"
+                     style="{{ $bgStyle }}">
+                    @if (empty($cardBg))
+                        @if (!empty($logo))
+                            <img src="{{ asset('storage/' . $logo) }}" alt="Logo {{ $title }}"
+                                 class="w-full h-full object-cover">
+                        @elseif (!empty($foto))
+                            <img src="{{ asset('storage/' . $foto) }}" alt="{{ $title }}"
+                                 class="w-full h-full object-cover">
+                        @elseif (!empty($emoji))
+                            <span class="text-3xl text-white font-bold">{{ $emoji }}</span>
+                        @else
+                            <span class="text-3xl text-white font-bold">{{ strtoupper(substr($title, 0, 1)) }}</span>
+                        @endif
                     @endif
                 </div>
                 <div class="p-5">

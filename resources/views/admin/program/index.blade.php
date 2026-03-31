@@ -18,51 +18,91 @@
             </div>
         </div>
 
-        <div class="mt-5 overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead class="text-left text-slate-500">
-                    <tr>
-                        <th class="py-2">No</th>
-                        <th class="py-2">Foto</th>
-                        <th class="py-2">Slug</th>
-                        <th class="py-2">Judul</th>
-                        <th class="py-2">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="text-slate-700">
-                    @forelse ($program as $item)
-                        <tr class="border-t border-slate-200/60">
-                            <td class="py-3">{{ $loop->iteration }}</td>
-                            <td class="py-3">
-                                @if ($item->foto)
-                                    <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->title }}"
-                                         class="h-12 w-12 rounded-xl object-cover border border-slate-200">
-                                @else
-                                    <div class="h-12 w-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 text-xs">
-                                        No Img
-                                    </div>
-                                @endif
-                            </td>
-                            <td class="py-3">{{ $item->slug }}</td>
-                            <td class="py-3 font-semibold">{{ $item->title }}</td>
-                            <td class="py-3">
-                                <div class="flex flex-wrap gap-2">
-                                    <a href="{{ route('admin.program-sekolah.photos.index', $item) }}"
-                                       class="px-3 py-1 rounded-xl bg-slate-900 text-white text-xs">
-                                        Kelola Dokumentasi
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr class="border-t border-slate-200/60">
-                            <td colspan="5" class="py-6 text-center text-slate-500">
-                                Data program belum tersedia.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+        <form action="{{ route('admin.program-sekolah.hero-background.update') }}" method="POST"
+              enctype="multipart/form-data" class="mt-6 rounded-2xl border border-slate-200 bg-white/70 p-4">
+            @csrf
+            @method('PUT')
+            <div class="grid md:grid-cols-2 gap-4 items-center">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Background Halaman Program</label>
+                    <input type="file" name="hero_bg_image" accept=".jpg,.jpeg,.png,.webp"
+                           class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-300">
+                    @error('hero_bg_image')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div class="flex items-center gap-4">
+                    @if (!empty(\App\Models\SiteSetting::getValue('program_hero_bg_image')))
+                        <img src="{{ asset('storage/' . \App\Models\SiteSetting::getValue('program_hero_bg_image')) }}"
+                             alt="Background Program" class="h-20 w-full max-w-xs rounded-xl object-cover border border-slate-200">
+                        <label class="inline-flex items-center gap-2 text-xs text-slate-600">
+                            <input type="checkbox" name="remove_hero_bg_image" value="1"
+                                   class="rounded border-slate-300 text-slate-900 focus:ring-slate-300">
+                            Hapus background
+                        </label>
+                    @else
+                        <p class="text-xs text-slate-500">Belum ada background.</p>
+                    @endif
+                </div>
+            </div>
+            <div class="mt-4">
+                <button type="submit"
+                        class="px-4 py-2 rounded-2xl bg-slate-900 text-white text-sm hover:opacity-90 transition">
+                    Simpan Background
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-6 grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @forelse ($program as $item)
+                <div class="rounded-2xl border border-slate-200 bg-white/70 p-5 flex flex-col gap-4">
+                    <div class="flex items-center gap-3">
+                        @if ($item->foto)
+                            <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->title }}"
+                                 class="h-14 w-14 rounded-2xl object-cover border border-slate-200">
+                        @else
+                            <div class="h-14 w-14 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 text-xs">
+                                No Img
+                            </div>
+                        @endif
+                        <div>
+                            <p class="text-xs text-slate-500">{{ $item->slug }}</p>
+                            <h3 class="text-base font-semibold text-slate-900">{{ $item->title }}</h3>
+                        </div>
+                    </div>
+                    <p class="text-sm text-slate-600">Kelola dokumentasi foto program untuk ditampilkan di halaman publik.</p>
+                    <form action="{{ route('admin.program-sekolah.card-background.update', $item) }}" method="POST"
+                          enctype="multipart/form-data" class="space-y-2">
+                        @csrf
+                        @method('PUT')
+                        <label class="block text-xs font-medium text-slate-700">Background Kartu Program</label>
+                        <input type="file" name="card_bg_image" accept=".jpg,.jpeg,.png,.webp"
+                               class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-700">
+                        @if (!empty($item->card_bg_image))
+                            <div class="flex items-center gap-3">
+                                <img src="{{ asset('storage/' . $item->card_bg_image) }}" alt="Background {{ $item->title }}"
+                                     class="h-14 w-24 rounded-xl object-cover border border-slate-200">
+                                <label class="inline-flex items-center gap-2 text-xs text-slate-600">
+                                    <input type="checkbox" name="remove_card_bg_image" value="1"
+                                           class="rounded border-slate-300 text-slate-900 focus:ring-slate-300">
+                                    Hapus background
+                                </label>
+                            </div>
+                        @endif
+                        <button type="submit" class="px-3 py-2 rounded-xl bg-slate-900 text-white text-xs">
+                            Simpan Background
+                        </button>
+                    </form>
+                    <a href="{{ route('admin.program-sekolah.photos.index', $item) }}"
+                       class="mt-auto inline-flex items-center justify-center px-4 py-2 rounded-2xl bg-slate-900 text-white text-xs">
+                        Dokumentasi Program
+                    </a>
+                </div>
+            @empty
+                <div class="rounded-2xl border border-slate-200 bg-white/70 p-6 text-center text-slate-500">
+                    Data program belum tersedia.
+                </div>
+            @endforelse
         </div>
     </div>
 @endsection

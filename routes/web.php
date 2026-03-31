@@ -11,10 +11,13 @@ use App\Http\Controllers\AdminProgramController;
 use App\Http\Controllers\AdminPrestasiController;
 use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\AdminSambutanController;
+use App\Http\Controllers\AdminKontakController;
 use App\Http\Controllers\AdminArticleController;
 use App\Http\Controllers\AdminCategoryController;
 use App\Http\Controllers\AdminProgramPhotoController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\ContactMessageController;
+use App\Http\Controllers\AdminContactMessageController;
 
 Route::get('/', [PageController::class, 'index'])->name('home');
 Route::get('/program', [PageController::class, 'programIndex'])->name('program.index');
@@ -29,12 +32,7 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 // ── FASILITAS PUBLIK (halaman detail) ──
-Route::prefix('fasilitas')->name('fasilitas.')->group(function () {
-    Route::get('/ruang-kelas',       [FasilitasController::class, 'ruangKelas'])->name('ruang-kelas');
-    Route::get('/perpustakaan',      [FasilitasController::class, 'perpustakaan'])->name('perpustakaan');
-    Route::get('/musholla',          [FasilitasController::class, 'musholla'])->name('musholla');
-    Route::get('/lapangan-olahraga', [FasilitasController::class, 'lapanganOlahraga'])->name('lapangan-olahraga');
-});
+// (detail fasilitas publik dihapus)
 
 // ── PROGRAM ──
 Route::prefix('program')->name('program.')->group(function () {
@@ -45,6 +43,9 @@ Route::prefix('program')->name('program.')->group(function () {
 
 // ── PRESTASI ──
 Route::get('/prestasi', [PrestasiController::class, 'index'])->name('prestasi.index');
+
+// Pesan Kontak
+Route::post('/kirim-pesan', [ContactMessageController::class, 'store'])->name('contact-messages.store');
 
 // —— NEWS / ARTICLES ——
 Route::prefix('news')->name('news.')->group(function () {
@@ -61,6 +62,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Guru
     Route::resource('guru', GuruController::class)->except(['show']);
 
+    Route::put('fasilitas/hero-background', [FasilitasController::class, 'updateHeroBackground'])
+        ->name('fasilitas.hero-background.update');
     // Fasilitas CRUD
     Route::resource('fasilitas', FasilitasController::class)
         ->except(['show'])
@@ -69,6 +72,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Program Sekolah (hanya dokumentasi)
     Route::get('program-sekolah', [AdminProgramController::class, 'index'])
         ->name('program-sekolah.index');
+    Route::put('program-sekolah/hero-background', [AdminProgramController::class, 'updateHeroBackground'])
+        ->name('program-sekolah.hero-background.update');
+    Route::put('program-sekolah/{programSekolah}/card-background', [AdminProgramController::class, 'updateCardBackground'])
+        ->name('program-sekolah.card-background.update');
+    Route::put('program-sekolah/{programSekolah}/icon', [AdminProgramController::class, 'updateIcon'])
+        ->name('program-sekolah.icon.update');
 
     Route::get('program-sekolah/{programSekolah}/photos', [AdminProgramPhotoController::class, 'index'])
         ->name('program-sekolah.photos.index');
@@ -94,6 +103,16 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         ->name('sambutan-kepsek.edit');
     Route::put('sambutan-kepsek', [AdminSambutanController::class, 'update'])
         ->name('sambutan-kepsek.update');
+
+    // Kontak Sekolah
+    Route::get('kontak-sekolah', [AdminKontakController::class, 'edit'])
+        ->name('kontak.edit');
+    Route::put('kontak-sekolah', [AdminKontakController::class, 'update'])
+        ->name('kontak.update');
+
+    // Pesan Masuk
+    Route::get('pesan-masuk', [AdminContactMessageController::class, 'index'])
+        ->name('messages.index');
 
     // Prestasi Sekolah CRUD
     Route::resource('prestasi-sekolah', AdminPrestasiController::class)

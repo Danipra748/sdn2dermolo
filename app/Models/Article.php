@@ -19,6 +19,7 @@ class Article extends Model
         'category_id',
         'author_id',
         'status',
+        'type',
         'meta_title',
         'meta_description',
         'view_count',
