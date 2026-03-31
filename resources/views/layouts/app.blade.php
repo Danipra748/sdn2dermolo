@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Custom animations - used by utility classes below */
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
             to   { opacity: 1; transform: translateY(0); }
@@ -26,236 +27,90 @@
             from { opacity: 0; transform: translateY(20px); }
             to   { opacity: 1; transform: translateY(0); }
         }
-        .animate-fadeInUp   { animation: fadeInUp 0.8s ease-out; }
-        .animate-bounce     { animation: bounce 2s infinite; }
-        .animate-float      { animation: float 3s ease-in-out infinite; }
-        .animate-fadeIn     { animation: fadeIn 0.6s ease-in; }
-        .card-hover         { transition: all 0.3s ease; }
-        .card-hover:hover   { transform: translateY(-10px); box-shadow: 0 20px 25px -5px rgba(0,0,0,.1); }
-        .teacher-card       { transition: all 0.3s ease; }
+        /* Animation utility classes */
+        .animate-fadeInUp { animation: fadeInUp 0.8s ease-out; }
+        .animate-bounce { animation: bounce 2s infinite; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .animate-fadeIn { animation: fadeIn 0.6s ease-in; }
+        /* Card hover effects */
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-10px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .teacher-card { transition: all 0.3s ease; }
         .teacher-card:hover { transform: scale(1.05); }
-        :root {
-            --nav-bg: #f8fafc;
-            --nav-border: #e2e8f0;
-            --nav-text: #0f172a;
-            --nav-muted: #64748b;
-            --nav-accent: #1a56db;
-            --nav-accent-2: #10b981;
-            --nav-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-        }
-        .navbar {
-            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
-            border-bottom: 1px solid var(--nav-border);
-            position: fixed;
-            inset: 0 0 auto 0;
-            z-index: 50;
-            box-shadow: var(--nav-shadow);
-        }
-        .navbar-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem 0 3.5rem;
-            height: 76px;
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            align-items: center;
-            gap: 1.5rem;
-        }
-        .brand {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.9rem;
-        }
-        .brand-badge {
-            width: 44px;
-            height: 44px;
-            border-radius: 999px;
-            background: linear-gradient(135deg, var(--nav-accent), #3b82f6);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: 800;
-            letter-spacing: 0.02em;
-            box-shadow: 0 8px 20px rgba(26, 86, 219, 0.25);
-        }
-        .brand-title { font-weight: 800; color: var(--nav-text); line-height: 1.1; }
-        .brand-sub { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--nav-muted); }
-        .nav-group {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1.4rem;
-            font-weight: 600;
-            color: var(--nav-muted);
-            margin-left: 2.5rem;
-        }
-        .nav-link {
-            position: relative;
-            padding: 0.45rem 0.65rem;
-            transition: color 0.25s ease, background 0.25s ease;
-            border-radius: 999px;
-        }
-        .nav-link--caret {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-        }
-        .nav-link:hover,
-        .nav-link:focus-visible {
-            color: var(--nav-accent);
-            background: rgba(26, 86, 219, 0.08);
-        }
-        .nav-link--active {
-            color: var(--nav-accent);
-            background: rgba(16, 185, 129, 0.12);
-        }
-        .nav-item {
-            position: relative;
-        }
-        .nav-caret {
-            margin-left: 0;
-            width: 0.8rem;
-            height: 0.8rem;
-            display: block;
-        }
-        .dropdown-menu {
-            position: absolute;
-            top: calc(100% + 0.6rem);
-            left: 50%;
-            transform: translateX(-50%) translateY(8px);
-            min-width: 220px;
-            background: #f1f5f9;
-            color: #0f172a;
-            border-radius: 0.9rem;
-            padding: 0.6rem;
-            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.2s ease;
-            z-index: 30;
-        }
-        .dropdown-menu a {
-            display: block;
-            padding: 0.55rem 0.75rem;
-            border-radius: 0.6rem;
-            font-size: 0.9rem;
-            color: inherit;
-            transition: background 0.2s ease;
-        }
-        .dropdown-menu a:hover {
-            background: rgba(15, 23, 42, 0.06);
-        }
-        .nav-item:hover .dropdown-menu,
-        .nav-item:focus-within .dropdown-menu {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateX(-50%) translateY(0);
-        }
-        .nav-user {
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-        .nav-user-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--nav-text);
-        }
-        .nav-user-avatar {
-            width: 38px;
-            height: 38px;
-            border-radius: 999px;
-            background: #0f172a;
-            color: #fff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.85rem;
-        }
-        .mobile-menu {
-            border-top: 1px solid var(--nav-border);
-            background: #ffffff;
-            padding: 0.75rem 1rem 1rem;
-        }
-        .mobile-menu a,
-        .mobile-menu button,
-        .mobile-menu summary {
-            color: #475569;
-            font-weight: 600;
-        }
-        .mobile-menu details {
-            border-radius: 0.75rem;
-            background: #f8fafc;
-            padding: 0.6rem 0.8rem;
-        }
-        .mobile-menu details[open] summary {
-            color: var(--nav-accent);
-        }
-        .mobile-sub a {
-            display: block;
-            padding: 0.4rem 0.5rem 0.4rem 1rem;
-            font-size: 0.9rem;
-            color: #64748b;
-        }
-        .hero-pattern {
-            background-color: #1e293b;
-            position: relative;
-            overflow: hidden;
-        }
-        .hero-pattern::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
-        }
-        .smooth-scroll { scroll-behavior: smooth; }
     </style>
     @stack('styles')
 </head>
-<body class="smooth-scroll bg-gray-50">
+<body class="scroll-smooth bg-gray-50">
 
     {{-- ===== NAVBAR ===== --}}
-    <nav class="navbar">
-        <div class="navbar-inner">
+    <nav class="fixed inset-x-0 top-0 z-50 border-b border-slate-200 bg-gradient-to-b from-slate-50 to-white shadow-[0_10px_30px_rgba(15,23,42,0.08)]">
+        <div class="mx-auto grid h-[76px] max-w-6xl grid-cols-[auto,1fr,auto] items-center gap-6 px-4 lg:px-14">
 
             {{-- Logo --}}
-            <a href="{{ route('home') }}" class="brand">
-                <div class="brand-badge">SD</div>
+            <a href="{{ route('home') }}" class="inline-flex items-center gap-3.5">
+                <div class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-500 text-sm font-extrabold text-white shadow-[0_8px_20px_rgba(26,86,219,0.25)]">SD</div>
                 <div>
-                    <h1 class="brand-title">SD N 2 Dermolo</h1>
-                    <p class="brand-sub">Unggul & Berkarakter</p>
+                    <h1 class="text-base font-extrabold leading-tight text-slate-900">SD N 2 Dermolo</h1>
+                    <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500">Unggul & Berkarakter</p>
                 </div>
             </a>
 
             {{-- Menu Desktop --}}
-            <div class="hidden md:flex nav-group">
-                <a href="{{ route('home') }}#home" class="nav-link nav-link--active">Beranda</a>
-                <div class="nav-item">
-                    <button class="nav-link nav-link--caret" type="button">
+            <div class="hidden md:flex items-center justify-center gap-5 font-semibold text-slate-500 md:ml-8">
+                <a href="{{ route('home') }}#home" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('home') && !request()->filled('section') ? 'bg-emerald-50 text-blue-600' : '' }}">Beranda</a>
+                
+                {{-- Dropdown Profil dengan Pure CSS --}}
+                <div class="relative group">
+                    <button class="inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ (request()->routeIs('fasilitas.*') || request()->routeIs('program.*')) ? 'bg-emerald-50 text-blue-600' : '' }}" type="button">
                         Profil
-                        <svg class="nav-caret" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="h-3.5 w-3.5 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
-                    <div class="dropdown-menu">
-                        <a href="{{ route('home') }}#tentang">Identitas Sekolah</a>
-                        <a href="{{ route('fasilitas.index') }}">Sarana Prasarana</a>
-                        <a href="{{ route('program.index') }}">Ekstrakurikuler</a>
+                    {{-- Dropdown Menu --}}
+                    <div class="absolute left-1/2 top-full mt-0 w-56 -translate-x-1/2 rounded-xl bg-white p-2 text-slate-900 shadow-[0_16px_40px_rgba(15,23,42,0.12)] border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-2 group-hover:translate-y-0">
+                        <a href="{{ route('home') }}#tentang" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition">Identitas Sekolah</a>
+                        <a href="{{ route('fasilitas.index') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition {{ request()->routeIs('fasilitas.*') ? 'bg-blue-50 text-blue-600' : '' }}">Sarana Prasarana</a>
+                        <a href="{{ route('program.index') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition {{ request()->routeIs('program.*') ? 'bg-blue-50 text-blue-600' : '' }}">Ekstrakurikuler</a>
                     </div>
                 </div>
-                <a href="{{ route('guru.index') }}" class="nav-link">Data Guru</a>
-                <a href="{{ route('news.index') }}" class="nav-link">Berita</a>
-                <a href="{{ route('prestasi.index') }}" class="nav-link">Prestasi</a>
-                <a href="{{ route('home') }}#kontak" class="nav-link">Kontak</a>
+                
+                <a href="{{ route('guru.index') }}" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('guru.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Data Guru</a>
+                <a href="{{ route('news.index') }}" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('news.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Berita</a>
+                <a href="{{ route('prestasi.index') }}" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('prestasi.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Prestasi</a>
+                <a href="{{ route('home') }}#kontak" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600">Kontak</a>
+            </div>
+
+            {{-- Right Side Actions --}}
+            <div class="hidden md:flex items-center gap-3">
+                @auth
+                    {{-- User Avatar/Logout --}}
+                    <div class="relative group">
+                        <button class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-500 text-white font-bold flex items-center justify-center shadow-md hover:shadow-lg transition">
+                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                        </button>
+                        {{-- Dropdown Menu --}}
+                        <div class="absolute right-0 top-full mt-2 w-48 rounded-xl bg-white p-2 text-slate-900 shadow-[0_16px_40px_rgba(15,23,42,0.12)] border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-2 group-hover:translate-y-0">
+                            <div class="px-3 py-2 border-b border-slate-100">
+                                <p class="text-sm font-semibold text-slate-900">{{ auth()->user()->name }}</p>
+                                <p class="text-xs text-slate-500 truncate">{{ auth()->user()->email }}</p>
+                            </div>
+                            <a href="{{ route('admin.dashboard') }}" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                                Dashboard Admin
+                            </a>
+                            <form action="{{ route('logout') }}" method="POST" data-confirm="Yakin ingin logout?">
+                                @csrf
+                                <button type="submit" class="w-full text-left rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition">
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @endauth
             </div>
 
             {{-- Tombol Hamburger (Mobile) --}}
-            <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-gray-600 hover:text-blue-600">
+            <button id="mobile-menu-button" class="md:hidden rounded-md p-2 text-slate-600 hover:text-blue-600">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                 </svg>
@@ -263,20 +118,37 @@
         </div>
 
         {{-- Menu Mobile --}}
-        <div id="mobile-menu" class="hidden md:hidden mobile-menu space-y-3">
-            <a href="{{ route('home') }}#home" class="block py-2">Beranda</a>
-            <details>
-                <summary class="cursor-pointer">Profil</summary>
-                <div class="mobile-sub mt-2">
-                    <a href="{{ route('home') }}#tentang">Identitas Sekolah</a>
-                    <a href="{{ route('fasilitas.index') }}">Sarana Prasarana</a>
-                    <a href="{{ route('program.index') }}">Ekstrakurikuler</a>
+        <div id="mobile-menu" class="hidden md:hidden space-y-3 border-t border-slate-200 bg-white px-4 pb-4 pt-3">
+            <a href="{{ route('home') }}#home" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('home') ? 'text-blue-600' : '' }}">Beranda</a>
+            <details class="rounded-xl bg-slate-50 px-3 py-2">
+                <summary class="cursor-pointer font-semibold text-slate-600">Profil</summary>
+                <div class="mt-2 space-y-1">
+                    <a href="{{ route('home') }}#tentang" class="block rounded-lg px-3 py-1.5 text-sm font-medium text-slate-500">Identitas Sekolah</a>
+                    <a href="{{ route('fasilitas.index') }}" class="block rounded-lg px-3 py-1.5 text-sm font-medium text-slate-500">Sarana Prasarana</a>
+                    <a href="{{ route('program.index') }}" class="block rounded-lg px-3 py-1.5 text-sm font-medium text-slate-500">Ekstrakurikuler</a>
                 </div>
             </details>
-            <a href="{{ route('guru.index') }}" class="block py-2">Data Guru</a>
-            <a href="{{ route('news.index') }}" class="block py-2">Berita</a>
-            <a href="{{ route('prestasi.index') }}" class="block py-2">Prestasi</a>
-            <a href="{{ route('home') }}#kontak" class="block py-2">Kontak</a>
+            <a href="{{ route('guru.index') }}" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('guru.*') ? 'text-blue-600' : '' }}">Data Guru</a>
+            <a href="{{ route('news.index') }}" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('news.*') ? 'text-blue-600' : '' }}">Berita</a>
+            <a href="{{ route('prestasi.index') }}" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('prestasi.*') ? 'text-blue-600' : '' }}">Prestasi</a>
+            <a href="{{ route('home') }}#kontak" class="block py-2 font-semibold text-slate-600">Kontak</a>
+            
+            {{-- Mobile Admin Actions --}}
+            @auth
+                <div class="pt-3 border-t border-slate-200">
+                    <a href="{{ route('admin.dashboard') }}" 
+                       class="block w-full py-3 px-4 rounded-xl bg-slate-900 text-white text-sm font-semibold text-center mb-2">
+                        <x-heroicon-o-cog-6-tooth class="w-4 h-4 inline mr-2" />
+                        Dashboard Admin
+                    </a>
+                    <form action="{{ route('logout') }}" method="POST" data-confirm="Yakin ingin logout?">
+                        @csrf
+                        <button type="submit" class="block w-full py-2 px-4 rounded-xl border border-red-300 text-red-600 text-sm font-semibold text-center hover:bg-red-50 transition">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            @endauth
         </div>
     </nav>
 
@@ -317,6 +189,14 @@
                         <li><a href="{{ route('fasilitas.index') }}"             class="hover:text-white transition">Fasilitas</a></li>
                         <li><a href="{{ route('guru.index') }}"                  class="hover:text-white transition">Guru Pendidik</a></li>
                         <li><a href="{{ route('news.index') }}"                  class="hover:text-white transition">Berita</a></li>
+                        @guest
+                            <li class="pt-2 mt-2 border-t border-gray-700">
+                                <a href="{{ route('login') }}" class="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 transition font-semibold">
+                                    <x-heroicon-o-lock-closed class="w-4 h-4" />
+                                    Login Admin
+                                </a>
+                            </li>
+                        @endguest
                     </ul>
                 </div>
 
@@ -324,9 +204,18 @@
                 <div>
                     <h4 class="font-bold text-lg mb-4">Kontak</h4>
                     <ul class="space-y-2 text-gray-400 text-sm">
-                        <li class="flex items-center gap-2"><span>📍</span> Desa Dermolo, Jepara, Jawa Tengah</li>
-                        <li class="flex items-center gap-2"><span>📞</span> (0291) 123-456</li>
-                        <li class="flex items-center gap-2"><span>✉️</span> sdn2dermolo@gmail.com</li>
+                        <li class="flex items-center gap-2">
+                            <x-heroicon-o-map-pin class="w-4 h-4 text-slate-300" />
+                            Desa Dermolo, Jepara, Jawa Tengah
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <x-heroicon-o-phone class="w-4 h-4 text-slate-300" />
+                            (0291) 123-456
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <x-heroicon-o-envelope class="w-4 h-4 text-slate-300" />
+                            sdn2dermolo@gmail.com
+                        </li>
                     </ul>
                 </div>
 
@@ -370,7 +259,7 @@
             document.getElementById('mobile-menu').classList.toggle('hidden');
         });
 
-                // Avatar dropdown
+        // Avatar dropdown
         const userMenuButton = document.getElementById('user-menu-button');
         const userMenu = document.getElementById('user-menu');
         if (userMenuButton && userMenu) {
@@ -420,7 +309,8 @@
             }
             closePublicModal();
         });
-// Scroll to top — tampilkan tombol setelah scroll 300px
+
+        // Scroll to top — tampilkan tombol setelah scroll 300px
         const scrollToTopBtn = document.getElementById('scrollToTop');
         window.addEventListener('scroll', () => {
             scrollToTopBtn.classList.toggle('hidden', window.pageYOffset <= 300);
@@ -450,4 +340,3 @@
     @stack('scripts')
 </body>
 </html>
-

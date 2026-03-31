@@ -19,13 +19,19 @@ class NewsController extends Controller
                 'latest' => collect(),
                 'categories' => collect(),
                 'selectedCategory' => null,
+                'selectedType' => null,
                 'queryText' => (string) $request->string('q'),
             ]);
         }
 
+        $selectedType = $request->string('type')->toString();
+        if (! in_array($selectedType, ['berita', 'artikel'], true)) {
+            $selectedType = null;
+        }
+
         $query = Article::with(['category', 'author'])
             ->published();
-        $query = $this->applyArticleTypeFilter($query);
+        $query = $this->applyArticleTypeFilter($query, $selectedType);
 
         $selectedCategory = null;
         if ($request->filled('category')) {
@@ -50,7 +56,7 @@ class NewsController extends Controller
             ->withQueryString();
 
         $latestQuery = Article::published();
-        $latestQuery = $this->applyArticleTypeFilter($latestQuery);
+        $latestQuery = $this->applyArticleTypeFilter($latestQuery, $selectedType);
         if ($selectedCategory) {
             $latestQuery->where('category_id', $selectedCategory->id);
         }
@@ -59,14 +65,14 @@ class NewsController extends Controller
             ->take(3)
             ->get();
 
-        $categories = Category::withCount(['articles' => function ($q) {
+        $categories = Category::withCount(['articles' => function ($q) use ($selectedType) {
             $q->published();
-            $this->applyArticleTypeFilter($q);
+            $this->applyArticleTypeFilter($q, $selectedType);
         }])->orderBy('name')->get();
 
         $queryText = (string) $search;
 
-        return view('news.index', compact('articles', 'latest', 'categories', 'selectedCategory', 'queryText'));
+        return view('news.index', compact('articles', 'latest', 'categories', 'selectedCategory', 'selectedType', 'queryText'));
     }
 
     public function show(Article $article, Request $request)
@@ -103,7 +109,7 @@ class NewsController extends Controller
         return view('news.show', compact('article', 'related'));
     }
 
-    public function category(Category $category)
+    public function category(Category $category, Request $request)
     {
         if (!Schema::hasTable('articles')) {
             return view('news.category', [
@@ -112,9 +118,14 @@ class NewsController extends Controller
             ]);
         }
 
+        $selectedType = $request->string('type')->toString();
+        if (! in_array($selectedType, ['berita', 'artikel'], true)) {
+            $selectedType = null;
+        }
+
         $categoryQuery = $category->articles()
             ->published();
-        $this->applyArticleTypeFilter($categoryQuery);
+        $this->applyArticleTypeFilter($categoryQuery, $selectedType);
 
         $articles = $categoryQuery->latest('published_at')
             ->paginate(9)
@@ -126,6 +137,10 @@ class NewsController extends Controller
     public function search(Request $request)
     {
         $query = $request->string('q');
+        $selectedType = $request->string('type')->toString();
+        if (! in_array($selectedType, ['berita', 'artikel'], true)) {
+            $selectedType = null;
+        }
 
         if (!Schema::hasTable('articles')) {
             return view('news.search', [
@@ -136,7 +151,7 @@ class NewsController extends Controller
 
         $searchQuery = Article::with(['category', 'author'])
             ->published();
-        $this->applyArticleTypeFilter($searchQuery);
+        $this->applyArticleTypeFilter($searchQuery, $selectedType);
 
         $articles = $searchQuery->when($query, function ($builder) use ($query) {
             $builder->where(function ($q) use ($query) {
@@ -164,10 +179,12 @@ class NewsController extends Controller
         ]);
     }
 
-    protected function applyArticleTypeFilter($query)
+    protected function applyArticleTypeFilter($query, ?string $type = null)
     {
         if (Schema::hasColumn('articles', 'type')) {
-            $query->where('type', 'artikel');
+            if ($type) {
+                $query->where('type', $type);
+            }
         }
 
         return $query;

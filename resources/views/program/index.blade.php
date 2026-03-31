@@ -3,7 +3,7 @@
 @section('title', 'Program Sekolah - SD N 2 Dermolo')
 
 @section('content')
-<section class="pt-28 pb-12 px-4 relative overflow-hidden"
+<section class="min-h-[600px] pt-32 pb-16 px-4 relative overflow-hidden"
     @if (!empty($heroBg))
         style="background-image: url('{{ asset('storage/' . $heroBg) }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"
     @else
@@ -12,9 +12,9 @@
     @if (!empty($heroBg))
         <div class="absolute inset-0 bg-slate-900/40"></div>
     @endif
-    <div class="max-w-6xl mx-auto text-center text-white relative z-10">
-        <h1 class="text-4xl md:text-5xl font-bold">Program Sekolah</h1>
-        <p class="mt-3 text-white/80 max-w-2xl mx-auto">
+    <div class="max-w-7xl mx-auto text-center text-white relative z-10">
+        <h1 class="text-5xl md:text-6xl font-bold mb-4">Program Sekolah</h1>
+        <p class="text-xl text-white/80 max-w-3xl mx-auto">
             Daftar program unggulan yang mendukung pengembangan karakter dan bakat siswa.
         </p>
     </div>

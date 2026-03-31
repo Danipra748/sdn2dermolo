@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Guru & Tenaga Pendidik - SD N 2 Dermolo')
 
@@ -22,16 +22,13 @@
                             <img src="{{ asset('storage/' . $kepsek->photo) }}" alt="{{ $kepsek->nama }}"
                                  class="w-full h-full object-cover object-center">
                         @else
-                            👤
+                            <x-heroicon-o-user class="w-10 h-10 text-white" />
                         @endif
                     </div>
                     <div>
                         <div class="text-sm text-slate-500">Kepala Sekolah</div>
                         <div class="text-2xl font-semibold text-slate-900">{{ $kepsek->nama }}</div>
                         <div class="text-slate-600">{{ $kepsek->jabatan }}</div>
-                        @if ($kepsek->nip)
-                            <div class="text-sm text-slate-500 mt-1">NIP: {{ $kepsek->nip }}</div>
-                        @endif
                     </div>
                 </div>
             </div>
@@ -46,7 +43,7 @@
                                 <img src="{{ asset('storage/' . $g->photo) }}" alt="{{ $g->nama }}"
                                      class="w-full h-full object-cover object-center">
                             @else
-                                👤
+                                <x-heroicon-o-user class="w-6 h-6 text-slate-500" />
                             @endif
                         </div>
                         <div>
@@ -55,9 +52,6 @@
                         </div>
                     </div>
                     <div class="text-xs text-slate-500 mt-3">
-                        @if ($g->nip)
-                            <div>NIP: {{ $g->nip }}</div>
-                        @endif
                         @if ($g->ijazah)
                             <div>Ijazah: {{ $g->ijazah }}</div>
                         @endif

@@ -7,40 +7,41 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --ink: #0f172a;
-            --slate: #1f2937;
-            --mist: #f8fafc;
-            --sky: #0ea5e9;
-            --leaf: #22c55e;
-            --sun: #f59e0b;
-            --berry: #ef4444;
-        }
         body { font-family: "Work Sans", system-ui, sans-serif; }
         h1, h2, h3, .brand { font-family: "Space Grotesk", system-ui, sans-serif; }
+
+        /* Admin background gradient */
         .admin-bg {
             background: radial-gradient(60rem 60rem at -10% -20%, rgba(14,165,233,0.15), transparent 60%),
                         radial-gradient(50rem 50rem at 110% -10%, rgba(34,197,94,0.12), transparent 60%),
                         linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
         }
+
+        /* Glass effect */
         .glass {
             background: rgba(255,255,255,0.7);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(148,163,184,0.3);
         }
+
+        /* Metric card */
         .metric-card {
             background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.6));
             border: 1px solid rgba(148,163,184,0.25);
         }
+
+        /* Badge dot indicator */
         .badge-dot::before {
             content: "";
             width: 8px;
             height: 8px;
             border-radius: 9999px;
-            background: var(--leaf);
+            background: #22c55e;
             display: inline-block;
             margin-right: 8px;
         }
+
+        /* Sidebar styles */
         .sidebar-label {
             font-size: 0.7rem;
             letter-spacing: 0.2em;
@@ -49,6 +50,7 @@
             font-weight: 600;
             padding: 0 0.5rem;
         }
+
         .sidebar-summary {
             display: flex;
             align-items: center;
@@ -74,6 +76,7 @@
         details[open] > .sidebar-summary svg {
             transform: rotate(180deg);
         }
+
         .sidebar-link {
             display: flex;
             align-items: center;
@@ -91,6 +94,7 @@
             background: #0f172a;
             color: #fff;
         }
+
         .sidebar-sub {
             display: flex;
             flex-direction: column;

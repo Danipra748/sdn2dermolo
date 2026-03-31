@@ -3,7 +3,7 @@
 @section('title', 'Prestasi Sekolah - SD N 2 Dermolo')
 
 @section('content')
-<section class="pt-32 pb-16 px-4 relative overflow-hidden"
+<section class="min-h-[600px] pt-32 pb-16 px-4 relative overflow-hidden"
     @if (!empty($data['hero_bg_image']))
         style="background-image: url('{{ asset('storage/' . $data['hero_bg_image']) }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"
     @else

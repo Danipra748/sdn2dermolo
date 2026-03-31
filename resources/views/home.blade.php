@@ -7,862 +7,37 @@
 @push('styles')
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
 <style>
-    :root {
-        --primary:   #1a56db;
-        --primary-light: #3b82f6;
-        --accent:    #f59e0b;
-        --accent-2:  #10b981;
-        --dark:      #0f172a;
-        --dark-2:    #1e293b;
-        --surface:   #f8fafc;
-        --text:      #334155;
-        --text-muted:#64748b;
-        --border:    #e2e8f0;
-        --radius:    1.25rem;
-        --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
-        --shadow:    0 10px 40px rgba(0,0,0,.10);
-        --shadow-lg: 0 25px 60px rgba(0,0,0,.15);
-        /* Hero background image (ubah ke url('path-gambar')) */
-        --hero-bg-image: none;
-        --hero-bg-position: center;
-        --hero-bg-size: cover;
-        --hero-bg-opacity: 0.35;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        color: var(--text);
-        background: var(--surface);
-        overflow-x: hidden;
-    }
-
-    /* ── TYPOGRAPHY ── */
-    .font-display { font-family: 'Fraunces', serif; }
-
-    /* ── SCROLL REVEAL ── */
-    .reveal {
-        opacity: 0;
-        transform: translateY(40px);
-        transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
-    }
+    /* Scroll Reveal Animation - Required for JS interaction */
+    .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
     .reveal.visible { opacity: 1; transform: none; }
-    .reveal-delay-1 { transition-delay: .1s; }
-    .reveal-delay-2 { transition-delay: .2s; }
-    .reveal-delay-3 { transition-delay: .3s; }
-    .reveal-delay-4 { transition-delay: .4s; }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
 
-    /* ── HERO ── */
-    .hero {
-        min-height: 100vh;
-        background: var(--dark);
-        position: relative;
-        display: flex;
-        align-items: center;
-        overflow: hidden;
-        isolation: isolate;
-    }
-    .hero::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background-image: var(--hero-bg-image);
-        background-position: var(--hero-bg-position);
-        background-size: var(--hero-bg-size);
-        background-repeat: no-repeat;
-        opacity: var(--hero-bg-opacity);
-        z-index: 1;
-        pointer-events: none;
-    }
-
-    /* Animated mesh gradient */
-    .hero-mesh {
-        position: absolute;
-        inset: 0;
-        background:
-            radial-gradient(ellipse 80% 60% at 20% 50%, rgba(26,86,219,.45) 0%, transparent 60%),
-            radial-gradient(ellipse 60% 80% at 80% 20%, rgba(16,185,129,.25) 0%, transparent 55%),
-            radial-gradient(ellipse 50% 50% at 60% 80%, rgba(245,158,11,.20) 0%, transparent 55%);
-        animation: meshShift 12s ease-in-out infinite alternate;
-        z-index: 2;
-        pointer-events: none;
-    }
+    /* Hero Animations */
     @keyframes meshShift {
-        0%   { filter: hue-rotate(0deg) brightness(1); }
+        0% { filter: hue-rotate(0deg) brightness(1); }
         100% { filter: hue-rotate(20deg) brightness(1.1); }
     }
+    .hero-mesh { animation: meshShift 12s ease-in-out infinite alternate; }
 
-    /* Floating orbs */
-    .orb {
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(80px);
-        opacity: .35;
-        animation: orbFloat 8s ease-in-out infinite;
-        z-index: 3;
-        pointer-events: none;
-    }
-    .orb-1 { width: 500px; height: 500px; background: #1a56db; top: -100px; left: -100px; animation-delay: 0s; }
-    .orb-2 { width: 400px; height: 400px; background: #10b981; bottom: -80px; right: -80px; animation-delay: -3s; }
-    .orb-3 { width: 300px; height: 300px; background: #f59e0b; top: 40%; left: 40%; animation-delay: -6s; }
     @keyframes orbFloat {
         0%, 100% { transform: translate(0, 0) scale(1); }
-        50%       { transform: translate(30px, -30px) scale(1.08); }
+        50% { transform: translate(30px, -30px) scale(1.08); }
     }
+    .orb { animation: orbFloat 8s ease-in-out infinite; }
 
-    /* Grid overlay */
-    .hero-grid {
-        position: absolute;
-        inset: 0;
-        background-image:
-            linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
-        background-size: 60px 60px;
-        z-index: 4;
-        pointer-events: none;
-    }
-
-    .hero-content {
-        position: relative;
-        z-index: 5;
-        width: 100%;
-        padding: 8rem 1.5rem 6rem;
-        max-width: 1200px;
-        margin: 0 auto;
-        text-align: center;
-    }
-
-    .hero-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: .5rem;
-        background: rgba(255,255,255,.1);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,.2);
-        color: #fff;
-        padding: .5rem 1.25rem;
-        border-radius: 999px;
-        font-size: .85rem;
-        font-weight: 600;
-        letter-spacing: .04em;
-        margin-bottom: 2rem;
-        animation: badgePulse 3s ease-in-out infinite;
-    }
     @keyframes badgePulse {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,.4); }
-        50%       { box-shadow: 0 0 0 12px rgba(245,158,11,0); }
+        0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+        50% { box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
     }
+    .hero-badge { animation: badgePulse 3s ease-in-out infinite; }
 
-    .hero-title {
-        font-family: 'Fraunces', serif;
-        font-size: clamp(3rem, 8vw, 6rem);
-        font-weight: 900;
-        color: #fff;
-        line-height: 1.05;
-        letter-spacing: -.02em;
-        margin-bottom: 1.5rem;
-    }
-    .hero-title span {
-        background: linear-gradient(135deg, #f59e0b, #fcd34d);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
-    .hero-sub {
-        font-size: clamp(1rem, 2vw, 1.25rem);
-        color: rgba(255,255,255,.7);
-        max-width: 600px;
-        margin: 0 auto 3rem;
-        line-height: 1.7;
-    }
-
-    .hero-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        justify-content: center;
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, var(--accent), #f97316);
-        color: #fff;
-        font-weight: 700;
-        padding: .9rem 2.2rem;
-        border-radius: 999px;
-        text-decoration: none;
-        font-size: 1rem;
-        transition: all .3s cubic-bezier(.34,1.56,.64,1);
-        box-shadow: 0 8px 30px rgba(245,158,11,.4);
-        display: inline-flex;
-        align-items: center;
-        gap: .5rem;
-    }
-    .btn-primary:hover {
-        transform: translateY(-3px) scale(1.03);
-        box-shadow: 0 16px 40px rgba(245,158,11,.5);
-    }
-
-    .btn-ghost {
-        background: rgba(255,255,255,.1);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,.25);
-        color: #fff;
-        font-weight: 600;
-        padding: .9rem 2.2rem;
-        border-radius: 999px;
-        text-decoration: none;
-        font-size: 1rem;
-        transition: all .3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: .5rem;
-    }
-    .btn-ghost:hover {
-        background: rgba(255,255,255,.2);
-        transform: translateY(-3px);
-    }
-
-    /* ── SECTION WRAPPER ── */
-    .section { padding: 6rem 1.5rem; }
-    .section-inner { max-width: 1200px; margin: 0 auto; }
-
-    .section-label {
-        display: inline-flex;
-        align-items: center;
-        gap: .5rem;
-        font-size: .8rem;
-        font-weight: 700;
-        letter-spacing: .12em;
-        text-transform: uppercase;
-        color: var(--primary);
-        background: rgba(26,86,219,.08);
-        padding: .4rem 1rem;
-        border-radius: 999px;
-        margin-bottom: 1rem;
-    }
-    .section-title {
-        font-family: 'Fraunces', serif;
-        font-size: clamp(2rem, 4vw, 3rem);
-        font-weight: 900;
-        color: var(--dark);
-        line-height: 1.15;
-        letter-spacing: -.02em;
-    }
-    .section-desc {
-        color: var(--text-muted);
-        font-size: 1.05rem;
-        line-height: 1.7;
-        max-width: 560px;
-    }
-
-    /* ── INFO CARDS ── */
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-        margin-top: -5rem;
-        position: relative;
-        z-index: 20;
-        padding: 0 1.5rem;
-        max-width: 1200px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .info-card {
-        background: #fff;
-        border-radius: var(--radius);
-        padding: 2rem;
-        box-shadow: var(--shadow);
-        border: 1px solid var(--border);
-        transition: all .4s cubic-bezier(.34,1.56,.64,1);
-        position: relative;
-        overflow: hidden;
-    }
-    .info-card::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, var(--primary), var(--primary-light));
-        transform: scaleX(0);
-        transform-origin: left;
-        transition: transform .4s ease;
-    }
-    .info-card:hover::before { transform: scaleX(1); }
-    .info-card:hover {
-        transform: translateY(-8px);
-        box-shadow: var(--shadow-lg);
-    }
-    .info-card:nth-child(2)::before { background: linear-gradient(90deg, var(--accent-2), #34d399); }
-    .info-card:nth-child(3)::before { background: linear-gradient(90deg, var(--accent), #fcd34d); }
-
-    .info-icon {
-        width: 3.5rem;
-        height: 3.5rem;
-        border-radius: 1rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        margin-bottom: 1.25rem;
-    }
-    .info-icon-blue   { background: rgba(26,86,219,.1); }
-    .info-icon-green  { background: rgba(16,185,129,.1); }
-    .info-icon-yellow { background: rgba(245,158,11,.1); }
-
-    .info-card h3 {
-        font-weight: 700;
-        font-size: 1.1rem;
-        color: var(--dark);
-        margin-bottom: .5rem;
-    }
-    .info-card p { color: var(--text-muted); font-size: .95rem; line-height: 1.6; }
-
-    /* ── TENTANG ── */
-    .tentang-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 5rem;
-        align-items: center;
-    }
-    @media (max-width: 768px) {
-        .tentang-grid { grid-template-columns: 1fr; gap: 3rem; }
-    }
-
-    .tentang-visual {
-        position: relative;
-    }
-    .tentang-visual-main {
-        background: linear-gradient(135deg, var(--primary), #1e40af);
-        border-radius: 2rem;
-        aspect-ratio: 4/3;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        position: relative;
-    }
-    .tentang-visual-main img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-        position: relative;
-        z-index: 1;
-    }
-    .tentang-visual-main::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background:
-            radial-gradient(circle at 30% 70%, rgba(16,185,129,.3), transparent 50%),
-            radial-gradient(circle at 70% 30%, rgba(245,158,11,.2), transparent 50%);
-    }
-    .tentang-visual-badge {
-        position: absolute;
-        bottom: -1.5rem;
-        right: -1.5rem;
-        background: #fff;
-        border-radius: 1.25rem;
-        padding: 1.25rem 1.5rem;
-        box-shadow: var(--shadow-lg);
-        display: flex;
-        align-items: center;
-        gap: .75rem;
-        border: 1px solid var(--border);
-        z-index: 2;
-    }
-    .tentang-visual-badge-icon { font-size: 2rem; }
-    .tentang-visual-badge-text { font-weight: 800; font-size: 1.5rem; color: var(--dark); line-height: 1; }
-    .tentang-visual-badge-sub  { font-size: .75rem; color: var(--text-muted); margin-top: .15rem; }
-
-    .visi-misi {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1.5rem;
-        margin-top: 2rem;
-    }
-    @media (max-width: 768px) {
-        .visi-misi { grid-template-columns: 1fr; }
-    }
-    .visi-misi-item {
-        display: flex;
-        gap: 1rem;
-        align-items: flex-start;
-        padding: 1.25rem;
-        background: var(--surface);
-        border-radius: 1rem;
-        border: 1px solid var(--border);
-        transition: all .3s ease;
-    }
-    .visi-misi-item:hover {
-        border-color: var(--primary);
-        background: rgba(26,86,219,.03);
-        transform: translateX(6px);
-    }
-    .visi-misi-icon {
-        width: 2.5rem;
-        height: 2.5rem;
-        background: linear-gradient(135deg, var(--primary), var(--primary-light));
-        border-radius: .75rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        color: #fff;
-        font-size: .9rem;
-        font-weight: 700;
-    }
-
-    /* ── PROGRAM ── */
-    .program-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 1.5rem;
-        margin-top: 3rem;
-    }
-
-    /* Program Sekolah: 3 card sama besar sejajar */
-    .program-grid-extras {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-    .program-card-extras {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
-    .program-card-extras .program-card-header {
-        height: 180px;
-    }
-    .program-card-extras .program-card-body {
-        padding: 1.25rem;
-        display: flex;
-        flex-direction: column;
-        gap: .5rem;
-        flex: 1 1 auto;
-    }
-    .program-card-extras .program-card-body p {
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .program-card {
-        background: #fff;
-        border-radius: var(--radius);
-        overflow: hidden;
-        border: 1px solid var(--border);
-        transition: all .4s cubic-bezier(.34,1.56,.64,1);
-        cursor: pointer;
-        text-decoration: none;
-        display: block;
-    }
-    .program-card:hover {
-        transform: translateY(-8px);
-        box-shadow: var(--shadow-lg);
-        border-color: transparent;
-    }
-    .program-card-header {
-        height: 160px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 3.5rem;
-        position: relative;
-        overflow: hidden;
-    }
-    .program-card-header::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,.15));
-    }
-    .program-card-body { padding: 1.5rem; }
-    .program-card-body h3 {
-        font-weight: 700;
-        font-size: 1.05rem;
-        color: var(--dark);
-        margin-bottom: .5rem;
-    }
-    .program-card-body p { color: var(--text-muted); font-size: .9rem; line-height: 1.6; }
-
-    /* Prestasi: foto fill di header card */
-    .prestasi-card .program-card-header img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-    }
-
-    /* ——— NEWS ——— */
-    .news-home-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-        margin-top: 2.5rem;
-    }
-    .news-home-card {
-        background: #fff;
-        border-radius: var(--radius);
-        overflow: hidden;
-        border: 1px solid var(--border);
-        transition: all .4s cubic-bezier(.34,1.56,.64,1);
-        text-decoration: none;
-        display: block;
-    }
-    .news-home-card:hover {
-        transform: translateY(-8px);
-        box-shadow: var(--shadow-lg);
-        border-color: transparent;
-    }
-    .news-home-thumb {
-        height: 180px;
-        background: #e2e8f0;
-    }
-    .news-home-chip {
-        background: rgba(26,86,219,.08);
-        color: #1a56db;
-        padding: .25rem .6rem;
-        border-radius: 999px;
-        font-size: .7rem;
-        font-weight: 700;
-    }
-
-    /* ── GURU ── */
-    .guru-section { background: var(--dark); }
-
-    .kepsek-card {
-        background: rgba(255,255,255,.05);
-        border: 1px solid rgba(255,255,255,.1);
-        border-radius: 1.5rem;
-        padding: 2.5rem;
-        display: flex;
-        align-items: center;
-        gap: 2.5rem;
-        max-width: 700px;
-        margin: 3rem auto 4rem;
-        backdrop-filter: blur(10px);
-        transition: all .4s ease;
-    }
-    .kepsek-card:hover {
-        background: rgba(255,255,255,.08);
-        border-color: rgba(245,158,11,.4);
-        box-shadow: 0 0 40px rgba(245,158,11,.1);
-    }
-    @media (max-width: 600px) {
-        .kepsek-card { flex-direction: column; text-align: center; }
-    }
-    .kepsek-avatar {
-        width: 7rem;
-        height: 7rem;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #7c3aed, #ec4899);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        font-size: 2.5rem;
-        border: 3px solid rgba(255,255,255,.2);
-    }
-    .kepsek-name  { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 700; color: #fff; }
-    .kepsek-role  { color: var(--accent); font-weight: 600; font-size: .9rem; margin: .3rem 0; }
-    .kepsek-nip   { color: rgba(255,255,255,.4); font-size: .8rem; }
-    .kepsek-badges { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
-    .kepsek-badge {
-        background: rgba(245,158,11,.15);
-        border: 1px solid rgba(245,158,11,.3);
-        color: #fcd34d;
-        padding: .3rem .85rem;
-        border-radius: 999px;
-        font-size: .78rem;
-        font-weight: 600;
-    }
-
-    .guru-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        gap: 1.25rem;
-    }
-
-    .guru-card {
-        background: rgba(255,255,255,.04);
-        border: 1px solid rgba(255,255,255,.08);
-        border-radius: 1.25rem;
-        padding: 1.75rem 1.5rem;
-        text-align: center;
-        transition: all .4s cubic-bezier(.34,1.56,.64,1);
-    }
-    .guru-card:hover {
-        background: rgba(255,255,255,.08);
-        border-color: rgba(255,255,255,.2);
-        transform: translateY(-6px);
-        box-shadow: 0 20px 40px rgba(0,0,0,.3);
-    }
-    .guru-avatar {
-        width: 5rem;
-        height: 5rem;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.75rem;
-        margin: 0 auto 1rem;
-        border: 2px solid rgba(255,255,255,.15);
-    }
-    .guru-name   { font-weight: 700; color: #fff; font-size: .95rem; margin-bottom: .3rem; }
-    .guru-jabatan{ font-size: .8rem; font-weight: 600; margin-bottom: .25rem; }
-    .guru-nip    { font-size: .72rem; color: rgba(255,255,255,.35); margin-bottom: .75rem; }
-    .guru-badges { display: flex; flex-wrap: wrap; gap: .35rem; justify-content: center; }
-    .guru-badge  {
-        padding: .25rem .7rem;
-        border-radius: 999px;
-        font-size: .72rem;
-        font-weight: 600;
-    }
-
-    /* ── FASILITAS ── */
-    .fasilitas-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-        gap: 1.5rem;
-        margin-top: 3rem;
-    }
-
-    .fasilitas-card {
-        background: #fff;
-        border-radius: var(--radius);
-        overflow: hidden;
-        border: 1px solid var(--border);
-        text-decoration: none;
-        display: block;
-        transition: all .4s cubic-bezier(.34,1.56,.64,1);
-        group: true;
-        position: relative;
-    }
-    .fasilitas-card::after {
-        content: 'Lihat Detail →';
-        position: absolute;
-        bottom: 1.5rem;
-        right: 1.5rem;
-        font-size: .8rem;
-        font-weight: 700;
-        opacity: 0;
-        transform: translateX(-8px);
-        transition: all .3s ease;
-    }
-    .fasilitas-card:hover::after {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    .fasilitas-card:hover {
-        transform: translateY(-8px);
-        box-shadow: var(--shadow-lg);
-        border-color: transparent;
-    }
-    .fasilitas-card-top {
-        height: 180px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 4rem;
-        position: relative;
-        overflow: hidden;
-    }
-    .fasilitas-card-body { padding: 1.5rem; padding-bottom: 3rem; }
-    .fasilitas-card-body h3 {
-        font-weight: 800;
-        font-size: 1.1rem;
-        color: var(--dark);
-        margin-bottom: .4rem;
-    }
-    .fasilitas-card-body p {
-        color: var(--text-muted);
-        font-size: .88rem;
-        line-height: 1.6;
-    }
-    .fasilitas-card-arrow {
-        display: inline-flex;
-        align-items: center;
-        gap: .4rem;
-        font-size: .82rem;
-        font-weight: 700;
-        margin-top: .75rem;
-        transition: gap .3s ease;
-    }
-    .fasilitas-card:hover .fasilitas-card-arrow { gap: .75rem; }
-
-    /* ── KONTAK ── */
-    .kontak-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 1.5rem;
-        margin-top: 3rem;
-    }
-    .kontak-card {
-        background: #fff;
-        border-radius: 1.25rem;
-        padding: 1.5rem;
-        text-align: left;
-        border: 1px solid #e5e7eb;
-        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-        position: relative;
-        overflow: hidden;
-        transition: all .35s ease;
-    }
-    .kontak-card::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(135deg, rgba(26,86,219,.06), rgba(59,130,246,.06));
-        opacity: 0;
-        transition: opacity .35s ease;
-    }
-    .kontak-card-blue::before   { background: linear-gradient(135deg, rgba(26,86,219,.04), rgba(59,130,246,.04)); }
-    .kontak-card-green::before  { background: linear-gradient(135deg, rgba(16,185,129,.04), rgba(52,211,153,.04)); }
-    .kontak-card-purple::before { background: linear-gradient(135deg, rgba(124,58,237,.04), rgba(167,139,250,.04)); }
-    .kontak-card:hover::before  { opacity: 1; }
-    .kontak-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
-        border-color: transparent;
-    }
-    .kontak-icon {
-        width: 2.75rem;
-        height: 2.75rem;
-        border-radius: 0.85rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        margin: 0 0 1rem;
-        border: 1px solid rgba(15, 23, 42, 0.08);
-    }
-    .kontak-card h3 { font-weight: 800; font-size: 1.05rem; color: var(--dark); margin-bottom: .4rem; }
-    .kontak-card p  { color: var(--text-muted); font-size: .9rem; line-height: 1.7; }
-    .kontak-meta {
-        font-size: .75rem;
-        text-transform: uppercase;
-        letter-spacing: .12em;
-        color: #94a3b8;
-        font-weight: 700;
-        margin-bottom: .5rem;
-    }
-    .kontak-body {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: .9rem;
-        padding: 1rem;
-    }
-    .kontak-extra {
-        margin-top: 2.5rem;
-        display: grid;
-        grid-template-columns: 1.3fr 0.7fr;
-        gap: 1.5rem;
-        align-items: stretch;
-    }
-    .kontak-map {
-        background: #fff;
-        border-radius: var(--radius);
-        border: 1px solid var(--border);
-        overflow: hidden;
-        box-shadow: var(--shadow-sm);
-        min-height: 320px;
-    }
-    .kontak-map iframe {
-        width: 100%;
-        height: 100%;
-        border: 0;
-        display: block;
-    }
-    .kontak-form {
-        background: #fff;
-        border-radius: var(--radius);
-        border: 1px solid var(--border);
-        padding: 1.5rem;
-        box-shadow: var(--shadow-sm);
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-    .kontak-form h3 {
-        font-weight: 800;
-        font-size: 1.2rem;
-        color: var(--dark);
-    }
-    .kontak-form p {
-        color: var(--text-muted);
-        font-size: .92rem;
-        line-height: 1.6;
-    }
-    .kontak-field {
-        display: flex;
-        flex-direction: column;
-        gap: .4rem;
-    }
-    .kontak-field label {
-        font-weight: 700;
-        font-size: .85rem;
-        color: var(--dark);
-    }
-    .kontak-field input,
-    .kontak-field textarea {
-        border: 1px solid var(--border);
-        border-radius: .9rem;
-        padding: .75rem .9rem;
-        font-size: .9rem;
-        color: var(--text);
-        background: #f8fafc;
-        transition: border .2s ease, box-shadow .2s ease, background .2s ease;
-    }
-    .kontak-field input:focus,
-    .kontak-field textarea:focus {
-        outline: none;
-        border-color: rgba(26,86,219,.5);
-        background: #fff;
-        box-shadow: 0 0 0 3px rgba(26,86,219,.12);
-    }
-    .kontak-field textarea {
-        min-height: 140px;
-        resize: vertical;
-    }
-    .kontak-submit {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: .6rem;
-        padding: .75rem 1rem;
-        border-radius: 999px;
-        background: linear-gradient(135deg, var(--primary), var(--primary-light));
-        color: #fff;
-        font-weight: 700;
-        font-size: .9rem;
-        border: none;
-        cursor: pointer;
-        transition: transform .2s ease, box-shadow .2s ease;
-        box-shadow: 0 10px 25px rgba(26,86,219,.25);
-    }
-    .kontak-submit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 14px 30px rgba(26,86,219,.3);
-    }
-
-    /* ── RESPONSIVE FIXES ── */
-    @media (max-width: 640px) {
-        .hero-title  { font-size: 2.5rem; }
-        .section     { padding: 4rem 1.25rem; }
-        .info-grid   { padding: 0 1.25rem; }
-        .program-grid, .fasilitas-grid, .kontak-grid, .kontak-extra { grid-template-columns: 1fr; }
-        .program-grid.program-grid-extras { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    }
-
-    /* ── CUSTOM SCROLLBAR ── */
+    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 999px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 </style>
 @endpush
@@ -870,85 +45,102 @@
 @section('content')
 
 {{-- ===== HERO ===== --}}
-<section id="home" class="hero">
-    <div class="hero-mesh"></div>
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-    <div class="hero-grid"></div>
+<section id="home" class="relative min-h-screen overflow-hidden bg-slate-900 text-white">
+    {{-- Animated mesh gradient --}}
+    <div class="hero-mesh absolute inset-0 z-2" style="background: radial-gradient(ellipse 80% 60% at 20% 50%, rgba(26,86,219,0.45) 0%, transparent 60%), radial-gradient(ellipse 60% 80% at 80% 20%, rgba(16,185,129,0.25) 0%, transparent 55%), radial-gradient(ellipse 50% 50% at 60% 80%, rgba(245,158,11,0.20) 0%, transparent 55%);"></div>
 
-    <div class="hero-content">
-        <div class="hero-badge reveal">
-            <span>⭐</span> Selamat Datang di SD N 2 Dermolo
+    {{-- Floating orbs --}}
+    <div class="orb orb-1 absolute -top-24 -left-24 h-[500px] w-[500px] rounded-full bg-blue-600 opacity-30 blur-[80px] z-3" style="animation-delay: 0s;"></div>
+    <div class="orb orb-2 absolute -bottom-20 -right-20 h-[400px] w-[400px] rounded-full bg-emerald-600 opacity-30 blur-[80px] z-3" style="animation-delay: -3s;"></div>
+    <div class="orb orb-3 absolute top-2/5 left-2/5 h-[300px] w-[300px] rounded-full bg-amber-500 opacity-30 blur-[80px] z-3" style="animation-delay: -6s;"></div>
+
+    {{-- Grid overlay --}}
+    <div class="absolute inset-0 z-4" style="background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none;"></div>
+
+    <div class="hero-content relative z-5 mx-auto flex min-h-screen max-w-[1200px] flex-col items-center justify-center px-6 pb-24 pt-32 text-center">
+        <div class="reveal hero-badge inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2 text-sm font-semibold tracking-[0.04em] text-white backdrop-blur">
+            <x-heroicon-o-star class="h-4 w-4" /> Selamat Datang di SD N 2 Dermolo
         </div>
-        <h1 class="hero-title reveal reveal-delay-1">
+        <h1 class="reveal reveal-delay-1 mt-6 font-[Fraunces] text-[clamp(3rem,8vw,6rem)] font-black leading-[1.05] tracking-[-0.02em] text-white">
             Sekolah yang<br>
-            <span>Membentuk</span><br>
+            <span class="bg-gradient-to-r from-amber-400 to-yellow-200 bg-clip-text text-transparent">Membentuk</span><br>
             Generasi Unggul
         </h1>
-        <p class="hero-sub reveal reveal-delay-2">
+        <p class="reveal reveal-delay-2 mt-6 max-w-[600px] text-[clamp(1rem,2vw,1.25rem)] leading-[1.7] text-white/70">
             Membangun siswa yang cerdas, berkarakter, dan berprestasi melalui
             kurikulum merdeka dan lingkungan belajar yang inspiratif.
         </p>
-        <div class="hero-buttons reveal reveal-delay-3">
-            <a href="#tentang" class="btn-primary">
-                📖 Tentang Kami
+        <div class="reveal reveal-delay-3 mt-8 flex flex-wrap items-center justify-center gap-4">
+            <a href="#tentang" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-[2.2rem] py-[0.9rem] text-base font-bold shadow-[0_8px_30px_rgba(245,158,11,0.4)] transition-all duration-300 hover:-translate-y-[3px] hover:scale-[1.03] hover:shadow-[0_16px_40px_rgba(245,158,11,0.5)]">
+                <x-heroicon-o-book-open class="h-5 w-5" /> Tentang Kami
             </a>
-            <a href="#kontak" class="btn-ghost">
-                📞 Hubungi Kami
+            <a href="#kontak" class="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-[2.2rem] py-[0.9rem] text-base font-semibold transition-all duration-300 hover:-translate-y-[3px] hover:bg-white/20 hover:backdrop-blur">
+                <x-heroicon-o-phone class="h-5 w-5" /> Hubungi Kami
             </a>
         </div>
     </div>
-
 </section>
 
 {{-- ===== INFO CARDS ===== --}}
-<div class="info-grid" style="padding-top: 2rem; margin-top: 0; padding-bottom: 2rem;">
-    <div class="info-card reveal">
-        <div class="info-icon info-icon-blue">📚</div>
-        <h3>Kurikulum Merdeka</h3>
-        <p>Menerapkan kurikulum terkini yang mengembangkan potensi siswa secara optimal dan holistik.</p>
-    </div>
-    <div class="info-card reveal reveal-delay-1">
-        <div class="info-icon info-icon-green">👨‍🏫</div>
-        <h3>Guru Berkualitas</h3>
-        <p>Tenaga pendidik profesional dan berpengalaman yang berdedikasi membimbing setiap siswa.</p>
-    </div>
-    <div class="info-card reveal reveal-delay-2">
-        <div class="info-icon info-icon-yellow">🏆</div>
-        <h3>Prestasi Gemilang</h3>
-        <p>Berbagai prestasi akademik dan non-akademik tingkat kabupaten hingga nasional.</p>
+<div class="-mt-20 pb-8">
+    <div class="info-grid relative z-20 mx-auto grid max-w-[1200px] grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6 px-6 md:grid-cols-3">
+        <div class="reveal rounded-[1.25rem] border border-[#e2e8f0] bg-white p-8 shadow-[0_10px_40px_rgba(0,0,0,0.10)] transition-all duration-[400ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:shadow-[0_25px_60px_rgba(0,0,0,0.15)] relative overflow-hidden before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-gradient-to-r before:from-blue-600 before:to-blue-500 before:transform before:scale-x-0 before:transform-origin-left before:transition-transform before:duration-[400ms] hover:before:scale-x-100">
+            <div class="mb-5 flex h-14 w-14 items-center justify-center rounded-[1rem] bg-blue-50 text-2xl">
+                <x-heroicon-o-book-open class="h-6 w-6 text-blue-600" />
+            </div>
+            <h3 class="mb-2 text-lg font-bold text-slate-900">Kurikulum Merdeka</h3>
+            <p class="text-[0.95rem] leading-[1.6] text-slate-500">Menerapkan kurikulum terkini yang mengembangkan potensi siswa secara optimal dan holistik.</p>
+        </div>
+        <div class="reveal reveal-delay-1 rounded-[1.25rem] border border-[#e2e8f0] bg-white p-8 shadow-[0_10px_40px_rgba(0,0,0,0.10)] transition-all duration-[400ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:shadow-[0_25px_60px_rgba(0,0,0,0.15)] relative overflow-hidden before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-gradient-to-r before:from-emerald-600 before:to-emerald-400 before:transform before:scale-x-0 before:transform-origin-left before:transition-transform before:duration-[400ms] hover:before:scale-x-100">
+            <div class="mb-5 flex h-14 w-14 items-center justify-center rounded-[1rem] bg-emerald-50 text-2xl">
+                <x-heroicon-o-academic-cap class="h-6 w-6 text-emerald-600" />
+            </div>
+            <h3 class="mb-2 text-lg font-bold text-slate-900">Guru Berkualitas</h3>
+            <p class="text-[0.95rem] leading-[1.6] text-slate-500">Tenaga pendidik profesional dan berpengalaman yang berdedikasi membimbing setiap siswa.</p>
+        </div>
+        <div class="reveal reveal-delay-2 rounded-[1.25rem] border border-[#e2e8f0] bg-white p-8 shadow-[0_10px_40px_rgba(0,0,0,0.10)] transition-all duration-[400ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:shadow-[0_25px_60px_rgba(0,0,0,0.15)] relative overflow-hidden before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-gradient-to-r before:from-amber-500 before:to-yellow-300 before:transform before:scale-x-0 before:transform-origin-left before:transition-transform before:duration-[400ms] hover:before:scale-x-100">
+            <div class="mb-5 flex h-14 w-14 items-center justify-center rounded-[1rem] bg-amber-50 text-2xl">
+                <x-heroicon-o-trophy class="h-6 w-6 text-amber-600" />
+            </div>
+            <h3 class="mb-2 text-lg font-bold text-slate-900">Prestasi Gemilang</h3>
+            <p class="text-[0.95rem] leading-[1.6] text-slate-500">Berbagai prestasi akademik dan non-akademik tingkat kabupaten hingga nasional.</p>
+        </div>
     </div>
 </div>
 
 {{-- ===== TENTANG KAMI ===== --}}
-<section id="tentang" class="section" style="background: #fff;">
-    <div class="section-inner">
-        <div class="tentang-grid">
+<section id="tentang" class="section relative bg-white py-24 px-6">
+    <div class="section-inner mx-auto max-w-[1200px]">
+        <div class="tentang-grid grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-20 items-center">
             {{-- Visual Kiri --}}
-            <div class="tentang-visual reveal">
-                <div class="tentang-visual-main">
+            <div class="tentang-visual reveal relative">
+                <div class="tentang-visual-main relative rounded-[2rem] aspect-[4/3] overflow-hidden bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center">
                     @if (!empty($sambutanFoto))
-                        <img src="{{ asset('storage/' . $sambutanFoto) }}" alt="Foto Kepala Sekolah">
+                        <img src="{{ asset('storage/' . $sambutanFoto) }}" alt="Foto Kepala Sekolah" class="w-full h-full object-cover relative z-10">
                     @else
-                        <svg width="180" height="180" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width=".8" xmlns="http://www.w3.org/2000/svg" style="position:relative;z-index:1">
+                        <svg width="180" height="180" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width=".8" xmlns="http://www.w3.org/2000/svg" class="relative z-10">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                         </svg>
                     @endif
+                    <div class="absolute inset-0" style="background: radial-gradient(circle at 30% 70%, rgba(16,185,129,0.3), transparent 50%), radial-gradient(circle at 70% 30%, rgba(245,158,11,0.2), transparent 50%);"></div>
                 </div>
-                <div class="tentang-visual-badge">
-                    <div class="tentang-visual-badge-icon">🏫</div>
+                <div class="tentang-visual-badge absolute -bottom-6 -right-6 z-20 flex items-center gap-3 rounded-[1.25rem] border border-[#e2e8f0] bg-white p-5 shadow-[0_25px_60px_rgba(0,0,0,0.15)]">
+                    <div class="tentang-visual-badge-icon text-3xl">
+                        <x-heroicon-o-building-library class="w-8 h-8 text-blue-600" />
+                    </div>
                     <div>
-                        <div class="tentang-visual-badge-text">2009</div>
-                        <div class="tentang-visual-badge-sub">Tahun Berdiri</div>
+                        <div class="tentang-visual-badge-text text-2xl font-black leading-none text-slate-900">2009</div>
+                        <div class="tentang-visual-badge-sub text-[0.75rem] text-slate-500 mt-[0.15rem]">Tahun Berdiri</div>
                     </div>
                 </div>
             </div>
 
             {{-- Konten Kanan --}}
             <div class="reveal reveal-delay-1">
-                <div class="section-label">🏫 Tentang Kami</div>
-                <h2 class="section-title" style="margin-bottom: 1.25rem;">
+                <div class="section-label inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-[0.4rem] text-[0.8rem] font-bold uppercase tracking-[0.12em] text-blue-600">
+                    <x-heroicon-o-building-library class="w-4 h-4" /> Tentang Kami
+                </div>
+                <h2 class="section-title font-[Fraunces] text-[clamp(2rem,4vw,3rem)] font-black leading-[1.15] tracking-[-0.02em] text-slate-900" style="margin-bottom: 1.25rem;">
                     Mendidik dengan<br>Hati & Dedikasi
                 </h2>
                 @php
@@ -958,26 +150,26 @@
                         ->values();
                 @endphp
                 @foreach ($paragraphs as $index => $paragraph)
-                    <p class="section-desc" @if ($index === 0) style="margin-bottom: 1rem;" @endif>
+                    <p class="section-desc text-[1.05rem] leading-[1.7] text-slate-500 max-w-[560px] @if ($index === 0) mb-4 @endif">
                         {{ $paragraph }}
                     </p>
                 @endforeach
 
             </div>
         </div>
-        <div class="visi-misi reveal" style="margin-top: 2.5rem;">
-            <div class="visi-misi-item">
-                <div class="visi-misi-icon">V</div>
+        <div class="visi-misi grid grid-cols-1 gap-6 md:grid-cols-2 mt-10">
+            <div class="visi-misi-item flex gap-4 items-start p-5 bg-slate-50 rounded-2xl border border-slate-200 transition-all duration-300 hover:border-blue-600 hover:bg-blue-50 hover:translate-x-[6px]">
+                <div class="visi-misi-icon w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center flex-shrink-0 text-white text-sm font-bold">V</div>
                 <div>
-                    <div style="font-weight:700; color:var(--dark); margin-bottom:.25rem;">Visi</div>
-                    <div style="color:var(--text-muted); font-size:.92rem;">Mewujudkan siswa yang cerdas, berakhlak mulia, dan berprestasi tinggi.</div>
+                    <div class="font-bold text-slate-900 mb-1">Visi</div>
+                    <div class="text-slate-500 text-[0.92rem]">Mewujudkan siswa yang cerdas, berakhlak mulia, dan berprestasi tinggi.</div>
                 </div>
             </div>
-            <div class="visi-misi-item">
-                <div class="visi-misi-icon">M</div>
+            <div class="visi-misi-item flex gap-4 items-start p-5 bg-slate-50 rounded-2xl border border-slate-200 transition-all duration-300 hover:border-blue-600 hover:bg-blue-50 hover:translate-x-[6px]">
+                <div class="visi-misi-icon w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center flex-shrink-0 text-white text-sm font-bold">M</div>
                 <div>
-                    <div style="font-weight:700; color:var(--dark); margin-bottom:.25rem;">Misi</div>
-                    <div style="color:var(--text-muted); font-size:.92rem;">Memberikan pendidikan berkualitas dengan pendekatan inovatif dan berbasis karakter.</div>
+                    <div class="font-bold text-slate-900 mb-1">Misi</div>
+                    <div class="text-slate-500 text-[0.92rem]">Memberikan pendidikan berkualitas dengan pendekatan inovatif dan berbasis karakter.</div>
                 </div>
             </div>
         </div>
@@ -985,12 +177,12 @@
 </section>
 
 {{-- ===== PROGRAM SEKOLAH ===== --}}
-<section id="program" class="section" style="background: var(--surface);">
-    <div class="section-inner">
-        <div class="text-center reveal" style="margin-bottom: 1rem;">
-            <div class="section-label" style="justify-content:center;">PROGRAM KAMI</div>
-            <h2 class="section-title">Program Sekolah</h2>
-            <p class="section-desc" style="margin: 1rem auto 0;">
+<section id="program" class="section py-24 px-6" style="background: #f8fafc;">
+    <div class="section-inner mx-auto max-w-[1200px]">
+        <div class="text-center reveal mb-4">
+            <div class="section-label inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-[0.4rem] text-[0.8rem] font-bold uppercase tracking-[0.12em] text-blue-600 justify-center">PROGRAM KAMI</div>
+            <h2 class="section-title font-[Fraunces] text-[clamp(2rem,4vw,3rem)] font-black leading-[1.15] tracking-[-0.02em] text-slate-900">Program Sekolah</h2>
+            <p class="section-desc text-[1.05rem] leading-[1.7] text-slate-500 max-w-[560px] mx-auto mt-4">
                 Tiga program unggulan yang aktif mendukung pengembangan bakat siswa.
             </p>
         </div>
@@ -1002,10 +194,10 @@
         ];
         @endphp
 
-        <div class="program-grid program-grid-extras">
+        <div class="program-grid program-grid-extras grid grid-cols-1 md:grid-cols-3 gap-5 mt-12">
             @foreach($program as $i => $item)
             @php $pd = $programData[$item['color']]; @endphp
-            <a href="{{ route($item['route']) }}" class="program-card program-card-extras reveal" style="transition-delay: {{ $i * 0.08 }}s;">
+            <a href="{{ route($item['route']) }}" class="program-card program-card-extras reveal flex flex-col h-full rounded-[1.25rem] overflow-hidden border border-slate-200 bg-white transition-all duration-[400ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:shadow-[0_25px_60px_rgba(0,0,0,0.15)] hover:border-transparent" style="transition-delay: {{ $i * 0.08 }}s;">
                 @php
                     $programBg = !empty($item['card_bg_image'])
                         ? "background-image: url('" . asset('storage/' . $item['card_bg_image']) . "'); background-size: cover; background-position: center; background-repeat: no-repeat;"
@@ -1013,63 +205,70 @@
                             ? "background-image: url('" . asset('storage/' . $item['foto']) . "'); background-size: cover; background-position: center; background-repeat: no-repeat;"
                             : '');
                 @endphp
-                <div class="program-card-header" style="background: {{ $pd['gradient'] }}; {{ $programBg }}">
+                <div class="program-card-header h-[160px] flex items-center justify-center text-[3.5rem] relative overflow-hidden" style="background: {{ $pd['gradient'] }}; {{ $programBg }}">
                 </div>
-                <div class="program-card-body">
-                    <h3>{{ $item['title'] }}</h3>
-                    <p>{{ $item['desc'] }}</p>
-                    <div style="margin-top:.85rem; color:#1a56db; font-size:.82rem; font-weight:700;">
+                <div class="program-card-body p-6 flex flex-col gap-2 flex-1">
+                    <h3 class="font-bold text-[1.05rem] text-slate-900 mb-2">{{ $item['title'] }}</h3>
+                    <p class="text-slate-500 text-[0.9rem] leading-[1.6] line-clamp-3">{{ $item['desc'] }}</p>
+                    <div class="program-card-cta mt-auto text-blue-600 text-[0.82rem] font-bold">
                         Lihat Dokumentasi <span>-></span>
                     </div>
                 </div>
-            </div>
+            </a>
             @endforeach
         </div>
-        
+
     </div>
 </section>
 
 {{-- ===== BERITA ===== --}}
-<section id="berita" class="section" style="background: #fff;">
-    <div class="section-inner">
+<section id="berita" class="section py-24 px-6 bg-white">
+    <div class="section-inner mx-auto max-w-[1200px]">
         <div class="text-center reveal">
-            <div class="section-label" style="justify-content:center;">BERITA</div>
-            <h2 class="section-title">Berita Terbaru</h2>
-            <p class="section-desc" style="margin: 1rem auto 0;">
+            <div class="section-label inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-[0.4rem] text-[0.8rem] font-bold uppercase tracking-[0.12em] text-blue-600 justify-center">
+                <x-heroicon-o-newspaper class="w-4 h-4" /> BERITA
+            </div>
+            <h2 class="section-title font-[Fraunces] text-[clamp(2rem,4vw,3rem)] font-black leading-[1.15] tracking-[-0.02em] text-slate-900">Berita Terbaru</h2>
+            <p class="section-desc text-[1.05rem] leading-[1.7] text-slate-500 max-w-[560px] mx-auto mt-4">
                 Informasi kegiatan dan cerita terbaru dari SD N 2 Dermolo.
             </p>
         </div>
-        <div class="news-home-grid">
+        <div class="news-home-grid grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6 mt-10">
+            @php $beritaCount = $berita->count(); @endphp
             @forelse($berita as $i => $item)
-                <a href="{{ route('news.show', $item) }}" class="news-home-card reveal" style="transition-delay: {{ $i * 0.08 }}s;">
-                    <div class="news-home-thumb">
+                <a href="{{ route('news.show', $item) }}" class="news-home-card reveal flex flex-col h-full bg-white rounded-[1.25rem] overflow-hidden border border-slate-200 transition-all duration-[400ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:shadow-[0_25px_60px_rgba(0,0,0,0.15)] hover:border-transparent" style="transition-delay: {{ $i * 0.08 }}s;">
+                    <div class="news-home-thumb aspect-[16/9] bg-slate-200 overflow-hidden">
                         @if ($item->featured_image)
                             <img src="{{ asset('storage/' . $item->featured_image) }}" alt="{{ $item->title }}"
-                                 class="w-full h-full object-cover">
+                                 class="w-full h-full object-cover transition-transform duration-300 hover:scale-105">
                         @endif
                     </div>
-                    <div class="p-5">
-                        <div class="flex items-center gap-2 text-xs text-slate-500">
-                            <span class="news-home-chip">{{ $item->category?->name ?? 'Umum' }}</span>
-                            <span>{{ optional($item->published_at)->format('d M Y') }}</span>
+                    <div class="news-home-body p-5 flex flex-col flex-1">
+                        <div class="flex items-center gap-2 text-xs text-slate-500 flex-wrap">
+                            <span class="news-home-chip bg-blue-100 text-blue-600 px-[0.6rem] py-[0.25rem] rounded-full text-[0.7rem] font-bold">{{ $item->category?->name ?? 'Umum' }}</span>
+                            @if($item->published_at)
+                                <span>{{ $item->published_at->format('d M Y') }}</span>
+                            @endif
                         </div>
-                        <h3 class="mt-3 font-semibold text-slate-900">{{ $item->title }}</h3>
-                        <p class="text-sm text-slate-500 mt-2">{{ $item->summary ?? Str::limit(strip_tags($item->content), 110) }}</p>
+                        <h3 class="mt-3 font-semibold text-slate-900 line-clamp-2">{{ $item->title }}</h3>
+                        <p class="text-sm text-slate-500 mt-2 line-clamp-3">{{ $item->summary ?? Str::limit(strip_tags($item->content), 110) }}</p>
                     </div>
-            </div>
+                </a>
             @empty
-                <div class="news-home-card reveal">
-                    <div class="news-home-thumb flex items-center justify-center text-slate-500 text-sm">
-                        Belum ada berita terbaru.
-                    </div>
-                    <div class="p-5">
-                        <h3 class="font-semibold text-slate-900">Belum Ada Berita</h3>
-                        <p class="text-sm text-slate-500 mt-2">Tambah berita di panel admin agar tampil di sini.</p>
+                <div class="col-span-full">
+                    <div class="news-home-card reveal flex flex-col h-full bg-white rounded-[1.25rem] overflow-hidden border border-slate-200">
+                        <div class="news-home-thumb aspect-[16/9] bg-slate-200 flex items-center justify-center text-slate-500 text-sm">
+                            <x-heroicon-o-newspaper class="w-12 h-12 mb-2 opacity-50" />
+                        </div>
+                        <div class="news-home-body p-5 flex flex-col flex-1 text-center">
+                            <h3 class="font-semibold text-slate-900">Belum Ada Berita</h3>
+                            <p class="text-sm text-slate-500 mt-2">Tambah berita di panel admin agar tampil di sini.</p>
+                        </div>
                     </div>
                 </div>
             @endforelse
         </div>
-        <div class="text-center reveal" style="margin-top: 2rem;">
+        <div class="text-center reveal mt-8">
             <a href="{{ route('news.index') }}"
                class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition">
                 Lihat Semua Berita <span>-></span>
@@ -1079,51 +278,51 @@
 </section>
 
 {{-- ===== PRESTASI ===== --}}
-<section id="prestasi" class="section" style="background: #fff;">
-    <div class="section-inner">
+<section id="prestasi" class="section py-24 px-6 bg-white">
+    <div class="section-inner mx-auto max-w-[1200px]">
         <div class="text-center reveal">
-            <div class="section-label" style="justify-content:center;">PRESTASI</div>
-            <h2 class="section-title">Prestasi Sekolah</h2>
-            <p class="section-desc" style="margin: 1rem auto 0;">
+            <div class="section-label inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-[0.4rem] text-[0.8rem] font-bold uppercase tracking-[0.12em] text-blue-600 justify-center">PRESTASI</div>
+            <h2 class="section-title font-[Fraunces] text-[clamp(2rem,4vw,3rem)] font-black leading-[1.15] tracking-[-0.02em] text-slate-900">Prestasi Sekolah</h2>
+            <p class="section-desc text-[1.05rem] leading-[1.7] text-slate-500 max-w-[560px] mx-auto mt-4">
                 Dokumentasi capaian akademik dan non-akademik sekolah.
             </p>
         </div>
-        <div class="program-grid" style="margin-top:2rem;">
+        <div class="program-grid grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
             @forelse($prestasi as $i => $item)
-                <div class="program-card prestasi-card reveal" style="transition-delay: {{ $i * 0.08 }}s;">
-                    <div class="program-card-header" style="background: linear-gradient(135deg,#7c3aed,#a78bfa);">
+                <div class="program-card prestasi-card reveal rounded-[1.25rem] overflow-hidden border border-slate-200 bg-white transition-all duration-[400ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:shadow-[0_25px_60px_rgba(0,0,0,0.15)] hover:border-transparent" style="transition-delay: {{ $i * 0.08 }}s;">
+                    <div class="program-card-header h-[160px] flex items-center justify-center text-[3.5rem] relative overflow-hidden" style="background: linear-gradient(135deg,#7c3aed,#a78bfa);">
                         @if (!empty($item['foto']))
-                            <img src="{{ asset('storage/' . $item['foto']) }}" alt="{{ $item['judul'] }}">
+                            <img src="{{ asset('storage/' . $item['foto']) }}" alt="{{ $item['judul'] }}" class="w-full h-full object-cover">
                         @else
-                            <span style="position:relative;z-index:2;filter:drop-shadow(0 4px 8px rgba(0,0,0,.2));">
+                            <span class="relative z-10 drop-shadow-[0_4px_8px_rgba(0,0,0,0.2)]">
                                 {{ strtoupper(substr($item['judul'] ?? 'P', 0, 1)) }}
                             </span>
                         @endif
                     </div>
-                    <div class="program-card-body">
-                        <h3>{{ $item['judul'] }}</h3>
+                    <div class="program-card-body p-6">
+                        <h3 class="font-bold text-[1.05rem] text-slate-900 mb-2">{{ $item['judul'] }}</h3>
                         @if (!empty($item['deskripsi']))
-                            <p>{{ $item['deskripsi'] }}</p>
+                            <p class="text-slate-500 text-[0.9rem] leading-[1.6]">{{ $item['deskripsi'] }}</p>
                         @else
-                            <p>Dokumentasi prestasi siswa dan sekolah.</p>
+                            <p class="text-slate-500 text-[0.9rem] leading-[1.6]">Dokumentasi prestasi siswa dan sekolah.</p>
                         @endif
                     </div>
                 </div>
             @empty
-                <div class="program-card prestasi-card reveal">
-                    <div class="program-card-header" style="background: linear-gradient(135deg,#7c3aed,#a78bfa);">
-                        <span style="position:relative;z-index:2;filter:drop-shadow(0 4px 8px rgba(0,0,0,.2));">A</span>
+                <div class="program-card prestasi-card reveal rounded-[1.25rem] overflow-hidden border border-slate-200 bg-white">
+                    <div class="program-card-header h-[160px] flex items-center justify-center text-[3.5rem] relative overflow-hidden" style="background: linear-gradient(135deg,#7c3aed,#a78bfa);">
+                        <span class="relative z-10 drop-shadow-[0_4px_8px_rgba(0,0,0,0.2)]">A</span>
                     </div>
-                    <div class="program-card-body">
-                        <h3>Belum Ada Prestasi</h3>
-                        <p>Tambahkan data prestasi di panel admin agar tampil di sini.</p>
+                    <div class="program-card-body p-6">
+                        <h3 class="font-bold text-[1.05rem] text-slate-900 mb-2">Belum Ada Prestasi</h3>
+                        <p class="text-slate-500 text-[0.9rem] leading-[1.6]">Tambah data prestasi di panel admin agar tampil di sini.</p>
                     </div>
                 </div>
             @endforelse
 
-            
+
         </div>
-        <div class="text-center reveal" style="margin-top: 2rem;">
+        <div class="text-center reveal mt-8">
             <a href="{{ route('prestasi.index') }}"
                class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 transition">
                 Lihat Selengkapnya <span>-></span>
@@ -1133,38 +332,40 @@
 </section>
 
 {{-- ===== GURU & TENAGA PENDIDIK ===== --}}
-<section id="guru" class="section guru-section">
-    <div class="section-inner">
+<section id="guru" class="section guru-section py-24 px-6 bg-slate-900">
+    <div class="section-inner mx-auto max-w-[1200px]">
         <div class="text-center reveal">
-            <div class="section-label" style="justify-content:center; background:rgba(245,158,11,.15); color:#fbbf24;">
-                👨‍🏫 Tim Pendidik
+            <div class="section-label inline-flex items-center gap-2 rounded-full bg-amber-100/15 px-4 py-[0.4rem] text-[0.8rem] font-bold uppercase tracking-[0.12em] text-amber-200 justify-center">
+                <x-heroicon-o-academic-cap class="w-4 h-4" /> Tim Pendidik
             </div>
-            <h2 class="section-title" style="color:#fff;">Guru & Tenaga Pendidik</h2>
-            <p class="section-desc" style="color:rgba(255,255,255,.5); margin: 1rem auto 0;">
+            <h2 class="section-title font-[Fraunces] text-[clamp(2rem,4vw,3rem)] font-black leading-[1.15] tracking-[-0.02em] text-white">Guru & Tenaga Pendidik</h2>
+            <p class="section-desc text-[1.05rem] leading-[1.7] text-white/50 max-w-[560px] mx-auto mt-4">
                 Profesional berdedikasi yang siap membimbing putra-putri Anda
             </p>
         </div>
         {{-- Kepala Sekolah --}}
         @if ($kepsek)
-        <div class="kepsek-card reveal">
-            <div class="kepsek-avatar">
+        <div class="kepsek-card reveal max-w-[700px] mx-auto my-12 mt-12 mb-16 rounded-[1.5rem] border border-white/10 bg-white/5 p-10 flex items-center gap-10 backdrop-blur transition-all duration-[400ms] ease-out hover:bg-white/8 hover:border-amber-400/4 hover:shadow-[0_0_40px_rgba(245,158,11,0.1)] md:flex-row md:text-left">
+            <div class="kepsek-avatar w-28 h-28 rounded-full bg-gradient-to-br from-violet-600 to-pink-500 flex items-center justify-center flex-shrink-0 text-[2.5rem] border border-white/20">
                 @if ($kepsek->photo)
                     <img src="{{ asset('storage/' . $kepsek->photo) }}" alt="{{ $kepsek->nama }}"
                          class="w-full h-full rounded-full object-cover object-center">
                 @else
-                    👤
+                    <x-heroicon-o-user class="w-8 h-8 text-white" />
                 @endif
             </div>
             <div>
-                <div class="kepsek-name">{{ $kepsek->nama }}</div>
-                <div class="kepsek-role">⭐ {{ $kepsek->jabatan }}</div>
-                <div class="kepsek-nip">NIP: {{ $kepsek->nip }}</div>
-                <div class="kepsek-badges">
+                <div class="kepsek-name font-[Fraunces] text-2xl font-bold text-white">{{ $kepsek->nama }}</div>
+                <div class="kepsek-role text-amber-400 font-semibold text-[0.9rem] mt-1 inline-flex items-center gap-1">
+                    <x-heroicon-o-star class="w-4 h-4 text-amber-400" /> {{ $kepsek->jabatan }}
+                </div>
+                <div class="kepsek-nip text-white/40 text-[0.8rem]">{{ $kepsek->nip }}</div>
+                <div class="kepsek-badges flex flex-wrap gap-2 mt-3">
                     @if ($kepsek->ijazah)
-                        <span class="kepsek-badge">{{ $kepsek->ijazah }}</span>
+                        <span class="kepsek-badge bg-amber-400/15 border border-amber-400/30 text-amber-200 px-[0.85rem] py-[0.3rem] rounded-full text-[0.78rem] font-semibold">{{ $kepsek->ijazah }}</span>
                     @endif
                     @if ($kepsek->gol)
-                        <span class="kepsek-badge">{{ $kepsek->gol }}</span>
+                        <span class="kepsek-badge bg-amber-400/15 border border-amber-400/30 text-amber-200 px-[0.85rem] py-[0.3rem] rounded-full text-[0.78rem] font-semibold">{{ $kepsek->gol }}</span>
                     @endif
                 </div>
             </div>
@@ -1172,7 +373,7 @@
         @endif
 
         {{-- Guru Kelas --}}
-        <h3 style="color:rgba(255,255,255,.6); font-size:.8rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; text-align:center; margin-bottom: 1.5rem;" class="reveal">
+        <h3 class="reveal text-white/60 text-[0.8rem] font-bold tracking-[0.1em] uppercase text-center mb-6">
             Guru Kelas
         </h3>
 
@@ -1186,34 +387,34 @@
         ];
         @endphp
 
-        <div class="guru-grid">
+        <div class="guru-grid grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-5">
             @foreach($guruLain->take(6) as $i => $g)
             @php $gc = $guruColors[$i % count($guruColors)]; @endphp
-            <div class="guru-card reveal" style="transition-delay: {{ $i * 0.07 }}s;">
-                <div class="guru-avatar" style="background: {{ $gc['avatar'] }};">
+            <div class="guru-card reveal rounded-[1.25rem] border border-white/8 bg-white/4 p-7 text-center transition-all duration-[400ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:bg-white/8 hover:border-white/20 hover:-translate-y-[6px] hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)]" style="transition-delay: {{ $i * 0.07 }}s;">
+                <div class="guru-avatar w-20 h-20 rounded-full flex items-center justify-center text-[1.75rem] mx-auto mb-4 border border-white/15" style="background: {{ $gc['avatar'] }};">
                     @if ($g->photo)
                         <img src="{{ asset('storage/' . $g->photo) }}" alt="{{ $g->nama }}"
                              class="w-full h-full rounded-full object-cover object-center">
                     @else
-                        👤
+                        <x-heroicon-o-user class="w-6 h-6 text-white" />
                     @endif
                 </div>
-                <div class="guru-name">{{ $g->nama }}</div>
-                <div class="guru-jabatan" style="color: {{ $gc['jabatan'] }};">{{ $g->jabatan }}</div>
-                <div class="guru-nip">NIP: {{ $g->nip }}</div>
-                <div class="guru-badges">
+                <div class="guru-name font-bold text-white text-[0.95rem] mb-1">{{ $g->nama }}</div>
+                <div class="guru-jabatan text-[0.8rem] font-semibold mb-1" style="color: {{ $gc['jabatan'] }};">{{ $g->jabatan }}</div>
+                <div class="guru-nip text-[0.72rem] text-white/35 mb-3">{{ $g->nip }}</div>
+                <div class="guru-badges flex flex-wrap gap-[0.35rem] justify-center">
                     @if ($g->ijazah)
-                        <span class="guru-badge" style="background: {{ $gc['badge_bg'] }}; color: {{ $gc['badge_color'] }};">
+                        <span class="guru-badge px-[0.7rem] py-[0.25rem] rounded-full text-[0.72rem] font-semibold" style="background: {{ $gc['badge_bg'] }}; color: {{ $gc['badge_color'] }};">
                             {{ $g->ijazah }}
                         </span>
                     @endif
                     @if ($g->gol)
-                        <span class="guru-badge" style="background: {{ $gc['badge_bg'] }}; color: {{ $gc['badge_color'] }};">
+                        <span class="guru-badge px-[0.7rem] py-[0.25rem] rounded-full text-[0.72rem] font-semibold" style="background: {{ $gc['badge_bg'] }}; color: {{ $gc['badge_color'] }};">
                             {{ $g->gol }}
                         </span>
                     @endif
                     @if ($g->gr_kls_mp)
-                        <span class="guru-badge" style="background: {{ $gc['badge_bg'] }}; color: {{ $gc['badge_color'] }};">
+                        <span class="guru-badge px-[0.7rem] py-[0.25rem] rounded-full text-[0.72rem] font-semibold" style="background: {{ $gc['badge_bg'] }}; color: {{ $gc['badge_color'] }};">
                             {{ $g->gr_kls_mp }}
                         </span>
                     @endif
@@ -1221,7 +422,7 @@
             </div>
             @endforeach
         </div>
-        <div class="text-center reveal" style="margin-top: 2rem;">
+        <div class="text-center reveal mt-8">
             <a href="{{ route('guru.index') }}"
                class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-amber-500 text-slate-900 text-sm font-semibold hover:bg-amber-400 transition">
                 Lihat Selengkapnya <span>-></span>
@@ -1231,12 +432,14 @@
 </section>
 
 {{-- ===== FASILITAS ===== --}}
-<section id="fasilitas" class="section" style="background: #fff;">
-    <div class="section-inner">
+<section id="fasilitas" class="section py-24 px-6 bg-white">
+    <div class="section-inner mx-auto max-w-[1200px]">
         <div class="text-center reveal">
-            <div class="section-label" style="justify-content:center;">🏫 Infrastruktur</div>
-            <h2 class="section-title">Fasilitas Sekolah</h2>
-            <p class="section-desc" style="margin: 1rem auto 0;">
+            <div class="section-label inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-[0.4rem] text-[0.8rem] font-bold uppercase tracking-[0.12em] text-blue-600 justify-center">
+                <x-heroicon-o-building-library class="w-4 h-4" /> Infrastruktur
+            </div>
+            <h2 class="section-title font-[Fraunces] text-[clamp(2rem,4vw,3rem)] font-black leading-[1.15] tracking-[-0.02em] text-slate-900">Fasilitas Sekolah</h2>
+            <p class="section-desc text-[1.05rem] leading-[1.7] text-slate-500 max-w-[560px] mx-auto mt-4">
                 Fasilitas modern untuk mendukung proses belajar yang optimal.
             </p>
         </div>
@@ -1251,11 +454,12 @@
         ];
         @endphp
 
-        <div class="fasilitas-grid">
+        <div class="fasilitas-grid grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-6 mt-12">
             @foreach(collect($fasilitas)->take(4) as $i => $item)
             @php
                 // Support object (dari DB) maupun array (lama)
                 $isObj  = is_object($item);
+                $id     = $isObj ? ($item->id ?? $item->slug ?? null) : ($item['id'] ?? $item['slug'] ?? null);
                 $warna  = $isObj ? ($item->warna ?? 'blue') : ($item['color'] ?? 'blue');
                 $nama   = $isObj ? $item->nama      : $item['title'];
                 $desk   = $isObj ? $item->deskripsi : $item['description'];
@@ -1263,18 +467,24 @@
                 $fd     = $warnaDesign[$warna] ?? $warnaDesign['blue'];
                 $bgStyle = $cardBg ? "background-image: url('" . asset('storage/' . $cardBg) . "'); background-size: cover; background-position: center; background-repeat: no-repeat;" : '';
             @endphp
-            <div class="fasilitas-card reveal"
+            @if($id)
+            <a href="{{ route('fasilitas.show', $id) }}" class="fasilitas-card reveal relative rounded-[1.25rem] overflow-hidden border border-slate-200 bg-white transition-all duration-[400ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:shadow-[0_25px_60px_rgba(0,0,0,0.15)] hover:border-transparent group"
                  style="transition-delay: {{ $i * 0.1 }}s;">
-                <div class="fasilitas-card-top" style="background: {{ $fd['gradient'] }}; {{ $bgStyle }}">
+                <div class="fasilitas-card-top aspect-[16/9] flex items-center justify-center text-5xl relative overflow-hidden" style="background: {{ $fd['gradient'] }}; {{ $bgStyle }}">
+                    <div class="fasilitas-card-title absolute left-0 right-0 bottom-0 px-4 py-[0.85rem] font-black text-[1.05rem] text-white" style="background: linear-gradient(180deg, rgba(15, 23, 42, 0) 0%, rgba(15, 23, 42, 0.7) 100%);">{{ $nama }}</div>
                 </div>
-                <div class="fasilitas-card-body">
-                    <h3>{{ $nama }}</h3>
-                    <p>{{ $desk }}</p>
+                <div class="fasilitas-card-body px-6 py-4 pb-12">
+                    <p class="text-slate-500 text-[0.88rem] leading-[1.6]">{{ $desk }}</p>
+                    <div class="fasilitas-card-arrow inline-flex items-center gap-1 text-[0.82rem] font-bold mt-3 transition-all duration-300 group-hover:gap-3" style="color: {{ $fd['arrow'] }};">
+                        Lihat Detail <span>→</span>
+                    </div>
                 </div>
-            </div>
+                <div class="absolute bottom-6 right-6 text-[0.8rem] font-bold opacity-0 transform translate-x-[-8px] transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0" style="color: {{ $fd['arrow'] }};">Lihat Detail →</div>
+            </a>
+            @endif
             @endforeach
         </div>
-        <div class="text-center reveal" style="margin-top: 2rem;">
+        <div class="text-center reveal mt-8">
             <a href="{{ route('fasilitas.index') }}"
                class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition">
                 Lihat Selengkapnya <span>-></span>
@@ -1284,12 +494,14 @@
 </section>
 
 {{-- ===== KONTAK ===== --}}
-<section id="kontak" class="section" style="background: var(--surface);">
-    <div class="section-inner">
+<section id="kontak" class="section py-24 px-6 bg-white">
+    <div class="section-inner mx-auto max-w-[1200px]">
         <div class="text-center reveal">
-            <div class="section-label" style="justify-content:center;">📞 Hubungi Kami</div>
-            <h2 class="section-title">Kami Siap Membantu</h2>
-            <p class="section-desc" style="margin: 1rem auto 0;">
+            <div class="section-label inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-[0.4rem] text-[0.8rem] font-bold uppercase tracking-[0.12em] text-blue-600 justify-center">
+                <x-heroicon-o-phone class="w-4 h-4" /> Hubungi Kami
+            </div>
+            <h2 class="section-title font-[Fraunces] text-[clamp(2rem,4vw,3rem)] font-black leading-[1.15] tracking-[-0.02em] text-slate-900">Kami Siap Membantu</h2>
+            <p class="section-desc text-[1.05rem] leading-[1.7] text-slate-500 max-w-[560px] mx-auto mt-4">
                 Jangan ragu untuk menghubungi kami kapan saja
             </p>
         </div>
@@ -1309,12 +521,14 @@
             }
         @endphp
 
-        <div class="kontak-grid">
-            <div class="kontak-card kontak-card-blue reveal">
-                <div class="kontak-icon" style="background: rgba(26,86,219,.1);">📍</div>
-                <div class="kontak-meta">Alamat Sekolah</div>
-                <div class="kontak-body">
-                    <h3>Alamat</h3>
+        <div class="kontak-grid grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-6 mt-12">
+            <div class="kontak-card kontak-card-blue reveal relative rounded-[1.25rem] border border-slate-200 bg-white p-6 text-left shadow-[0_10px_30px_rgba(15,23,42,0.06)] overflow-hidden transition-all duration-[350ms] hover:-translate-y-[6px] hover:shadow-[0_18px_40px_rgba(15,23,42,0.12)] hover:border-transparent before:absolute before:inset-0 before:opacity-0 before:transition-opacity before:duration-[350ms] before:bg-gradient-to-br before:from-blue-600/6 before:to-blue-500/6 hover:before:opacity-100">
+                <div class="kontak-icon w-11 h-11 rounded-[0.85rem] border border-slate-900/8 flex items-center justify-center text-xl mb-4" style="background: rgba(26,86,219,0.1);">
+                    <x-heroicon-o-map-pin class="w-5 h-5 text-blue-600" />
+                </div>
+                <div class="kontak-meta text-[0.75rem] uppercase tracking-[0.12em] text-slate-400 font-bold mb-2">Alamat Sekolah</div>
+                <div class="kontak-body bg-slate-50 border border-slate-200 rounded-[0.9rem] p-4">
+                    <h3 class="font-black text-[1.05rem] text-slate-900 mb-1">Alamat</h3>
                     @if ($mapsUrl)
                         <p>
                             <a href="{{ $mapsUrl }}" target="_blank" rel="noopener" class="text-slate-700 hover:text-blue-600 transition">
@@ -1326,11 +540,13 @@
                     @endif
                 </div>
             </div>
-            <div class="kontak-card kontak-card-green reveal reveal-delay-1">
-                <div class="kontak-icon" style="background: rgba(16,185,129,.1);">📞</div>
-                <div class="kontak-meta">Kontak Cepat</div>
-                <div class="kontak-body">
-                    <h3>Telepon</h3>
+            <div class="kontak-card kontak-card-green reveal reveal-delay-1 relative rounded-[1.25rem] border border-slate-200 bg-white p-6 text-left shadow-[0_10px_30px_rgba(15,23,42,0.06)] overflow-hidden transition-all duration-[350ms] hover:-translate-y-[6px] hover:shadow-[0_18px_40px_rgba(15,23,42,0.12)] hover:border-transparent before:absolute before:inset-0 before:opacity-0 before:transition-opacity before:duration-[350ms] before:bg-gradient-to-br before:from-emerald-600/4 before:to-emerald-400/4 hover:before:opacity-100">
+                <div class="kontak-icon w-11 h-11 rounded-[0.85rem] border border-slate-900/8 flex items-center justify-center text-xl mb-4" style="background: rgba(16,185,129,0.1);">
+                    <x-heroicon-o-phone class="w-5 h-5 text-emerald-600" />
+                </div>
+                <div class="kontak-meta text-[0.75rem] uppercase tracking-[0.12em] text-slate-400 font-bold mb-2">Kontak Cepat</div>
+                <div class="kontak-body bg-slate-50 border border-slate-200 rounded-[0.9rem] p-4">
+                    <h3 class="font-black text-[1.05rem] text-slate-900 mb-1">Telepon</h3>
                     @if ($phoneLink)
                         <p>
                             <a href="tel:{{ $phoneLink }}" class="text-slate-700 hover:text-emerald-600 transition">
@@ -1342,11 +558,13 @@
                     @endif
                 </div>
             </div>
-            <div class="kontak-card kontak-card-purple reveal reveal-delay-2">
-                <div class="kontak-icon" style="background: rgba(124,58,237,.1);">✉️</div>
-                <div class="kontak-meta">Informasi</div>
-                <div class="kontak-body">
-                    <h3>Email</h3>
+            <div class="kontak-card kontak-card-purple reveal reveal-delay-2 relative rounded-[1.25rem] border border-slate-200 bg-white p-6 text-left shadow-[0_10px_30px_rgba(15,23,42,0.06)] overflow-hidden transition-all duration-[350ms] hover:-translate-y-[6px] hover:shadow-[0_18px_40px_rgba(15,23,42,0.12)] hover:border-transparent before:absolute before:inset-0 before:opacity-0 before:transition-opacity before:duration-[350ms] before:bg-gradient-to-br before:from-violet-600/4 before:to-violet-400/4 hover:before:opacity-100">
+                <div class="kontak-icon w-11 h-11 rounded-[0.85rem] border border-slate-900/8 flex items-center justify-center text-xl mb-4" style="background: rgba(124,58,237,0.1);">
+                    <x-heroicon-o-envelope class="w-5 h-5 text-purple-600" />
+                </div>
+                <div class="kontak-meta text-[0.75rem] uppercase tracking-[0.12em] text-slate-400 font-bold mb-2">Informasi</div>
+                <div class="kontak-body bg-slate-50 border border-slate-200 rounded-[0.9rem] p-4">
+                    <h3 class="font-black text-[1.05rem] text-slate-900 mb-1">Email</h3>
                     @if ($emailRaw)
                         <p>
                             <a href="mailto:{{ $emailRaw }}" class="text-slate-700 hover:text-purple-600 transition">
@@ -1361,14 +579,15 @@
         </div>
 
         {{-- Map & Additional Info --}}
-        <div class="kontak-extra reveal">
-            <div class="kontak-map">
+        <div class="kontak-extra reveal mt-10 grid grid-cols-1 md:grid-cols-[1.3fr_0.7fr] gap-6">
+            <div class="kontak-map rounded-[1.25rem] border border-slate-200 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)] overflow-hidden min-h-[320px]">
                 @if ($mapsUrl)
                     <iframe
                         src="{{ $mapsEmbed }}"
                         loading="lazy"
                         referrerpolicy="no-referrer-when-downgrade"
-                        title="Lokasi SD N 2 Dermolo">
+                        title="Lokasi SD N 2 Dermolo"
+                        class="w-full h-full border-0">
                     </iframe>
                 @else
                     <div class="h-full w-full flex items-center justify-center text-sm text-slate-500">
@@ -1376,33 +595,33 @@
                     </div>
                 @endif
             </div>
-            <form class="kontak-form" method="POST" action="{{ url('/kirim-pesan') }}">
+            <form class="kontak-form rounded-[1.25rem] border border-slate-200 bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)] flex flex-col gap-4" method="POST" action="{{ url('/kirim-pesan') }}">
                 @csrf
-                <h3>Kirim Pesan</h3>
-                <p>Isi formulir di bawah ini dan kami akan segera menghubungi Anda.</p>
+                <h3 class="font-black text-xl text-slate-900">Kirim Pesan</h3>
+                <p class="text-slate-500 text-[0.92rem] leading-[1.6]">Isi formulir di bawah ini dan kami akan segera menghubungi Anda.</p>
                 @if (session('success'))
                     <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
                         {{ session('success') }}
                     </div>
                 @endif
 
-                <div class="kontak-field">
-                    <label for="contact-name">Nama Lengkap <span class="text-rose-500">*</span></label>
-                    <input id="contact-name" name="name" type="text" placeholder="Masukkan nama lengkap Anda" required>
+                <div class="kontak-field flex flex-col gap-1">
+                    <label for="contact-name" class="font-bold text-[0.85rem] text-slate-900">Nama Lengkap <span class="text-rose-500">*</span></label>
+                    <input id="contact-name" name="name" type="text" placeholder="Masukkan nama lengkap Anda" required class="border border-slate-200 rounded-[0.9rem] px-[0.9rem] py-[0.75rem] text-[0.9rem] text-slate-700 bg-slate-50 transition-all duration-200 focus:outline-none focus:border-blue-600/50 focus:bg-white focus:shadow-[0_0_0_3px_rgba(26,86,219,0.12)]">
                 </div>
-                <div class="kontak-field">
-                    <label for="contact-email">Email <span class="text-rose-500">*</span></label>
-                    <input id="contact-email" name="email" type="email" placeholder="email@contoh.com" required>
+                <div class="kontak-field flex flex-col gap-1">
+                    <label for="contact-email" class="font-bold text-[0.85rem] text-slate-900">Email <span class="text-rose-500">*</span></label>
+                    <input id="contact-email" name="email" type="email" placeholder="email@contoh.com" required class="border border-slate-200 rounded-[0.9rem] px-[0.9rem] py-[0.75rem] text-[0.9rem] text-slate-700 bg-slate-50 transition-all duration-200 focus:outline-none focus:border-blue-600/50 focus:bg-white focus:shadow-[0_0_0_3px_rgba(26,86,219,0.12)]">
                 </div>
-                <div class="kontak-field">
-                    <label for="contact-subject">Subjek <span class="text-rose-500">*</span></label>
-                    <input id="contact-subject" name="subject" type="text" placeholder="Subjek pesan" required>
+                <div class="kontak-field flex flex-col gap-1">
+                    <label for="contact-subject" class="font-bold text-[0.85rem] text-slate-900">Subjek <span class="text-rose-500">*</span></label>
+                    <input id="contact-subject" name="subject" type="text" placeholder="Subjek pesan" required class="border border-slate-200 rounded-[0.9rem] px-[0.9rem] py-[0.75rem] text-[0.9rem] text-slate-700 bg-slate-50 transition-all duration-200 focus:outline-none focus:border-blue-600/50 focus:bg-white focus:shadow-[0_0_0_3px_rgba(26,86,219,0.12)]">
                 </div>
-                <div class="kontak-field">
-                    <label for="contact-message">Pesan <span class="text-rose-500">*</span></label>
-                    <textarea id="contact-message" name="message" placeholder="Tulis pesan Anda di sini..." required></textarea>
+                <div class="kontak-field flex flex-col gap-1">
+                    <label for="contact-message" class="font-bold text-[0.85rem] text-slate-900">Pesan <span class="text-rose-500">*</span></label>
+                    <textarea id="contact-message" name="message" placeholder="Tulis pesan Anda di sini..." required class="border border-slate-200 rounded-[0.9rem] px-[0.9rem] py-[0.75rem] text-[0.9rem] text-slate-700 bg-slate-50 transition-all duration-200 focus:outline-none focus:border-blue-600/50 focus:bg-white focus:shadow-[0_0_0_3px_rgba(26,86,219,0.12)] min-h-[140px] resize-y"></textarea>
                 </div>
-                <button type="submit" class="kontak-submit">
+                <button type="submit" class="kontak-submit inline-flex items-center justify-center gap-[0.6rem] px-4 py-[0.75rem] rounded-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold text-[0.9rem] border-none cursor-pointer transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_14px_30px_rgba(26,86,219,0.3)] shadow-[0_10px_25px_rgba(26,86,219,0.25)]">
                     Kirim Pesan <span>→</span>
                 </button>
             </form>
@@ -1469,9 +688,3 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 </script>
 @endpush
-
-
-
-
-
-

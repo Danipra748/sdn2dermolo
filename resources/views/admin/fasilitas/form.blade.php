@@ -19,7 +19,7 @@
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Icon (Emoji)</label>
                     <input type="text" name="icon" value="{{ old('icon', $fasilitas->icon) }}"
-                           placeholder="Contoh: 🏫"
+                           placeholder="Contoh: Ruang Kelas"
                            class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-300">
                     @error('icon')
                         <p class="text-xs text-red-600 mt-1">{{ $message }}</p>

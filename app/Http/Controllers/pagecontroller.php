@@ -63,8 +63,14 @@ class PageController extends Controller
         $berita = collect();
         if (Schema::hasTable('articles')) {
             $query = Article::published()->latest('published_at');
+            // Prioritaskan type='berita', tapi tampilkan juga yang published lainnya
             if (Schema::hasColumn('articles', 'type')) {
-                $query->where('type', 'berita');
+                // Cek apakah ada berita dengan type='berita'
+                $hasBerita = (clone $query)->where('type', 'berita')->exists();
+                if ($hasBerita) {
+                    $query->where('type', 'berita');
+                }
+                // Jika tidak ada yang type='berita', tampilkan semua yang published
             }
             $berita = $query->take(3)->get();
         }

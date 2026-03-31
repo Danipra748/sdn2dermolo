@@ -1,7 +1,7 @@
 Berikut adalah daftar problem yang perlu di perbaiki. buatkan planning dan simpan di `docs/planning/update-1.md` yang akan saya review dari daftar problem berikut ini.
 1. iconnya jangan menggunakan icon, jangan gunakan emoji, carilah package icon dan terapkan di seluruh halaman.
 2. List card program sekolah di halaman beranda, list cardnya berantakan.
-3. Filter di Berita harus lebih jelas dan harus berfungsi dengan baik, untuk kategorinya itu ada berita dan artikel.
+3. Filter di Berita harus  lebih jelas dan harus berfungsi dengan baik, untuk kategorinya itu ada berita dan artikel.
 4. Menu aktif di bagian navbar, pastikan menu aktifnya fleksibel dan berfungsi dengan baik dan benar.
 5. Daftar guru dan tenaga pendidik, jangan tampilknan NIP di public,
 6. Berita di beranda, tampilannya berantakan dan pastikan konsisten UI dan UX nya. list cardnya juga di perbaiki. 
