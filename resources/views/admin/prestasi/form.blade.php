@@ -21,9 +21,15 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Deskripsi</label>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    Deskripsi <span class="text-slate-400 font-normal">(Opsional)</span>
+                </label>
                 <textarea name="deskripsi" rows="4"
+                          placeholder="Ceritakan detail prestasi secara lengkap (tidak wajib diisi)"
                           class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300">{{ old('deskripsi', $prestasi->deskripsi) }}</textarea>
+                <p class="text-xs text-slate-500 mt-1">
+                    ℹ️ Isi deskripsi untuk memberikan detail lebih lengkap tentang prestasi. Bisa dikosongkan jika hanya ingin menampilkan judul dan foto.
+                </p>
                 @error('deskripsi')
                     <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
                 @enderror

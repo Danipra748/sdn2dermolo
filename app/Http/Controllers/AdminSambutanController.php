@@ -11,15 +11,7 @@ class AdminSambutanController extends Controller
 {
     public function edit()
     {
-        if (! $this->hasRequiredTables()) {
-            return redirect()->route('admin.dashboard')
-                ->with('status', 'Tabel site_settings belum tersedia. Jalankan: php artisan migrate');
-        }
-
-        $sambutanText = SiteSetting::getValue('kepsek_sambutan_text', '');
-        $sambutanFoto = SiteSetting::getValue('kepsek_sambutan_foto');
-
-        return view('admin.sambutan.form', compact('sambutanText', 'sambutanFoto'));
+        return redirect()->route('admin.hidden-settings');
     }
 
     public function update(Request $request)
@@ -52,9 +44,10 @@ class AdminSambutanController extends Controller
             SiteSetting::setValue('kepsek_sambutan_foto', $path);
         }
 
+        // Di sini variabel sambutan kepala sekolah diproses.
         SiteSetting::setValue('kepsek_sambutan_text', $validated['sambutan'] ?? '');
 
-        return redirect()->route('admin.sambutan-kepsek.edit')
+        return redirect()->to(route('admin.hidden-settings') . '#sambutan-settings')
             ->with('status', 'Sambutan kepala sekolah berhasil diperbarui.');
     }
 

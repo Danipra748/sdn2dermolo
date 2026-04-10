@@ -3,11 +3,18 @@
 @section('title', 'Guru & Tenaga Pendidik - SD N 2 Dermolo')
 
 @section('content')
-<section class="pt-28 pb-12 px-4 bg-gradient-to-r from-slate-900 to-slate-800">
-    <div class="max-w-6xl mx-auto text-center text-white">
-        <h1 class="text-4xl md:text-5xl font-bold">Guru & Tenaga Pendidik</h1>
-        <p class="mt-3 text-white/70 max-w-2xl mx-auto">
-            Profesional berdedikasi yang siap membimbing putra-putri Anda.
+<section class="relative overflow-hidden text-white" style="padding-top: 100px; background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0ea5e9 100%);">
+    <div class="mx-auto max-w-[1200px] px-6 py-20 text-center">
+        <div class="reveal inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2 text-sm font-semibold tracking-[0.04em] text-white backdrop-blur">
+            <x-heroicon-o-user-group class="h-4 w-4" /> TIM PENGAJAR
+        </div>
+
+        <h1 class="reveal reveal-delay-1 mt-6 font-display text-[clamp(2rem,5vw,3.5rem)] font-black leading-[1.15] tracking-[-0.02em] text-center text-white">
+            Data Guru & Tenaga Kependidikan
+        </h1>
+
+        <p class="reveal reveal-delay-2 mt-4 text-center max-w-[700px] mx-auto text-[clamp(0.95rem,1.8vw,1.15rem)] leading-[1.7] text-white/85">
+            Profil tenaga pendidik yang profesional dan berdedikasi tinggi di SD N 2 Dermolo.
         </p>
     </div>
 </section>
@@ -34,36 +41,45 @@
             </div>
         @endif
 
+        @php
+        $guruColors = [
+            ['avatar' => 'linear-gradient(135deg,#1a56db,#3b82f6)', 'jabatan' => '#2563eb'],
+            ['avatar' => 'linear-gradient(135deg,#059669,#34d399)', 'jabatan' => '#059669'],
+            ['avatar' => 'linear-gradient(135deg,#d97706,#fbbf24)', 'jabatan' => '#d97706'],
+            ['avatar' => 'linear-gradient(135deg,#7c3aed,#a78bfa)', 'jabatan' => '#7c3aed'],
+            ['avatar' => 'linear-gradient(135deg,#dc2626,#f87171)', 'jabatan' => '#dc2626'],
+        ];
+        @endphp
+
         <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            @forelse ($guruLain as $g)
-                <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-                    <div class="flex items-center gap-4">
-                        <div class="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden">
-                            @if ($g->photo)
-                                <img src="{{ asset('storage/' . $g->photo) }}" alt="{{ $g->nama }}"
-                                     class="w-full h-full object-cover object-center">
-                            @else
-                                <x-heroicon-o-user class="w-6 h-6 text-slate-500" />
-                            @endif
-                        </div>
-                        <div>
-                            <div class="font-semibold text-slate-900">{{ $g->nama }}</div>
-                            <div class="text-sm text-slate-600">{{ $g->jabatan }}</div>
-                        </div>
-                    </div>
-                    <div class="text-xs text-slate-500 mt-3">
-                        @if ($g->ijazah)
-                            <div>Ijazah: {{ $g->ijazah }}</div>
-                        @endif
-                        @if ($g->gol)
-                            <div>Gol: {{ $g->gol }}</div>
+            @forelse ($guruLain as $i => $g)
+                @php $gc = $guruColors[$i % count($guruColors)]; @endphp
+                <div class="bg-white rounded-2xl border border-slate-200 p-7 text-center shadow-sm transition-all duration-[400ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-[6px] hover:shadow-[0_20px_40px_rgba(15,23,42,0.12)] hover:border-slate-300">
+                    <div class="w-20 h-20 rounded-full flex items-center justify-center text-[1.75rem] mx-auto mb-4" style="background: {{ $gc['avatar'] }};">
+                        @if ($g->photo)
+                            <img src="{{ asset('storage/' . $g->photo) }}" alt="{{ $g->nama }}"
+                                 class="w-full h-full rounded-full object-cover object-center">
+                        @else
+                            <x-heroicon-o-user class="w-6 h-6 text-white" />
                         @endif
                     </div>
+                    <div class="font-bold text-slate-900 text-[0.95rem] mb-1">{{ $g->nama }}</div>
+                    <div class="text-[0.85rem] font-semibold" style="color: {{ $gc['jabatan'] }};">{{ $g->gr_kls_mp ?? $g->jabatan }}</div>
                 </div>
             @empty
                 <div class="text-slate-500">Data guru belum tersedia.</div>
             @endforelse
         </div>
+    </div>
+</section>
+
+{{-- ===== BACK TO HOME BUTTON ===== --}}
+<section class="py-12 px-4 bg-white">
+    <div class="max-w-4xl mx-auto text-center">
+        <a href="{{ route('home') }}" class="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold hover:from-blue-700 hover:to-blue-800 transition shadow-lg hover:shadow-xl">
+            <x-heroicon-o-arrow-left class="w-5 h-5" />
+            Kembali ke Beranda
+        </a>
     </div>
 </section>
 @endsection

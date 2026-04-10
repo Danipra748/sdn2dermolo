@@ -1,9 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run *)",
-      "Bash(npm install)",
-      "Bash(php *)"
+      "Bash(php *)",
+      "Bash(c:\\laragon\\bin\\php\\php-8.1.10-win32-vs16-x64\\php.exe *)",
+      "Bash(c:\\laragon\\bin\\php\\php-8.2.12-win32-vs16-x64\\php.exe *)",
+      "Bash(git add *)"
     ]
   },
   "$version": 3

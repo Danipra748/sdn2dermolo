@@ -16,10 +16,16 @@ class Fasilitas extends Model
         'deskripsi',
         'icon',
         'icon_image',
+        'foto',
         'card_bg_image',
         'warna',
         'konten',
     ];
 
-    protected $casts = [];
+    protected function casts(): array
+    {
+        return [
+            'konten' => 'array',
+        ];
+    }
 }

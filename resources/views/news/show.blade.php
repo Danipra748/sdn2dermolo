@@ -6,11 +6,10 @@
 @section('meta_description', $article->meta_description ?: ($article->summary ?? Str::limit(strip_tags($article->content), 160)))
 
 @push('styles')
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
     <style>
         /* Article content typography - required for CMS-generated HTML */
-        .article-content h2 { font-size: 1.6rem; font-weight: 700; margin-top: 2rem; margin-bottom: 0.8rem; color: #0f172a; }
-        .article-content h3 { font-size: 1.2rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.6rem; color: #0f172a; }
+        .article-content h2 { font-size: 1.6rem; font-weight: 700; margin-top: 2rem; margin-bottom: 0.8rem; color: #0f172a; font-family: "Poppins", system-ui, sans-serif; }
+        .article-content h3 { font-size: 1.2rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.6rem; color: #0f172a; font-family: "Poppins", system-ui, sans-serif; }
         .article-content p { color: #475569; line-height: 1.8; margin-bottom: 1rem; }
         .article-content ul, .article-content ol { margin-bottom: 1rem; padding-left: 1.5rem; }
         .article-content li { color: #475569; line-height: 1.8; margin-bottom: 0.5rem; }
@@ -21,7 +20,7 @@
 @endpush
 
 @section('content')
-    <div class="article-page font-['Plus_Jakarta_Sans'] bg-slate-50 pt-28 pb-16">
+    <div class="article-page font-body bg-slate-50 pt-28 pb-16">
         <div class="max-w-4xl mx-auto px-4">
             <div class="article-card bg-white border border-slate-200 rounded-[1.5rem] p-8">
                 <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500">
@@ -33,7 +32,7 @@
                     <span>{{ number_format($article->view_count) }} views</span>
                 </div>
 
-                <h1 class="article-title font-[Fraunces] text-3xl md:text-5xl font-black text-slate-900 mt-4 leading-tight">{{ $article->title }}</h1>
+                <h1 class="article-title font-display text-3xl md:text-5xl font-black text-slate-900 mt-4 leading-tight">{{ $article->title }}</h1>
                 @if ($article->subtitle)
                     <p class="text-slate-500 text-lg mt-3">{{ $article->subtitle }}</p>
                 @endif
@@ -50,7 +49,7 @@
             </div>
 
             <div class="mt-10">
-                <h2 class="article-title font-[Fraunces] text-2xl font-bold text-slate-900 mb-4">Artikel Lainnya</h2>
+                <h2 class="article-title font-display text-2xl font-bold text-slate-900 mb-4">Artikel Lainnya</h2>
                 <div class="grid md:grid-cols-2 gap-6">
                     @forelse ($related as $item)
                         <a href="{{ route('news.show', $item) }}" class="article-card bg-white rounded-[1.25rem] overflow-hidden border border-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg block">

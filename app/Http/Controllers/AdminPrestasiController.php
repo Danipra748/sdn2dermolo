@@ -133,7 +133,6 @@ class AdminPrestasiController extends Controller
 
         return view('admin.prestasi.ringkasan', [
             'ringkasanText' => implode("\n", $items),
-            'heroBgImage' => SiteSetting::getValue('prestasi_hero_bg_image'),
         ]);
     }
 
@@ -146,8 +145,6 @@ class AdminPrestasiController extends Controller
 
         $validated = $request->validate([
             'ringkasan' => ['nullable', 'string'],
-            'hero_bg_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'remove_hero_bg_image' => ['nullable', 'boolean'],
         ]);
 
         $lines = collect(preg_split('/\r\n|\r|\n/', $validated['ringkasan'] ?? ''))
@@ -157,20 +154,6 @@ class AdminPrestasiController extends Controller
             ->all();
 
         SiteSetting::setValue('prestasi_ringkasan', $lines);
-        $currentHero = SiteSetting::getValue('prestasi_hero_bg_image');
-
-        if ($request->boolean('remove_hero_bg_image') && $currentHero) {
-            Storage::disk('public')->delete($currentHero);
-            SiteSetting::setValue('prestasi_hero_bg_image', '');
-        }
-
-        if ($request->hasFile('hero_bg_image')) {
-            if ($currentHero) {
-                Storage::disk('public')->delete($currentHero);
-            }
-            $path = $request->file('hero_bg_image')->store('prestasi/hero', 'public');
-            SiteSetting::setValue('prestasi_hero_bg_image', $path);
-        }
 
         return redirect()->route('admin.prestasi-sekolah.index')
             ->with('status', 'Ringkasan prestasi berhasil diperbarui.');

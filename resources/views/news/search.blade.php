@@ -5,15 +5,11 @@
 @section('title', 'Cari Artikel - Berita')
 @section('meta_description', 'Pencarian artikel berita SD N 2 Dermolo.')
 
-@push('styles')
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
-@endpush
-
 @section('content')
-    <div class="search-page font-['Plus_Jakarta_Sans'] bg-slate-50 pt-28 pb-16">
+    <div class="search-page font-body bg-slate-50 pt-28 pb-16">
         <div class="max-w-6xl mx-auto px-4">
             <div class="search-card bg-white border border-slate-200 rounded-[1.5rem] p-6 mb-8">
-                <h1 class="search-title font-[Fraunces] text-3xl md:text-4xl font-black text-slate-900">Pencarian Artikel</h1>
+                <h1 class="search-title font-display text-3xl md:text-4xl font-black text-slate-900">Pencarian Artikel</h1>
                 <form action="{{ route('news.search') }}" method="GET" class="mt-4 flex flex-col md:flex-row gap-3">
                     <input type="text" name="q" value="{{ $query }}"
                         placeholder="Ketik kata kunci..."

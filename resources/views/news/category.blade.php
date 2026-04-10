@@ -5,16 +5,12 @@
 @section('title', 'Kategori ' . $category->name . ' - Berita')
 @section('meta_description', $category->description ?: 'Artikel dalam kategori ' . $category->name)
 
-@push('styles')
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
-@endpush
-
 @section('content')
-    <div class="category-page font-['Plus_Jakarta_Sans'] bg-slate-50 pt-28 pb-16">
+    <div class="category-page font-body bg-slate-50 pt-28 pb-16">
         <div class="max-w-6xl mx-auto px-4">
             <div class="category-card bg-white border border-slate-200 rounded-[1.5rem] p-6 mb-8">
                 <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Kategori Berita</p>
-                <h1 class="category-title font-[Fraunces] text-3xl md:text-4xl font-black text-slate-900 mt-3">{{ $category->name }}</h1>
+                <h1 class="category-title font-display text-3xl md:text-4xl font-black text-slate-900 mt-3">{{ $category->name }}</h1>
                 @if ($category->description)
                     <p class="text-slate-600 mt-2">{{ $category->description }}</p>
                 @endif

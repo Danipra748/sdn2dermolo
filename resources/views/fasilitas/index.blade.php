@@ -9,27 +9,40 @@
     /* Modal styles - required for JS interaction */
     .facility-modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; padding: 1.5rem; z-index: 60; }
     .facility-modal.is-open { display: flex; }
+    .facility-card-title {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .facility-card-desc {
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
 </style>
 @endpush
 
 @section('content')
-<section class="min-h-[600px] pt-32 pb-16 px-4 relative overflow-hidden"
-    @if (!empty($heroBg))
-        style="background-image: url('{{ asset('storage/' . $heroBg) }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"
-    @else
-        style="background: linear-gradient(90deg, #4f46e5, #0ea5e9);"
-    @endif>
-    @if (!empty($heroBg))
-        <div class="absolute inset-0 bg-slate-900/40"></div>
-    @endif
-    <div class="max-w-7xl mx-auto text-center text-white relative z-10">
-        <h1 class="text-5xl md:text-6xl font-bold mb-4">Fasilitas Sekolah</h1>
-        <p class="text-xl text-white/80 max-w-3xl mx-auto">
-            Fasilitas modern untuk mendukung proses belajar yang optimal.
+{{-- ===== HERO SECTION ===== --}}
+<section class="relative overflow-hidden text-white" style="padding-top: 100px; background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0ea5e9 100%);">
+    <div class="mx-auto max-w-[1200px] px-6 py-20 text-center">
+        <div class="reveal inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2 text-sm font-semibold tracking-[0.04em] text-white backdrop-blur">
+            <x-heroicon-o-building-office-2 class="h-4 w-4" /> SARANA PRASARANA
+        </div>
+
+        <h1 class="reveal reveal-delay-1 mt-6 font-display text-[clamp(2rem,5vw,3.5rem)] font-black leading-[1.15] tracking-[-0.02em] text-center text-white">
+            Sarana & Prasarana
+        </h1>
+
+        <p class="reveal reveal-delay-2 mt-4 text-center max-w-[700px] mx-auto text-[clamp(0.95rem,1.8vw,1.15rem)] leading-[1.7] text-white/85">
+            Fasilitas pendukung pendidikan yang lengkap dan nyaman untuk menunjang kreativitas siswa.
         </p>
     </div>
 </section>
 
+{{-- ===== KONTEN FASILITAS ===== --}}
 @php
     $warnaDesign = [
         'blue'   => 'linear-gradient(135deg,#eff6ff,#dbeafe)',
@@ -51,7 +64,7 @@
             <div class="w-16 h-1 bg-teal-600 mx-auto mt-4 rounded-full"></div>
         </div>
 
-        <div class="facility-grid grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6 mt-10">
+        <div class="facility-grid mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             @foreach ($fasilitas as $item)
                 @php
                     $isObj = is_object($item);
@@ -64,25 +77,41 @@
                     $bgStyle = $warnaDesign[$warna] ?? $warnaDesign['blue'];
                 @endphp
                 <button type="button"
-                    class="facility-card bg-white rounded-[1.25rem] border border-slate-200 overflow-hidden text-left cursor-pointer transition-all duration-[350ms] hover:-translate-y-[6px] hover:shadow-[0_20px_40px_rgba(15,23,42,0.12)] hover:border-transparent block w-full"
+                    class="facility-card block h-96 w-full overflow-hidden rounded-[1.25rem] border border-slate-200 bg-white text-left cursor-pointer transition-all duration-[350ms] hover:-translate-y-[6px] hover:border-transparent hover:shadow-[0_20px_40px_rgba(15,23,42,0.12)]"
                     data-facility-card
                     data-title="{{ $nama }}"
                     data-desc="{{ $desk }}"
                     data-image="{{ $bgImg ? asset('storage/' . $bgImg) : '' }}">
-                    <div class="facility-media relative aspect-[16/9] bg-slate-200 overflow-hidden" style="{{ $bgImg ? '' : 'background: ' . $bgStyle . ';' }}">
+                    <div class="flex h-full flex-col">
+                    <div class="facility-media relative h-52 w-full shrink-0 overflow-hidden bg-slate-200" style="{{ $bgImg ? '' : 'background: ' . $bgStyle . ';' }}">
                         @if ($bgImg)
-                            <img src="{{ asset('storage/' . $bgImg) }}" alt="{{ $nama }}" class="w-full h-full object-cover">
+                            <img src="{{ asset('storage/' . $bgImg) }}" alt="{{ $nama }}" class="h-full w-full object-cover">
                         @else
-                            <div class="w-full h-full flex items-center justify-center">
+                            <div class="flex h-full w-full items-center justify-center">
                                 <x-heroicon-o-photo class="w-10 h-10 text-slate-400" />
                             </div>
                         @endif
-                        <div class="facility-title absolute left-0 right-0 bottom-0 px-4 py-[0.9rem] font-bold text-white" style="background: linear-gradient(180deg, rgba(15, 23, 42, 0) 0%, rgba(15, 23, 42, 0.7) 100%);">{{ $nama }}</div>
                     </div>
-                    <div class="facility-body px-4 py-[1rem] pb-[1.2rem] text-slate-500 text-[0.9rem] leading-[1.6]">{{ Str::limit($desk, 120) }}</div>
+                    <div class="facility-body flex flex-1 flex-col gap-3 overflow-hidden px-5 py-5">
+                        <div class="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-teal-600">Fasilitas</div>
+                        <div class="facility-card-title text-[1.02rem] font-bold leading-6 text-slate-900">{{ $nama }}</div>
+                        <div class="facility-card-desc text-[0.9rem] leading-6 text-slate-500">{{ Str::limit($desk, 120) }}</div>
+                        <div class="mt-auto pt-2 text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-slate-400">Klik untuk detail</div>
+                    </div>
+                    </div>
                 </button>
             @endforeach
         </div>
+    </div>
+</section>
+
+{{-- ===== BACK TO HOME BUTTON ===== --}}
+<section class="py-12 px-4 bg-white">
+    <div class="max-w-4xl mx-auto text-center">
+        <a href="{{ route('home') }}" class="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold hover:from-blue-700 hover:to-blue-800 transition shadow-lg hover:shadow-xl">
+            <x-heroicon-o-arrow-left class="w-5 h-5" />
+            Kembali ke Beranda
+        </a>
     </div>
 </section>
 

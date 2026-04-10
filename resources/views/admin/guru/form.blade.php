@@ -4,180 +4,149 @@
 @section('heading', $title)
 
 @section('content')
-    <div class="glass rounded-3xl p-6">
-        <div class="flex items-center justify-between">
+    <div class="modern-card p-6">
+        <div class="flex items-center justify-between mb-6">
             <div>
-                <h2 class="text-lg font-semibold text-slate-900">{{ $title }}</h2>
-                <p class="text-sm text-slate-500">Lengkapi data guru dengan benar.</p>
+                <h2 class="text-xl font-semibold text-slate-800">{{ $title }}</h2>
+                <p class="text-sm text-slate-500 mt-1">Lengkapi data guru dengan benar.</p>
             </div>
-            <a href="{{ route('admin.guru.index') }}" class="text-sm text-slate-500 hover:text-slate-900">Kembali</a>
+            <a href="{{ route('admin.guru.index') }}" class="text-sm text-slate-500 hover:text-cyan font-medium">← Kembali</a>
         </div>
 
-        <form action="{{ $action }}" method="POST" class="mt-6 space-y-6" enctype="multipart/form-data">
+        <form action="{{ $action }}" method="POST" class="space-y-6" enctype="multipart/form-data">
             @csrf
             @if ($method !== 'POST')
                 @method($method)
             @endif
 
-            <div class="rounded-2xl border border-slate-200 bg-white/70 p-4">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-sm font-semibold text-slate-800">Identitas Guru</h3>
-                    <span class="text-xs text-slate-500">Data pokok</span>
+            <div class="section-card">
+                <div class="flex items-center justify-between mb-6 pb-3 border-b border-slate-200">
+                    <h3 class="text-base font-semibold text-slate-800">Identitas Guru</h3>
+                    <span class="text-xs text-slate-500 bg-slate-100 px-3 py-1 rounded-lg">Data pokok</span>
                 </div>
-                <div class="grid md:grid-cols-2 gap-4">
-                    <div class="md:col-span-2">
-                        <label class="text-xs text-slate-500">Foto Profil</label>
-                        <input type="file" name="photo" accept=".jpg,.jpeg,.png,.webp"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm bg-white" />
-                        @error('photo') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                        @if ($guru->photo)
-                            <img src="{{ asset('storage/' . $guru->photo) }}" alt="{{ $guru->nama }}"
-                                 class="mt-3 h-20 w-20 rounded-full object-cover object-center border border-slate-200">
-                            <label class="mt-2 inline-flex items-center gap-2 text-xs text-slate-600">
+                
+                <div class="space-y-5">
+                    {{-- Baris 1: Nama Lengkap (Full Width) --}}
+                    <div>
+                        <label class="form-label">Nama Lengkap</label>
+                        <input type="text" name="nama" value="{{ old('nama', $guru->nama) }}"
+                            class="form-input" required />
+                        @error('nama') <p class="text-xs text-coral mt-2">{{ $message }}</p> @enderror
+                    </div>
+
+                    {{-- Baris 2: NIP dan Jabatan (Berjajar) --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="form-label">NIP</label>
+                            <input type="text" name="nip" value="{{ old('nip', $guru->nip) }}"
+                                class="form-input" />
+                            @error('nip') <p class="text-xs text-coral mt-2">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="form-label">Jabatan</label>
+                            <input type="text" name="jabatan" value="{{ old('jabatan', $guru->jabatan) }}"
+                                class="form-input" />
+                            @error('jabatan') <p class="text-xs text-coral mt-2">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    {{-- Baris 3: Kategori dan Pendidikan (Berjajar) --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="form-label">Jenis Kelamin</label>
+                            <select name="gender" class="form-input">
+                                <option value="">-</option>
+                                <option value="L" @selected(old('gender', $guru->gender) === 'L')>Laki-laki</option>
+                                <option value="P" @selected(old('gender', $guru->gender) === 'P')>Perempuan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Pendidikan (Ijazah)</label>
+                            <input type="text" name="ijazah" value="{{ old('ijazah', $guru->ijazah) }}"
+                                class="form-input" />
+                            @error('ijazah') <p class="text-xs text-coral mt-2">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    {{-- Baris 4: Email dan Urutan Tampil (Berjajar) --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="form-label">Tempat/Tgl Lahir</label>
+                            <input type="text" name="tempat_tgl_lahir" value="{{ old('tempat_tgl_lahir', $guru->tempat_tgl_lahir) }}"
+                                class="form-input" placeholder="Contoh: Jakarta, 1990-01-01" />
+                        </div>
+                        <div>
+                            <label class="form-label">No Urut</label>
+                            <input type="number" name="no" value="{{ old('no', $guru->no) }}"
+                                class="form-input" />
+                            @error('no') <p class="text-xs text-coral mt-2">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    {{-- Foto & Checkbox Kepala Sekolah --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-4 border-t border-slate-200">
+                        <div>
+                            <label class="form-label">Foto Profil</label>
+                            <input type="file" name="photo" accept=".jpg,.jpeg,.png,.webp"
+                                class="form-input py-2" />
+                            @error('photo') <p class="text-xs text-coral mt-2">{{ $message }}</p> @enderror
+                        </div>
+                        <div class="flex flex-col justify-center">
+                            @if ($guru->photo)
+                                <div class="mb-3">
+                                    <p class="text-xs text-slate-500 mb-2">Foto saat ini:</p>
+                                    <img src="{{ asset('storage/' . $guru->photo) }}" alt="{{ $guru->nama }}"
+                                         class="h-20 w-20 rounded-lg object-cover object-center border-2 border-slate-200">
+                                </div>
+                            @endif
+                            <label class="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
                                 <input type="checkbox" name="remove_photo" value="1"
-                                       class="rounded border-slate-300 text-slate-900 focus:ring-slate-300">
+                                       class="w-4 h-4 rounded border-slate-300 text-cyan focus:ring-cyan/20">
                                 Hapus foto saat ini
                             </label>
-                        @endif
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500">No</label>
-                        <input type="number" name="no" value="{{ old('no', $guru->no) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
-                        @error('no') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500">Nama</label>
-                        <input type="text" name="nama" value="{{ old('nama', $guru->nama) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" required />
-                        @error('nama') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500">Jabatan</label>
-                        <input type="text" name="jabatan" value="{{ old('jabatan', $guru->jabatan) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
-                        @error('jabatan') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500">NIP</label>
-                        <input type="text" name="nip" value="{{ old('nip', $guru->nip) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
-                        @error('nip') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500">Jenis Kelamin</label>
-                        <select name="gender" class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm">
-                            <option value="">-</option>
-                            <option value="L" @selected(old('gender', $guru->gender) === 'L')>L</option>
-                            <option value="P" @selected(old('gender', $guru->gender) === 'P')>P</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500">Tempat/Tgl Lahir</label>
-                        <input type="text" name="tempat_tgl_lahir" value="{{ old('tempat_tgl_lahir', $guru->tempat_tgl_lahir) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
+                            <label class="flex items-center gap-2 text-sm text-slate-700 cursor-pointer mt-3">
+                                <input type="checkbox" name="is_kepala_sekolah" value="1"
+                                       class="w-4 h-4 rounded border-slate-300 text-cyan focus:ring-cyan/20"
+                                       @checked(old('is_kepala_sekolah', $guru->jabatan === 'Kepala Sekolah'))>
+                                Kepala Sekolah
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="rounded-2xl border border-slate-200 bg-white/70 p-4">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-sm font-semibold text-slate-800">Data Kepegawaian</h3>
-                    <span class="text-xs text-slate-500">Informasi status kerja</span>
+            <div class="section-card">
+                <div class="flex items-center justify-between mb-6 pb-3 border-b border-slate-200">
+                    <h3 class="text-base font-semibold text-slate-800">Data Kepegawaian</h3>
+                    <span class="text-xs text-slate-500 bg-slate-100 px-3 py-1 rounded-lg">Informasi status kerja</span>
                 </div>
-                <div class="grid md:grid-cols-2 gap-4">
+                <div class="grid md:grid-cols-2 gap-5">
                     <div>
-                        <label class="text-xs text-slate-500">Karpeg</label>
+                        <label class="form-label">Karpeg</label>
                         <input type="text" name="karpeg" value="{{ old('karpeg', $guru->karpeg) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
+                            class="form-input" />
                     </div>
                     <div>
-                        <label class="text-xs text-slate-500">NUPTK</label>
+                        <label class="form-label">NUPTK</label>
                         <input type="text" name="nuptk" value="{{ old('nuptk', $guru->nuptk) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
+                            class="form-input" />
                     </div>
                     <div>
-                        <label class="text-xs text-slate-500">Ijazah</label>
-                        <input type="text" name="ijazah" value="{{ old('ijazah', $guru->ijazah) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500">Golongan</label>
-                        <input type="text" name="gol" value="{{ old('gol', $guru->gol) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500">TMT</label>
-                        <input type="text" name="tmt" value="{{ old('tmt', $guru->tmt) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500">Gaji Pokok</label>
-                        <input type="text" name="gaji_pokok" value="{{ old('gaji_pokok', $guru->gaji_pokok) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500">Mulai Bekerja (Permulaan)</label>
-                        <input type="text" name="mulai_bekerja_permulaan" value="{{ old('mulai_bekerja_permulaan', $guru->mulai_bekerja_permulaan) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500">Mulai Bekerja (Di Sini)</label>
-                        <input type="text" name="mulai_bekerja_di_sini" value="{{ old('mulai_bekerja_di_sini', $guru->mulai_bekerja_di_sini) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500">Masa Kerja (Tahun)</label>
-                        <input type="text" name="masa_kerja_th" value="{{ old('masa_kerja_th', $guru->masa_kerja_th) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500">Masa Kerja (Bulan)</label>
-                        <input type="text" name="masa_kerja_bl" value="{{ old('masa_kerja_bl', $guru->masa_kerja_bl) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500">Gr/Kls/MP</label>
+                        <label class="form-label">Gr/Kls/MP</label>
                         <input type="text" name="gr_kls_mp" value="{{ old('gr_kls_mp', $guru->gr_kls_mp) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500">SK Akhir (Tanggal)</label>
-                        <input type="text" name="sk_akhir_tanggal" value="{{ old('sk_akhir_tanggal', $guru->sk_akhir_tanggal) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
+                            class="form-input" />
                     </div>
                 </div>
             </div>
 
-            <div class="rounded-2xl border border-slate-200 bg-white/70 p-4">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-sm font-semibold text-slate-800">Informasi Tambahan</h3>
-                    <span class="text-xs text-slate-500">Sertifikasi & catatan</span>
-                </div>
-                <div class="grid md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-xs text-slate-500">Sertifikasi (No Peserta)</label>
-                        <input type="text" name="sertifikasi_nmr_psrt" value="{{ old('sertifikasi_nmr_psrt', $guru->sertifikasi_nmr_psrt) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500">Sertifikasi (Tahun)</label>
-                        <input type="text" name="sertifikasi_tahun" value="{{ old('sertifikasi_tahun', $guru->sertifikasi_tahun) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-500">Sertifikasi (NRG)</label>
-                        <input type="text" name="sertifikasi_nrg" value="{{ old('sertifikasi_nrg', $guru->sertifikasi_nrg) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm" />
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex gap-3 pt-2">
-                <button type="submit" class="px-4 py-2 rounded-2xl bg-slate-900 text-white text-sm hover:opacity-90 transition">
+            <div class="flex gap-3 pt-4 border-t border-slate-200">
+                <button type="submit" class="btn-primary inline-flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
                     Simpan
                 </button>
-                <a href="{{ route('admin.guru.index') }}" class="px-4 py-2 rounded-2xl bg-white border border-slate-200 text-sm text-slate-700 hover:bg-slate-50 transition">
+                <a href="{{ route('admin.guru.index') }}" class="btn-secondary">
                     Batal
                 </a>
             </div>

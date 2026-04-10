@@ -236,28 +236,8 @@ class AdminProgramController extends Controller
 
     public function updateHeroBackground(Request $request)
     {
-        $validated = $request->validate([
-            'hero_bg_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'remove_hero_bg_image' => ['nullable', 'boolean'],
-        ]);
-
-        $currentHero = SiteSetting::getValue('program_hero_bg_image');
-
-        if ($request->boolean('remove_hero_bg_image') && $currentHero) {
-            Storage::disk('public')->delete($currentHero);
-            SiteSetting::setValue('program_hero_bg_image', '');
-        }
-
-        if ($request->hasFile('hero_bg_image')) {
-            if ($currentHero) {
-                Storage::disk('public')->delete($currentHero);
-            }
-            $path = $request->file('hero_bg_image')->store('program/hero', 'public');
-            SiteSetting::setValue('program_hero_bg_image', $path);
-        }
-
         return redirect()->route('admin.program-sekolah.index')
-            ->with('status', 'Background program berhasil diperbarui.');
+            ->with('status', 'Background program menggunakan warna standar sekolah.');
     }
 
     public function updateCardBackground(Request $request, string $programSekolah)

@@ -46,11 +46,38 @@ class FasilitasController extends Controller
     // =========================================================
     public function store(Request $request)
     {
-        $data = $this->validateFasilitas($request);
-        if ($request->hasFile('icon_image')) {
-            $data['icon_image'] = $request->file('icon_image')->store('fasilitas/icon', 'public');
+        \Log::info('Fasilitas store started', [
+            'nama' => $request->input('nama'),
+            'has_file' => $request->hasFile('foto'),
+        ]);
+
+        $validated = $this->validateFasilitas($request);
+
+        // Handle file upload
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            
+            \Log::info('Processing file upload', [
+                'filename' => $file->getClientOriginalName(),
+                'size' => $file->getSize(),
+                'extension' => $file->getClientOriginalExtension(),
+            ]);
+
+            // Store file ke storage/app/public/fasilitas
+            $path = $file->store('fasilitas', 'public');
+            
+            $validated['foto'] = $path;
+            
+            \Log::info('File stored successfully', ['path' => $path]);
         }
-        Fasilitas::create($data);
+
+        // Create record
+        $fasilitas = Fasilitas::create($validated);
+        
+        \Log::info('Fasilitas created successfully', [
+            'id' => $fasilitas->id,
+            'nama' => $fasilitas->nama,
+        ]);
 
         return redirect()->route('admin.fasilitas.index')
             ->with('status', 'Data fasilitas berhasil ditambahkan.');
@@ -75,21 +102,54 @@ class FasilitasController extends Controller
     // =========================================================
     public function update(Request $request, Fasilitas $fasilita)
     {
-        $data = $this->validateFasilitas($request);
+        \Log::info('Fasilitas update started', [
+            'id' => $fasilita->id,
+            'nama' => $request->input('nama'),
+            'has_file' => $request->hasFile('foto'),
+            'remove_foto' => $request->input('remove_foto'),
+        ]);
 
-        if ($request->boolean('remove_icon_image') && $fasilita->icon_image) {
-            Storage::disk('public')->delete($fasilita->icon_image);
-            $data['icon_image'] = null;
+        $validated = $this->validateFasilitas($request);
+
+        // Handle remove foto
+        if ($request->boolean('remove_foto') && $fasilita->foto) {
+            \Log::info('Removing old foto', ['path' => $fasilita->foto]);
+            
+            Storage::disk('public')->delete($fasilita->foto);
+            $validated['foto'] = null;
         }
 
-        if ($request->hasFile('icon_image')) {
-            if ($fasilita->icon_image) {
-                Storage::disk('public')->delete($fasilita->icon_image);
+        // Handle file upload (replace old file)
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            
+            \Log::info('Processing new file upload', [
+                'filename' => $file->getClientOriginalName(),
+                'size' => $file->getSize(),
+                'old_path' => $fasilita->foto,
+            ]);
+
+            // Delete old file if exists
+            if ($fasilita->foto) {
+                Storage::disk('public')->delete($fasilita->foto);
+                \Log::info('Old file deleted', ['path' => $fasilita->foto]);
             }
-            $data['icon_image'] = $request->file('icon_image')->store('fasilitas/icon', 'public');
+
+            // Store new file
+            $path = $file->store('fasilitas', 'public');
+            $validated['foto'] = $path;
+            
+            \Log::info('New file stored', ['new_path' => $path]);
         }
 
-        $fasilita->update($data);
+        // Update record
+        $fasilita->update($validated);
+        
+        \Log::info('Fasilitas updated successfully', [
+            'id' => $fasilita->id,
+            'nama' => $fasilita->nama,
+            'foto' => $fasilita->foto,
+        ]);
 
         return redirect()->route('admin.fasilitas.index')
             ->with('status', 'Data fasilitas berhasil diperbarui.');
@@ -103,6 +163,9 @@ class FasilitasController extends Controller
         if ($fasilita->icon_image) {
             Storage::disk('public')->delete($fasilita->icon_image);
         }
+        if ($fasilita->foto) {
+            Storage::disk('public')->delete($fasilita->foto);
+        }
         $fasilita->delete();
 
         return redirect()->route('admin.fasilitas.index')
@@ -111,41 +174,20 @@ class FasilitasController extends Controller
 
     public function updateHeroBackground(Request $request)
     {
-        $validated = $request->validate([
-            'hero_bg_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'remove_hero_bg_image' => ['nullable', 'boolean'],
-        ]);
-
-        $currentHero = SiteSetting::getValue('fasilitas_hero_bg_image');
-
-        if ($request->boolean('remove_hero_bg_image') && $currentHero) {
-            Storage::disk('public')->delete($currentHero);
-            SiteSetting::setValue('fasilitas_hero_bg_image', '');
-        }
-
-        if ($request->hasFile('hero_bg_image')) {
-            if ($currentHero) {
-                Storage::disk('public')->delete($currentHero);
-            }
-            $path = $request->file('hero_bg_image')->store('fasilitas/hero', 'public');
-            SiteSetting::setValue('fasilitas_hero_bg_image', $path);
-        }
-
         return redirect()->route('admin.fasilitas.index')
-            ->with('status', 'Background fasilitas berhasil diperbarui.');
+            ->with('status', 'Background fasilitas menggunakan warna standar sekolah.');
     }
 
     private function validateFasilitas(Request $request): array
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'nama' => ['required', 'string', 'max:255'],
             'deskripsi' => ['nullable', 'string'],
-            'icon' => ['nullable', 'string', 'max:32'],
-            'icon_image' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
-            'remove_icon_image' => ['nullable', 'boolean'],
+            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'remove_foto' => ['nullable', 'boolean'],
         ]);
 
-        return $data;
+        return $validated;
     }
 
     // =========================================================

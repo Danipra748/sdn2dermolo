@@ -8,21 +8,42 @@ use App\Http\Controllers\GuruController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\AdminProgramController;
+
+// Load migration routes (development only)
+if (file_exists(__DIR__.'/migration.php')) {
+    require __DIR__.'/migration.php';
+}
 use App\Http\Controllers\AdminPrestasiController;
 use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\AdminSambutanController;
-use App\Http\Controllers\AdminKontakController;
 use App\Http\Controllers\AdminArticleController;
 use App\Http\Controllers\AdminCategoryController;
 use App\Http\Controllers\AdminProgramPhotoController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\AdminContactMessageController;
+use App\Http\Controllers\AdminHomepageController;
+use App\Http\Controllers\AboutController;
+use App\Http\Controllers\AdminSchoolProfileController;
+use App\Http\Controllers\AdminSettingsController;
+use App\Http\Controllers\SpaController;
 
 Route::get('/', [PageController::class, 'index'])->name('home');
 Route::get('/program', [PageController::class, 'programIndex'])->name('program.index');
 Route::get('/fasilitas', [PageController::class, 'fasilitasIndex'])->name('fasilitas.index');
 Route::get('/guru-pendidik', [PageController::class, 'guruIndex'])->name('guru.index');
+Route::get('/tentang-kami', [AboutController::class, 'index'])->name('about');
+
+// SPA Routes - Dynamic content loading
+Route::prefix('spa')->name('spa.')->group(function () {
+    Route::get('/home', [SpaController::class, 'getHomeContent'])->name('home');
+    Route::get('/sarana-prasarana', [SpaController::class, 'getSaranaPrasaranaContent'])->name('sarana-prasarana');
+    Route::get('/data-guru', [SpaController::class, 'getDataGuruContent'])->name('data-guru');
+    Route::get('/prestasi', [SpaController::class, 'getPrestasiContent'])->name('prestasi');
+    Route::get('/about', [SpaController::class, 'getAboutContent'])->name('about');
+    Route::get('/berita', [SpaController::class, 'getBeritaContent'])->name('berita');
+    Route::get('/program', [SpaController::class, 'getProgramContent'])->name('program');
+});
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -98,21 +119,39 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::put('prestasi-sekolah/ringkasan', [AdminPrestasiController::class, 'updateRingkasan'])
         ->name('prestasi-sekolah.ringkasan.update');
 
+    // Halaman khusus tersembunyi untuk backup form admin.
+    // Di sini lokasi penyimpanan path logonya.
+    // Di sini variabel sambutan kepala sekolah diproses.
+    Route::get('hidden-settings', [AdminSettingsController::class, 'hiddenSettings'])
+        ->name('hidden-settings');
+
     // Sambutan Kepala Sekolah
     Route::get('sambutan-kepsek', [AdminSambutanController::class, 'edit'])
         ->name('sambutan-kepsek.edit');
     Route::put('sambutan-kepsek', [AdminSambutanController::class, 'update'])
         ->name('sambutan-kepsek.update');
 
-    // Kontak Sekolah
-    Route::get('kontak-sekolah', [AdminKontakController::class, 'edit'])
-        ->name('kontak.edit');
-    Route::put('kontak-sekolah', [AdminKontakController::class, 'update'])
-        ->name('kontak.update');
-
     // Pesan Masuk
     Route::get('pesan-masuk', [AdminContactMessageController::class, 'index'])
         ->name('messages.index');
+
+    // Homepage Management (Read-only static info)
+    Route::prefix('homepage')->name('homepage.')->group(function () {
+        Route::get('/', [AdminHomepageController::class, 'index'])->name('index');
+    });
+
+    // School Profile Management
+    Route::prefix('school-profile')->name('school-profile.')->group(function () {
+        Route::get('/', [AdminSchoolProfileController::class, 'edit'])->name('edit');
+        Route::put('/', [AdminSchoolProfileController::class, 'update'])->name('update');
+        Route::delete('/logo', [AdminSchoolProfileController::class, 'deleteLogo'])->name('delete-logo');
+    });
+
+    // Settings - Logo Upload
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/logo', [AdminSettingsController::class, 'logoSettings'])->name('logo');
+        Route::post('/logo/upload', [AdminSettingsController::class, 'uploadLogo'])->name('upload-logo');
+    });
 
     // Prestasi Sekolah CRUD
     Route::resource('prestasi-sekolah', AdminPrestasiController::class)
