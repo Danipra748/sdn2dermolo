@@ -13,16 +13,14 @@ class CoordinateSeeder extends Seeder
      */
     public function run(): void
     {
-        // Check if columns exist
+        // Check if columns exist before adding
         if (!Schema::hasColumn('site_settings', 'school_latitude')) {
-            // Add columns first
-            DB::statement("
-                ALTER TABLE `site_settings` 
-                ADD COLUMN `school_latitude` DECIMAL(10, 8) NULL COMMENT 'School location latitude (decimal degrees)',
-                ADD COLUMN `school_longitude` DECIMAL(11, 8) NULL COMMENT 'School location longitude (decimal degrees)',
-                ADD COLUMN `map_zoom` INT NULL DEFAULT 15 COMMENT 'Map zoom level (1-19)'
-            ");
-            
+            Schema::table('site_settings', function ($table) {
+                $table->decimal('school_latitude', 10, 8)->nullable()->after('value');
+                $table->decimal('school_longitude', 11, 8)->nullable()->after('school_latitude');
+                $table->integer('map_zoom')->default(15)->after('school_longitude');
+            });
+
             $this->command->info('✅ Added coordinate columns to site_settings table');
         }
 
