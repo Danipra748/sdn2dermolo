@@ -13,7 +13,7 @@ class FasilitasSeeder extends Seeder
             [
                 'nama' => 'Ruang Kelas',
                 'deskripsi' => 'Ruang belajar nyaman dilengkapi fasilitas mendukung proses pembelajaran',
-                'icon' => '🏫',
+                'icon' => '',
                 'warna' => 'blue',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -21,7 +21,7 @@ class FasilitasSeeder extends Seeder
             [
                 'nama' => 'Perpustakaan',
                 'deskripsi' => 'Tempat membaca nyaman dengan koleksi buku lengkap siswa',
-                'icon' => '📚',
+                'icon' => '',
                 'warna' => 'green',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -29,7 +29,7 @@ class FasilitasSeeder extends Seeder
             [
                 'nama' => 'Musholla',
                 'deskripsi' => 'Tempat ibadah bersih untuk shalat dan kegiatan keagamaan',
-                'icon' => '🕌',
+                'icon' => '',
                 'warna' => 'purple',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -37,7 +37,7 @@ class FasilitasSeeder extends Seeder
             [
                 'nama' => 'Lapangan Olahraga',
                 'deskripsi' => 'Area luas untuk olahraga, upacara, dan aktivitas fisik siswa',
-                'icon' => '⚽',
+                'icon' => '',
                 'warna' => 'orange',
                 'created_at' => now(),
                 'updated_at' => now(),
