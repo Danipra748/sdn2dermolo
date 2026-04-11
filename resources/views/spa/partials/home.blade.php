@@ -221,6 +221,136 @@
     </div>
 </section>
 
+{{-- Galeri Section --}}
+@if($galeri && $galeri->count() > 0)
+<section id="galeri" class="section relative bg-white px-6 py-20 md:py-24">
+    <div class="section-inner mx-auto max-w-[1200px]">
+        <div class="text-center reveal">
+            <div class="section-label inline-flex items-center justify-center gap-2 rounded-full bg-blue-100 px-4 py-[0.4rem] text-[0.8rem] font-bold uppercase tracking-[0.12em] text-blue-600">
+                <x-heroicon-o-camera class="h-4 w-4" /> GALERI
+            </div>
+            <h2 class="section-title mt-3 font-display text-[clamp(2rem,4vw,3rem)] font-black leading-[1.15] tracking-[-0.02em] text-slate-900">
+                Galeri Terbaru
+            </h2>
+            <p class="section-desc mx-auto mt-4 max-w-[560px] text-[1.05rem] leading-[1.7] text-slate-500">
+                Dokumentasi kegiatan dan momen berharga di SD N 2 Dermolo.
+            </p>
+        </div>
+
+        <div class="galeri-grid mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            @foreach($galeri as $item)
+            <button type="button"
+               class="galeri-card group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm reveal transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-pointer"
+               data-gallery-card
+               data-title="{{ $item->judul ?? '' }}"
+               data-desc="{{ $item->deskripsi ?? '' }}"
+               data-image="{{ $item->foto ? asset('storage/' . $item->foto) : '' }}">
+                @if($item->foto)
+                    <div class="aspect-[4/3] overflow-hidden">
+                        <img src="{{ asset('storage/' . $item->foto) }}"
+                             alt="{{ $item->judul }}"
+                             class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105">
+                    </div>
+                @else
+                    <div class="aspect-[4/3] bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+                        <x-heroicon-o-camera class="h-16 w-16 text-white opacity-50" />
+                    </div>
+                @endif
+
+                <div class="p-5">
+                    <div class="mb-2 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-blue-600">Galeri</div>
+                    <h3 class="mb-2 text-[0.95rem] font-bold leading-snug text-slate-900 line-clamp-2">
+                        {{ \Illuminate\Support\Str::limit($item->judul, 50) }}
+                    </h3>
+                    @if($item->deskripsi)
+                    <p class="text-[0.8rem] leading-5 text-slate-600 line-clamp-2">
+                        {{ \Illuminate\Support\Str::limit($item->deskripsi, 80) }}
+                    </p>
+                    @endif
+                    <div class="mt-3 pt-2 border-t border-slate-100 text-[0.72rem] font-semibold uppercase tracking-[0.1em] text-blue-600">
+                        Klik untuk detail
+                    </div>
+                </div>
+            </button>
+            @endforeach
+        </div>
+
+        <div class="mt-12 text-center">
+            <a href="{{ route('gallery.index') }}"
+               class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700">
+                <x-heroicon-o-arrow-right class="h-5 w-5" />
+                Lihat Semua Galeri
+            </a>
+        </div>
+    </div>
+</section>
+
+{{-- Gallery Modal for Homepage --}}
+<div id="gallery-modal" class="gallery-modal" aria-hidden="true" style="position: fixed; inset: 0; display: none; align-items: center; justify-content: center; padding: 1.5rem; z-index: 60;">
+    <div class="absolute inset-0 bg-slate-900/60" data-gallery-close></div>
+    <div class="relative bg-white rounded-[1.5rem] overflow-hidden max-w-[900px] w-full grid grid-cols-1 md:grid-cols-[1.2fr_1fr] shadow-[0_30px_60px_rgba(15,23,42,0.2)] z-10" role="dialog" aria-modal="true" aria-labelledby="gallery-modal-title">
+        <button type="button" class="absolute top-[0.75rem] right-[0.75rem] w-[38px] h-[38px] rounded-full bg-white border border-slate-200 inline-flex items-center justify-center shadow-[0_8px_18px_rgba(15,23,42,0.12)] cursor-pointer z-20" data-gallery-close aria-label="Tutup">
+            <x-heroicon-o-x-mark class="w-5 h-5 text-slate-700" />
+        </button>
+        <div class="bg-slate-200 min-h-[300px]">
+            <img id="gallery-modal-image" alt="" class="w-full h-full object-cover" />
+        </div>
+        <div class="p-6">
+            <h3 id="gallery-modal-title" class="font-black text-[1.35rem] text-slate-900"></h3>
+            <p id="gallery-modal-desc" class="mt-[0.75rem] text-slate-500 leading-[1.7]"></p>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+(() => {
+    const modal = document.getElementById('gallery-modal');
+    if (!modal) return;
+    const imageEl = document.getElementById('gallery-modal-image');
+    const titleEl = document.getElementById('gallery-modal-title');
+    const descEl  = document.getElementById('gallery-modal-desc');
+
+    const openModal = (card) => {
+        const title = card.dataset.title || '';
+        const desc  = card.dataset.desc || '';
+        const img   = card.dataset.image || '';
+        titleEl.textContent = title;
+        descEl.textContent = desc || 'Deskripsi belum tersedia.';
+        if (img) {
+            imageEl.src = img;
+            imageEl.style.display = 'block';
+        } else {
+            imageEl.removeAttribute('src');
+            imageEl.style.display = 'none';
+        }
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeModal = () => {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    };
+
+    document.querySelectorAll('[data-gallery-card]').forEach(card => {
+        card.addEventListener('click', () => openModal(card));
+    });
+    modal.querySelectorAll('[data-gallery-close]').forEach(btn => {
+        btn.addEventListener('click', closeModal);
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+    });
+})();
+</script>
+@endpush
+@endif
+
 {{-- Berita Section --}}
 @if($berita && $berita->count() > 0)
 <section id="berita" class="section relative bg-slate-50 px-6 py-20 md:py-24">

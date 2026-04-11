@@ -41,14 +41,14 @@
                             <td class="px-4 py-3">
                                 <div class="flex gap-2">
                                     <a href="{{ route('admin.fasilitas.edit', $item) }}"
-                                       class="px-3 py-1 rounded-xl bg-slate-900 text-white text-xs">
+                                       class="btn-edit">
                                         Edit
                                     </a>
                                     <form action="{{ route('admin.fasilitas.destroy', $item) }}" method="POST"
                                           data-confirm="Hapus data fasilitas ini?">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="px-3 py-1 rounded-xl bg-white border border-slate-200 text-xs">
+                                        <button type="submit" class="btn-delete">
                                             Hapus
                                         </button>
                                     </form>

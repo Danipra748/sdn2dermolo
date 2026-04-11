@@ -88,7 +88,8 @@
                         <div>
                             <label class="form-label">Foto Profil</label>
                             <input type="file" name="photo" accept=".jpg,.jpeg,.png,.webp"
-                                class="form-input py-2" />
+                                class="drop-zone-enabled"
+                                id="foto-guru" />
                             @error('photo') <p class="text-xs text-coral mt-2">{{ $message }}</p> @enderror
                         </div>
                         <div class="flex flex-col justify-center">

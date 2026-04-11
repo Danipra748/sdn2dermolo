@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Article;
 use App\Models\Category;
 use App\Models\Fasilitas;
+use App\Models\Gallery;
 use App\Models\Guru;
 use App\Models\HomepageSection;
 use App\Models\Prestasi;
@@ -47,6 +48,11 @@ class SpaController extends Controller
         // Get latest news (3 posts)
         $berita = $this->getPublishedNews(3);
 
+        // Get latest gallery (4 photos)
+        $galeri = Schema::hasTable('galleries')
+            ? Gallery::latest()->take(4)->get()
+            : collect();
+
         // Get contact info from static config
         $kontak = SchoolConfig::contact();
         $alamatLines = SchoolConfig::addressLines();
@@ -64,6 +70,7 @@ class SpaController extends Controller
                 'visi',
                 'misi',
                 'berita',
+                'galeri',
                 'kontak',
                 'mapsEmbed',
                 'mapsOpen',
@@ -118,6 +125,21 @@ class SpaController extends Controller
             compact('prestasi'),
             'Prestasi - SD N 2 Dermolo',
             route('prestasi.index')
+        );
+    }
+
+    public function getGalleryContent(Request $request): JsonResponse|RedirectResponse
+    {
+        $galleries = Schema::hasTable('galleries')
+            ? Gallery::latest()->get()
+            : collect();
+
+        return $this->respond(
+            $request,
+            'spa.partials.gallery',
+            compact('galleries'),
+            'Galeri - SD N 2 Dermolo',
+            route('gallery.index')
         );
     }
 

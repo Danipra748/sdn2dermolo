@@ -61,55 +61,70 @@
 
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Background Card Program</label>
-                <input type="file" name="card_bg_image" accept=".jpg,.jpeg,.png,.webp"
-                       class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-300">
+                <input type="file" 
+                       id="card_bg_image" 
+                       name="card_bg_image" 
+                       accept=".jpg,.jpeg,.png,.webp"
+                       class="drop-zone-enabled w-full">
                 @error('card_bg_image')
                     <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
                 @enderror
                 @if ($program->card_bg_image)
-                    <img src="{{ asset('storage/' . $program->card_bg_image) }}" alt="Background {{ $program->title }}"
-                         class="mt-3 h-24 w-full rounded-xl object-cover border border-slate-200">
-                    <label class="mt-2 inline-flex items-center gap-2 text-xs text-slate-600">
-                        <input type="checkbox" name="remove_card_bg_image" value="1"
-                               class="rounded border-slate-300 text-slate-900 focus:ring-slate-300">
-                        Hapus background saat ini
-                    </label>
+                    <div class="existing-preview mt-3">
+                        <img src="{{ asset('storage/' . $program->card_bg_image) }}" alt="Background {{ $program->title }}"
+                             class="h-24 w-full rounded-xl object-cover border border-slate-200">
+                        <label class="mt-2 inline-flex items-center gap-2 text-xs text-slate-600">
+                            <input type="checkbox" name="remove_card_bg_image" value="1"
+                                   class="rounded border-slate-300 text-slate-900 focus:ring-slate-300">
+                            Hapus background saat ini
+                        </label>
+                    </div>
                 @endif
             </div>
 
             <div class="grid md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Foto Program</label>
-                    <input type="file" name="foto" accept=".jpg,.jpeg,.png,.webp"
-                           class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-300">
+                    <input type="file" 
+                           id="foto_program" 
+                           name="foto" 
+                           accept=".jpg,.jpeg,.png,.webp"
+                           class="drop-zone-enabled w-full">
                     @error('foto')
                         <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                     @if ($program->foto)
-                        <img src="{{ asset('storage/' . $program->foto) }}" alt="{{ $program->title }}"
-                             class="mt-3 h-20 w-20 rounded-xl object-cover border border-slate-200">
-                        <label class="mt-2 inline-flex items-center gap-2 text-xs text-slate-600">
-                            <input type="checkbox" name="remove_foto" value="1"
-                                   class="rounded border-slate-300 text-slate-900 focus:ring-slate-300">
-                            Hapus foto saat ini
-                        </label>
+                        <div class="existing-preview mt-3">
+                            <img src="{{ asset('storage/' . $program->foto) }}" alt="{{ $program->title }}"
+                                 class="h-20 w-20 rounded-xl object-cover border border-slate-200">
+                            <label class="mt-2 inline-flex items-center gap-2 text-xs text-slate-600">
+                                <input type="checkbox" name="remove_foto" value="1"
+                                       class="rounded border-slate-300 text-slate-900 focus:ring-slate-300">
+                                Hapus foto saat ini
+                            </label>
+                        </div>
                     @endif
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Logo Program</label>
-                    <input type="file" name="logo" accept=".jpg,.jpeg,.png,.webp"
-                           class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-300">
+                    <input type="file" 
+                           id="logo_program" 
+                           name="logo" 
+                           accept=".jpg,.jpeg,.png,.webp"
+                           class="drop-zone-enabled w-full">
                     @error('logo')
                         <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
                     @enderror
                     @if ($program->logo)
-                        <img src="{{ asset('storage/' . $program->logo) }}" alt="Logo {{ $program->title }}"
-                             class="mt-3 h-20 w-20 rounded-full object-cover border border-slate-200">
-                        <label class="mt-2 inline-flex items-center gap-2 text-xs text-slate-600">
-                            <input type="checkbox" name="remove_logo" value="1"
-                                   class="rounded border-slate-300 text-slate-900 focus:ring-slate-300">
-                            Hapus logo saat ini
-                        </label>
+                        <div class="existing-preview mt-3">
+                            <img src="{{ asset('storage/' . $program->logo) }}" alt="Logo {{ $program->title }}"
+                                 class="h-20 w-20 rounded-full object-cover border border-slate-200">
+                            <label class="mt-2 inline-flex items-center gap-2 text-xs text-slate-600">
+                                <input type="checkbox" name="remove_logo" value="1"
+                                       class="rounded border-slate-300 text-slate-900 focus:ring-slate-300">
+                                Hapus logo saat ini
+                            </label>
+                        </div>
                     @endif
                 </div>
             </div>

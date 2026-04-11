@@ -15,6 +15,8 @@ if (file_exists(__DIR__.'/migration.php')) {
 }
 use App\Http\Controllers\AdminPrestasiController;
 use App\Http\Controllers\PrestasiController;
+use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\AdminGalleryController;
 use App\Http\Controllers\AdminSambutanController;
 use App\Http\Controllers\AdminArticleController;
 use App\Http\Controllers\AdminCategoryController;
@@ -40,6 +42,7 @@ Route::prefix('spa')->name('spa.')->group(function () {
     Route::get('/sarana-prasarana', [SpaController::class, 'getSaranaPrasaranaContent'])->name('sarana-prasarana');
     Route::get('/data-guru', [SpaController::class, 'getDataGuruContent'])->name('data-guru');
     Route::get('/prestasi', [SpaController::class, 'getPrestasiContent'])->name('prestasi');
+    Route::get('/gallery', [SpaController::class, 'getGalleryContent'])->name('gallery');
     Route::get('/about', [SpaController::class, 'getAboutContent'])->name('about');
     Route::get('/berita', [SpaController::class, 'getBeritaContent'])->name('berita');
     Route::get('/program', [SpaController::class, 'getProgramContent'])->name('program');
@@ -64,6 +67,9 @@ Route::prefix('program')->name('program.')->group(function () {
 
 // ── PRESTASI ──
 Route::get('/prestasi', [PrestasiController::class, 'index'])->name('prestasi.index');
+
+// ── GALLERY ──
+Route::get('/galeri', [GalleryController::class, 'index'])->name('gallery.index');
 
 // Pesan Kontak
 Route::post('/kirim-pesan', [ContactMessageController::class, 'store'])->name('contact-messages.store');
@@ -157,6 +163,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::resource('prestasi-sekolah', AdminPrestasiController::class)
         ->except(['show'])
         ->parameters(['prestasi-sekolah' => 'prestasiSekolah']);
+
+    // Gallery CRUD
+    Route::resource('gallery', AdminGalleryController::class)
+        ->except(['show'])
+        ->parameters(['gallery' => 'gallery']);
 
     // Artikel & News
     Route::post('articles/ai-generate', [AdminArticleController::class, 'generateAi'])

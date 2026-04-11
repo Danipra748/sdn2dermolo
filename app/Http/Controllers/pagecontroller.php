@@ -7,6 +7,7 @@ use App\Support\SchoolConfig;
 use App\Support\SchoolData;
 use App\Models\Guru;
 use App\Models\Fasilitas;
+use App\Models\Gallery;
 use App\Models\Program;
 use App\Models\Prestasi;
 use App\Models\SiteSetting;
@@ -63,6 +64,11 @@ class PageController extends Controller
                 ->get()
             : collect();
 
+        // Get latest gallery (4 photos)
+        $galeri = Schema::hasTable('galleries')
+            ? Gallery::latest()->take(4)->get()
+            : collect();
+
         return view('home', compact(
             'hero',
             'kepsek',
@@ -72,6 +78,7 @@ class PageController extends Controller
             'visi',
             'misi',
             'berita',
+            'galeri',
             'mapsEmbed',
             'mapsOpen',
             'alamatLines'

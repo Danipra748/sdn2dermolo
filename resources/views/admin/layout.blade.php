@@ -227,11 +227,51 @@
             border: none;
             cursor: pointer;
             font-size: 13px;
+            opacity: 1 !important;
+            display: inline-block !important;
+            visibility: visible !important;
         }
         .btn-delete:hover {
             background: #DC2626;
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
             transform: translateY(-1px);
+        }
+
+        /* 
+         * GLOBAL DELETE BUTTON FIX - Force all delete buttons to be visible
+         * Fix untuk semua tombol hapus yang tersembunyi di berbagai halaman
+         * Target: Gallery, Prestasi, Fasilitas, Program Photos, dll.
+         */
+        form button[type="submit"],
+        form button[class*="Hapus"],
+        button[class*="hapus"],
+        button[class*="delete"] {
+            opacity: 1 !important;
+            display: inline-block !important;
+            visibility: visible !important;
+        }
+
+        /* Force delete buttons in forms to be red and visible */
+        form[action*="destroy"] button[type="submit"],
+        form[method="POST"] button[type="submit"] {
+            opacity: 1 !important;
+        }
+
+        /* Specific fix for white delete buttons */
+        button.bg-white.border-slate-200,
+        button[class*="bg-white"][class*="border-slate"] {
+            background: #EF4444 !important;
+            color: white !important;
+            border-color: #EF4444 !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        button.bg-white.border-slate-200:hover,
+        button[class*="bg-white"][class*="border-slate"]:hover {
+            background: #DC2626 !important;
+            border-color: #DC2626 !important;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
         }
 
         .btn-secondary {
@@ -247,6 +287,62 @@
         .btn-secondary:hover {
             background: #F8FAFC;
             border-color: #CBD5E1;
+        }
+
+        /* 
+         * MODAL CONFIRMATION BUTTON FIX
+         * Fix untuk tombol 'Hapus' di modal konfirmasi yang tersembunyi
+         * Pastikan selalu terlihat dengan warna merah yang kontras
+         */
+        #confirm-ok {
+            background-color: #DC2626 !important;      /* Merah gelap - selalu terlihat */
+            color: #FFFFFF !important;                  /* Teks putih */
+            border: 2px solid #DC2626 !important;       /* Border merah */
+            opacity: 1 !important;                      /* Selalu visible */
+            visibility: visible !important;             /* Selalu visible */
+            display: inline-block !important;           /* Selalu block */
+            font-weight: 600 !important;                /* Bold untuk emphasis */
+            cursor: pointer !important;                 /* Cursor pointer */
+            transition: all 0.2s ease !important;       /* Smooth transition */
+        }
+
+        #confirm-ok:hover {
+            background-color: #B91C1C !important;       /* Lebih gelap saat hover */
+            border-color: #B91C1C !important;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4) !important;
+            transform: translateY(-1px);
+        }
+
+        #confirm-cancel {
+            background-color: #FFFFFF !important;
+            color: #475569 !important;
+            border: 2px solid #CBD5E1 !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: inline-block !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+
+        #confirm-cancel:hover {
+            background-color: #F1F5F9 !important;
+            border-color: #94A3B8 !important;
+            color: #1E293B !important;
+        }
+
+        /* Force modal container to always show buttons properly */
+        #confirm-modal button[type="button"] {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: inline-block !important;
+        }
+
+        /* Prevent any inheritance that might hide modal buttons */
+        #confirm-modal .flex button,
+        #public-confirm-modal .flex button {
+            opacity: 1 !important;
+            visibility: visible !important;
         }
 
         /* Table styling with alternating rows */
@@ -340,6 +436,9 @@
         }
     </style>
     @stack('styles')
+    
+    {{-- Global Drop Zone Styles --}}
+    <link rel="stylesheet" href="{{ asset('css/drop-zone.css') }}">
 </head>
 <body class="admin-bg text-slate-700 min-h-screen">
     <div class="min-h-screen flex">
@@ -374,9 +473,22 @@
                         || request()->routeIs('admin.guru.*')
                         || request()->routeIs('admin.program-sekolah.*')
                         || request()->routeIs('admin.prestasi-sekolah.*')
+                        || request()->routeIs('admin.gallery.*')
                         || request()->routeIs('admin.articles.*')
                         || request()->routeIs('admin.categories.*')
                         || request()->routeIs('admin.messages.*');
+                    
+                    // Submenu open states
+                    $galeriPrestasiOpen = request()->routeIs('admin.prestasi-sekolah.*') || request()->routeIs('admin.gallery.*');
+                    $manajemenBeritaOpen = request()->routeIs('admin.articles.*') || request()->routeIs('admin.categories.*');
+                    
+                    // Check if current page has file upload forms
+                    $hasFileUpload = request()->routeIs('admin.gallery.*')
+                        || request()->routeIs('admin.prestasi-sekolah.*')
+                        || request()->routeIs('admin.fasilitas.*')
+                        || request()->routeIs('admin.guru.*')
+                        || request()->routeIs('admin.program-sekolah.*')
+                        || request()->routeIs('admin.articles.*');
                 @endphp
 
                 <nav class="flex flex-col gap-5 text-sm overflow-y-auto flex-1">
@@ -471,33 +583,78 @@
                                         <span>Program Sekolah</span>
                                     </div>
                                 </a>
-                                <a href="{{ route('admin.prestasi-sekolah.index') }}"
-                                   class="sidebar-link {{ request()->routeIs('admin.prestasi-sekolah.*') ? 'is-active' : '' }}">
-                                    <div class="flex items-center gap-2.5">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+
+                                {{-- Submenu: Galeri & Prestasi --}}
+                                <details class="rounded-xl" {{ $galeriPrestasiOpen ? 'open' : '' }}>
+                                    <summary class="sidebar-summary">
+                                        <div class="flex items-center gap-2.5">
+                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                            </svg>
+                                            <span>Galeri & Prestasi</span>
+                                        </div>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                                         </svg>
-                                        <span>Prestasi Sekolah</span>
+                                    </summary>
+                                    <div class="sidebar-sub">
+                                        <a href="{{ route('admin.prestasi-sekolah.index') }}"
+                                           class="sidebar-link {{ request()->routeIs('admin.prestasi-sekolah.*') ? 'is-active' : '' }}">
+                                            <div class="flex items-center gap-2.5">
+                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                                                </svg>
+                                                <span>Prestasi Sekolah</span>
+                                            </div>
+                                        </a>
+                                        <a href="{{ route('admin.gallery.index') }}"
+                                           class="sidebar-link {{ request()->routeIs('admin.gallery.*') ? 'is-active' : '' }}">
+                                            <div class="flex items-center gap-2.5">
+                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                </svg>
+                                                <span>Galeri Foto</span>
+                                            </div>
+                                        </a>
                                     </div>
-                                </a>
-                                <a href="{{ route('admin.articles.index') }}"
-                                   class="sidebar-link {{ request()->routeIs('admin.articles.*') ? 'is-active' : '' }}">
-                                    <div class="flex items-center gap-2.5">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </details>
+
+                                {{-- Submenu: Manajemen Berita --}}
+                                <details class="rounded-xl" {{ $manajemenBeritaOpen ? 'open' : '' }}>
+                                    <summary class="sidebar-summary">
+                                        <div class="flex items-center gap-2.5">
+                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                                            </svg>
+                                            <span>Manajemen Berita</span>
+                                        </div>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                                         </svg>
-                                        <span>Artikel & News</span>
+                                    </summary>
+                                    <div class="sidebar-sub">
+                                        <a href="{{ route('admin.articles.index') }}"
+                                           class="sidebar-link {{ request()->routeIs('admin.articles.*') ? 'is-active' : '' }}">
+                                            <div class="flex items-center gap-2.5">
+                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                </svg>
+                                                <span>Artikel & News</span>
+                                            </div>
+                                        </a>
+                                        <a href="{{ route('admin.categories.index') }}"
+                                           class="sidebar-link {{ request()->routeIs('admin.categories.*') ? 'is-active' : '' }}">
+                                            <div class="flex items-center gap-2.5">
+                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                                </svg>
+                                                <span>Kategori Artikel</span>
+                                            </div>
+                                        </a>
                                     </div>
-                                </a>
-                                <a href="{{ route('admin.categories.index') }}"
-                                   class="sidebar-link {{ request()->routeIs('admin.categories.*') ? 'is-active' : '' }}">
-                                    <div class="flex items-center gap-2.5">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                                        </svg>
-                                        <span>Kategori Artikel</span>
-                                    </div>
-                                </a>
+                                </details>
+
                                 <a href="{{ route('admin.messages.index') }}"
                                    class="sidebar-link {{ request()->routeIs('admin.messages.*') ? 'is-active' : '' }}">
                                     <div class="flex items-center gap-2.5">
@@ -592,21 +749,27 @@
         <div class="absolute inset-0 bg-slate-900/70" data-confirm-close="true"></div>
         <div class="relative w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden">
             <div class="p-6">
-                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mx-auto mb-4">
-                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex items-center justify-center w-14 h-14 rounded-full bg-red-100 mx-auto mb-4">
+                    <svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                     </svg>
                 </div>
-                <h3 class="text-lg font-semibold text-slate-800 text-center">Konfirmasi</h3>
+                <h3 class="text-lg font-semibold text-slate-800 text-center">Konfirmasi Hapus</h3>
                 <p id="confirm-message" class="mt-3 text-sm text-slate-600 text-center">Apakah Anda yakin ingin menghapus data ini?</p>
-                <div class="mt-6 flex items-center justify-center gap-3">
-                    <button type="button" id="confirm-cancel"
-                            class="px-6 py-2.5 rounded-xl border border-slate-300 text-sm font-medium text-slate-700 hover:bg-slate-50 transition">
+                
+                <div class="mt-6 flex items-center justify-center gap-4">
+                    <button type="button" 
+                            id="confirm-cancel"
+                            class="px-8 py-3 rounded-xl text-sm font-semibold transition-all duration-200">
                         Batal
                     </button>
-                    <button type="button" id="confirm-ok"
-                            class="px-6 py-2.5 rounded-xl bg-coral text-white text-sm font-medium hover:bg-red-600 transition">
-                        Hapus
+                    <button type="button" 
+                            id="confirm-ok"
+                            class="px-8 py-3 rounded-xl text-sm font-semibold transition-all duration-200">
+                        <svg class="inline-block w-4 h-4 mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 4m8 4V6m0 0L11 4m2 2h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Ya, Hapus
                     </button>
                 </div>
             </div>
@@ -653,5 +816,8 @@
     </script>
 
     @stack('scripts')
+    
+    {{-- Global Drop Zone Script --}}
+    <script src="{{ asset('js/drop-zone.js') }}"></script>
 </body>
 </html>

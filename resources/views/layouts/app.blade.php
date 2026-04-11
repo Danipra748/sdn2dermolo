@@ -287,6 +287,52 @@
                 transform: translateX(0);
             }
         }
+
+        /* 
+         * PUBLIC MODAL CONFIRMATION BUTTON FIX
+         * Fix untuk tombol 'Lanjutkan' di modal konfirmasi public
+         */
+        #public-confirm-ok {
+            background-color: #DC2626 !important;       /* Merah gelap */
+            color: #FFFFFF !important;                   /* Teks putih */
+            border: 2px solid #DC2626 !important;        /* Border merah */
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: inline-block !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+
+        #public-confirm-ok:hover {
+            background-color: #B91C1C !important;
+            border-color: #B91C1C !important;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4) !important;
+            transform: translateY(-1px);
+        }
+
+        #public-confirm-cancel {
+            background-color: #FFFFFF !important;
+            color: #475569 !important;
+            border: 2px solid #CBD5E1 !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: inline-block !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+
+        #public-confirm-cancel:hover {
+            background-color: #F1F5F9 !important;
+            border-color: #94A3B8 !important;
+        }
+
+        /* Force all modal buttons to be visible */
+        #public-confirm-modal button[type="button"] {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
     </style>
     @stack('styles')
 </head>
@@ -336,6 +382,7 @@
                 <a href="{{ route('guru.index') }}" data-spa="/spa/data-guru" data-spa-title="Data Guru - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('guru.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Data Guru</a>
                 <a href="{{ route('news.index') }}" data-spa="/spa/berita" data-spa-title="Berita - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('news.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Berita</a>
                 <a href="{{ route('prestasi.index') }}" data-spa="/spa/prestasi" data-spa-title="Prestasi - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('prestasi.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Prestasi</a>
+                <a href="{{ route('gallery.index') }}" data-spa="/spa/gallery" data-spa-title="Galeri - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('gallery.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Galeri</a>
                 <a href="{{ route('home') }}#kontak" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600">Kontak</a>
             </div>
 
@@ -363,6 +410,7 @@
             <a href="{{ route('guru.index') }}" data-spa="/spa/data-guru" data-spa-title="Data Guru - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('guru.*') ? 'text-blue-600' : '' }}">Data Guru</a>
             <a href="{{ route('news.index') }}" data-spa="/spa/berita" data-spa-title="Berita - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('news.*') ? 'text-blue-600' : '' }}">Berita</a>
             <a href="{{ route('prestasi.index') }}" data-spa="/spa/prestasi" data-spa-title="Prestasi - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('prestasi.*') ? 'text-blue-600' : '' }}">Prestasi</a>
+            <a href="{{ route('gallery.index') }}" data-spa="/spa/gallery" data-spa-title="Galeri - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('gallery.*') ? 'text-blue-600' : '' }}">Galeri</a>
             <a href="{{ route('home') }}#kontak" class="block py-2 font-semibold text-slate-600">Kontak</a>
             
             {{-- Mobile Admin Actions --}}
@@ -385,7 +433,7 @@
     </nav>
 
     {{-- ===== KONTEN HALAMAN ===== --}}
-    <main id="main-content">
+    <main id="main-content" style="opacity: 1; visibility: visible; min-height: 400px;">
         @yield('content')
     </main>
 
@@ -446,6 +494,7 @@
                         <li><a href="{{ route('about') }}" data-spa="/spa/about" data-spa-title="Profil - SD N 2 Dermolo" class="spa-nav-link inline-block">Profil</a></li>
                         <li><a href="{{ route('guru.index') }}" data-spa="/spa/data-guru" data-spa-title="Tenaga Kependidikan - SD N 2 Dermolo" class="spa-nav-link inline-block">Tenaga Kependidikan</a></li>
                         <li><a href="{{ route('prestasi.index') }}" data-spa="/spa/prestasi" data-spa-title="Prestasi - SD N 2 Dermolo" class="spa-nav-link inline-block">Prestasi</a></li>
+                        <li><a href="{{ route('gallery.index') }}" data-spa="/spa/gallery" data-spa-title="Galeri - SD N 2 Dermolo" class="spa-nav-link inline-block">Galeri</a></li>
                         <li><a href="{{ route('fasilitas.index') }}" data-spa="/spa/sarana-prasarana" data-spa-title="Fasilitas - SD N 2 Dermolo" class="spa-nav-link inline-block">Fasilitas</a></li>
                         <li><a href="{{ route('home') }}#kontak" data-spa="/spa/home" data-spa-title="Kontak - SD N 2 Dermolo" data-spa-hash="#kontak" class="spa-nav-link inline-block">Kontak</a></li>
                     </ul>
@@ -530,16 +579,23 @@
     <div id="public-confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
         <div class="absolute inset-0 bg-slate-900/60" data-confirm-close="true"></div>
         <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-            <h3 class="text-lg font-semibold text-slate-900">Konfirmasi</h3>
-            <p id="public-confirm-message" class="mt-2 text-sm text-slate-600">Apakah Anda yakin?</p>
-            <div class="mt-6 flex items-center justify-end gap-2">
-                <button type="button" id="public-confirm-cancel"
-                        class="px-4 py-2 rounded-2xl border border-slate-300 text-sm text-slate-700 hover:bg-slate-50 transition">
+            <div class="flex items-center justify-center w-14 h-14 rounded-full bg-red-100 mx-auto mb-4">
+                <svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-900 text-center">Konfirmasi</h3>
+            <p id="public-confirm-message" class="mt-2 text-sm text-slate-600 text-center">Apakah Anda yakin?</p>
+            <div class="mt-6 flex items-center justify-center gap-4">
+                <button type="button" 
+                        id="public-confirm-cancel"
+                        class="px-8 py-3 rounded-xl text-sm font-semibold transition-all duration-200">
                     Batal
                 </button>
-                <button type="button" id="public-confirm-ok"
-                        class="px-4 py-2 rounded-2xl bg-slate-900 text-white text-sm hover:opacity-90 transition">
-                    Lanjutkan
+                <button type="button" 
+                        id="public-confirm-ok"
+                        class="px-8 py-3 rounded-xl text-sm font-semibold transition-all duration-200">
+                    Ya, Lanjutkan
                 </button>
             </div>
         </div>

@@ -156,7 +156,9 @@
                             class="w-full h-40 object-cover rounded-2xl border border-slate-200">
                     @endif
                     <input type="file" name="featured_image"
-                        class="w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-2xl file:border-0 file:bg-slate-900 file:text-white hover:file:opacity-90">
+                        class="drop-zone-enabled"
+                        id="featured-image-input"
+                        accept=".jpg,.jpeg,.png,.webp">
                 </div>
             </div>
 

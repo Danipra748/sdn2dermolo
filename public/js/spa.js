@@ -10,14 +10,17 @@
         contentContainer: '#spa-content, #main-content',
         animationDuration: 220,
         loadingDelay: 200,
-        cachePrefix: 'sdn2-dermolo-spa-cache:v3',
+        cachePrefix: 'sdn2-dermolo-spa-cache:v4',
         // Routes that should always fetch fresh data (no cache)
         noCacheRoutes: [
             '/spa/data-guru',
             '/spa/berita',
             '/spa/prestasi',
+            '/spa/gallery',
             '/spa/sarana-prasarana',
             '/spa/program',
+            '/spa/about',
+            '/spa/home',
         ],
     };
 
@@ -38,6 +41,10 @@
             route: '/spa/prestasi',
             title: 'Prestasi - SD N 2 Dermolo',
         },
+        '/galeri': {
+            route: '/spa/gallery',
+            title: 'Galeri - SD N 2 Dermolo',
+        },
         '/tentang-kami': {
             route: '/spa/about',
             title: 'Tentang Kami - SD N 2 Dermolo',
@@ -57,6 +64,9 @@
     let revealObserver = null;
     let loadingTimer = null;
     const memoryCache = new Map();
+
+    // Loading progress bar element
+    let loadingBar = null;
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
@@ -163,17 +173,39 @@
         window.addEventListener('popstate', (event) => {
             const state = event.state;
 
+            console.log('[SPA] Popstate event triggered', state);
+
             if (state && state.route) {
+                console.log('[SPA] Loading content from history state:', state.route);
                 loadContent(state.route, state.title || document.title, false, state.hash || '');
                 return;
             }
 
+            // Fallback: use the current URL pathname
             const destination = routeMap[window.location.pathname];
 
             if (destination) {
+                console.log('[SPA] Loading content from URL pathname:', destination.route);
                 loadContent(destination.route, destination.title, false, window.location.hash || '');
+            } else {
+                console.warn('[SPA] No route found for pathname:', window.location.pathname);
             }
         });
+
+        // Ensure initial state is properly set
+        if (!window.history.state) {
+            const destination = routeMap[window.location.pathname];
+            if (destination) {
+                window.history.replaceState({
+                    route: destination.route,
+                    url: window.location.pathname,
+                    title: document.title,
+                    hash: window.location.hash || '',
+                }, document.title, window.location.pathname + window.location.hash);
+                
+                console.log('[SPA] Initial history state set:', destination.route);
+            }
+        }
     }
 
     function loadInitialContent() {
@@ -234,6 +266,9 @@
         }
 
         isLoading = true;
+        
+        // Show loading bar indicator
+        showLoadingBar();
         scheduleLoading(contentArea, route);
 
         try {
@@ -254,6 +289,7 @@
             console.error('SPA load failed:', error);
         } finally {
             hideLoading(contentArea);
+            hideLoadingBar();
             isLoading = false;
         }
     }
@@ -262,7 +298,9 @@
         // Add cache-busting timestamp for no-cache routes
         const isNoCache = config.noCacheRoutes.includes(route);
         const cacheBustUrl = isNoCache ? `${route}?_t=${Date.now()}` : route;
-        
+
+        console.log('[SPA] Fetching content from:', cacheBustUrl, isNoCache ? '(no-cache)' : '(cached)');
+
         return fetch(cacheBustUrl, {
             headers: {
                 Accept: 'application/json',
@@ -281,7 +319,11 @@
                 throw new Error('Invalid SPA response.');
             }
 
+            console.log('[SPA] Content fetched successfully for:', route);
             return data;
+        }).catch(error => {
+            console.error('[SPA] Fetch error for', route, ':', error);
+            throw error;
         });
     }
 
@@ -347,11 +389,15 @@
             document.scrollingElement.scrollTop = 0;
         }
 
-        // Ensure content is visible before reinitializing components
+        // Ensure content area is visible and properly styled
         const contentArea = getContentArea();
         if (contentArea) {
             contentArea.style.opacity = '1';
             contentArea.style.visibility = 'visible';
+            contentArea.style.display = '';
+            
+            // Remove any hidden states that might block content
+            contentArea.classList.remove('hidden', 'invisible');
         }
 
         // Reinitialize all components after a brief delay to ensure DOM is ready
@@ -361,10 +407,18 @@
                 console.warn('[SPA] Content area is empty after render');
             }
 
+            // Force another visibility check
+            if (contentArea) {
+                contentArea.style.opacity = '1';
+                contentArea.style.visibility = 'visible';
+            }
+
             reinitializeComponents();
 
             // Third scroll attempt after components are initialized
             window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+            
+            console.log('[SPA] Page navigation complete:', currentRoute);
         }, 100);
 
         if (hash) {
@@ -456,6 +510,59 @@
         contentArea.style.minHeight = '';
     }
 
+    function showLoadingBar() {
+        // Create loading bar if it doesn't exist
+        if (!loadingBar) {
+            loadingBar = document.createElement('div');
+            loadingBar.id = 'spa-loading-bar';
+            loadingBar.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 3px;
+                background: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6);
+                z-index: 9999;
+                width: 0%;
+                transition: width 0.3s ease;
+                box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+            `;
+            document.body.appendChild(loadingBar);
+        }
+
+        // Show and animate
+        loadingBar.style.display = 'block';
+        loadingBar.style.width = '0%';
+
+        // Animate to 70%
+        setTimeout(() => {
+            if (loadingBar) {
+                loadingBar.style.width = '70%';
+            }
+        }, 50);
+
+        // Animate to 90%
+        setTimeout(() => {
+            if (loadingBar) {
+                loadingBar.style.width = '90%';
+            }
+        }, 300);
+    }
+
+    function hideLoadingBar() {
+        if (!loadingBar) return;
+
+        // Complete to 100%
+        loadingBar.style.width = '100%';
+
+        // Hide after animation
+        setTimeout(() => {
+            if (loadingBar) {
+                loadingBar.style.display = 'none';
+                loadingBar.style.width = '0%';
+            }
+        }, 300);
+    }
+
     function getLoadingTemplate(route) {
         if (route === '/spa/data-guru') {
             return buildGuruLoadingTemplate();
@@ -463,6 +570,10 @@
 
         if (route === '/spa/prestasi') {
             return buildPrestasiLoadingTemplate();
+        }
+
+        if (route === '/spa/gallery') {
+            return buildGalleryLoadingTemplate();
         }
 
         return buildGenericLoadingTemplate();
@@ -527,6 +638,31 @@
     }
 
     function buildPrestasiLoadingTemplate() {
+        const cards = Array.from({ length: 8 }, () => `
+            <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                <div class="aspect-[4/3] animate-pulse bg-slate-200"></div>
+                <div class="p-5">
+                    <div class="h-5 w-4/5 animate-pulse rounded-full bg-slate-200"></div>
+                    <div class="mt-3 h-6 w-24 animate-pulse rounded-full bg-slate-100"></div>
+                    <div class="mt-4 h-4 w-full animate-pulse rounded-full bg-slate-100"></div>
+                    <div class="mt-2 h-4 w-3/4 animate-pulse rounded-full bg-slate-100"></div>
+                </div>
+            </div>
+        `).join('');
+
+        return buildLoadingShell(`
+            ${buildHeroLoadingTemplate()}
+            <section class="bg-slate-50 px-4 py-16">
+                <div class="mx-auto max-w-7xl">
+                    <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
+                        ${cards}
+                    </div>
+                </div>
+            </section>
+        `);
+    }
+
+    function buildGalleryLoadingTemplate() {
         const cards = Array.from({ length: 8 }, () => `
             <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
                 <div class="aspect-[4/3] animate-pulse bg-slate-200"></div>
@@ -803,6 +939,12 @@
         }
 
         try {
+            setupGalleryModal();
+        } catch (error) {
+            console.error('[SPA] Error in setupGalleryModal:', error);
+        }
+
+        try {
             setupNewsCategoryFilters();
         } catch (error) {
             console.error('[SPA] Error in setupNewsCategoryFilters:', error);
@@ -838,6 +980,36 @@
             console.error('[SPA] Error in reinitializeGlobalUI:', error);
         }
 
+        try {
+            // Reinitialize Drop Zone file uploads (Drag & Drop)
+            initializeDropZones();
+        } catch (error) {
+            console.error('[SPA] Error in initializeDropZones:', error);
+        }
+
+        try {
+            // Reinitialize gallery-specific drop zones
+            if (typeof window.initializeGalleryDropZone === 'function') {
+                window.initializeGalleryDropZone();
+            }
+        } catch (error) {
+            console.error('[SPA] Error in initializeGalleryDropZone:', error);
+        }
+
+        try {
+            // Reinitialize any admin form scripts
+            initializeAdminForms();
+        } catch (error) {
+            console.error('[SPA] Error in initializeAdminForms:', error);
+        }
+
+        try {
+            // Reinitialize image previews
+            initializeImagePreviews();
+        } catch (error) {
+            console.error('[SPA] Error in initializeImagePreviews:', error);
+        }
+
         console.log('[SPA] Components reinitialized successfully');
     }
 
@@ -854,7 +1026,7 @@
 
     function cleanupModalInstances() {
         // Remove initialized flags from modals so they can be re-setup
-        const modals = ['facility-modal', 'prestasi-modal'];
+        const modals = ['facility-modal', 'prestasi-modal', 'gallery-modal'];
         modals.forEach(modalId => {
             const modal = document.getElementById(modalId);
             if (modal) {
@@ -1494,8 +1666,30 @@
         // Event listeners are now handled in setupPrestasiCardClicks
         // This function just marks the modal as initialized
         modal.dataset.initialized = 'true';
-        
+
         console.log('[SPA] Prestasi modal initialized');
+    }
+
+    function setupGalleryModal() {
+        const modal = document.getElementById('gallery-modal');
+
+        if (!modal) {
+            return;
+        }
+
+        const imageEl = document.getElementById('gallery-modal-image');
+        const titleEl = document.getElementById('gallery-modal-title');
+        const descEl = document.getElementById('gallery-modal-desc');
+
+        if (!imageEl || !titleEl || !descEl) {
+            return;
+        }
+
+        // Event listeners are handled inline via data-gallery-card attributes
+        // This function just marks the modal as initialized
+        modal.dataset.initialized = 'true';
+
+        console.log('[SPA] Gallery modal initialized');
     }
 
     function setupNewsCategoryFilters() {
@@ -1585,6 +1779,76 @@
             const initialCategory = root.dataset.initialCategory || categoryInput?.value || 'all';
             applyFilter(initialCategory);
         });
+    }
+
+    // ============================================
+    // NEW: Drop Zone Reinitialization
+    // ============================================
+
+    function initializeDropZones() {
+        // Call the global drop zone initializer if it exists
+        if (typeof window.initializeDropZones === 'function') {
+            window.initializeDropZones();
+            console.log('[SPA] Drop zones reinitialized');
+        }
+    }
+
+    function initializeAdminForms() {
+        // Reinitialize any form-specific scripts
+        // This includes character counters, dynamic fields, etc.
+        
+        // Reinitialize character counters
+        document.querySelectorAll('[data-maxlength]').forEach(input => {
+            const maxLength = input.getAttribute('data-maxlength');
+            const counter = input.parentElement.querySelector('.char-counter');
+            
+            if (counter) {
+                const updateCounter = () => {
+                    const remaining = maxLength - input.value.length;
+                    counter.textContent = `${remaining} karakter tersisa`;
+                };
+                
+                input.removeEventListener('input', updateCounter);
+                input.addEventListener('input', updateCounter);
+                updateCounter();
+            }
+        });
+
+        // Reinitialize any rich text editors
+        if (typeof tinymce !== 'undefined' && tinymce.EditorManager) {
+            // TinyMCE exists - reinitialize it
+            tinymce.EditorManager.execCommand('mceRemoveEditor', true, 'content');
+            tinymce.EditorManager.execCommand('mceAddEditor', true, 'content');
+        }
+
+        console.log('[SPA] Admin forms reinitialized');
+    }
+
+    function initializeImagePreviews() {
+        // Reinitialize image preview for file inputs
+        document.querySelectorAll('input[type="file"][data-preview]').forEach(input => {
+            const previewSelector = input.dataset.preview;
+            const previewEl = document.querySelector(previewSelector);
+            
+            if (previewEl) {
+                input.removeEventListener('change', handleFilePreview);
+                input.addEventListener('change', handleFilePreview);
+                
+                function handleFilePreview(e) {
+                    const file = e.target.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            previewEl.src = e.target.result;
+                            previewEl.style.display = 'block';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                }
+            }
+        });
+
+        console.log('[SPA] Image previews reinitialized');
     }
 
     window.loadSPAContent = loadContent;

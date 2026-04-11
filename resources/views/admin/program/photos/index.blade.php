@@ -31,12 +31,12 @@
                         <p class="text-sm font-semibold text-slate-900">{{ $photo->caption ?: 'Dokumentasi program.' }}</p>
                         <div class="mt-3 flex gap-2">
                             <a href="{{ route('admin.program-sekolah.photos.edit', [$programSekolah, $photo]) }}"
-                               class="px-3 py-1 rounded-xl bg-slate-900 text-white text-xs">Edit</a>
+                               class="btn-edit">Edit</a>
                             <form action="{{ route('admin.program-sekolah.photos.destroy', [$programSekolah, $photo]) }}"
                                   method="POST" data-confirm="Hapus foto ini?">
                                 @csrf
                                 @method('DELETE')
-                                <button class="px-3 py-1 rounded-xl bg-white border border-slate-200 text-xs">
+                                <button type="submit" class="btn-delete">
                                     Hapus
                                 </button>
                             </form>

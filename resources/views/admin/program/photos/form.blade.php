@@ -13,19 +13,24 @@
 
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Foto Dokumentasi</label>
-                <input type="file" name="photo" accept=".jpg,.jpeg,.png,.webp"
-                       class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-300">
+                <input type="file" 
+                       id="foto_dokumentasi" 
+                       name="photo" 
+                       accept=".jpg,.jpeg,.png,.webp"
+                       class="drop-zone-enabled w-full">
                 @error('photo')
                     <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
                 @enderror
                 @if ($photo->photo)
-                    <img src="{{ asset('storage/' . $photo->photo) }}" alt="Dokumentasi"
-                         class="mt-3 h-24 w-24 rounded-xl object-cover border border-slate-200">
-                    <label class="mt-2 inline-flex items-center gap-2 text-xs text-slate-600">
-                        <input type="checkbox" name="remove_photo" value="1"
-                               class="rounded border-slate-300 text-slate-900 focus:ring-slate-300">
-                        Hapus foto saat ini
-                    </label>
+                    <div class="existing-preview mt-3">
+                        <img src="{{ asset('storage/' . $photo->photo) }}" alt="Dokumentasi"
+                             class="h-24 w-24 rounded-xl object-cover border border-slate-200">
+                        <label class="mt-2 inline-flex items-center gap-2 text-xs text-slate-600">
+                            <input type="checkbox" name="remove_photo" value="1"
+                                   class="rounded border-slate-300 text-slate-900 focus:ring-slate-300">
+                            Hapus foto saat ini
+                        </label>
+                    </div>
                 @endif
             </div>
 

@@ -70,18 +70,14 @@
                         </div>
                     @endif
 
-                    {{-- Upload input --}}
+                    {{-- Upload input with drop zone --}}
                     <div class="relative">
-                        <input type="file" 
-                               name="foto" 
-                               id="foto-input"
+                        <input type="file"
+                               name="foto"
+                               id="foto-fasilitas"
                                accept=".jpg,.jpeg,.png,.webp"
-                               onchange="previewImage(event)"
-                               class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                        
-                        <p class="text-xs text-slate-500 mt-2">
-                            📸 Format: JPG, JPEG, PNG, WEBP | Maksimal: 2MB
-                        </p>
+                               class="drop-zone-enabled">
+
                         @error('foto')
                             <p class="text-xs text-red-600 mt-2">{{ $message }}</p>
                         @enderror
