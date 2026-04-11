@@ -12,6 +12,8 @@ return new class extends Migration
             $table->id();
             $table->string('nama');
             $table->text('deskripsi')->nullable();
+            $table->string('icon')->default('icon');
+            $table->string('warna')->default('blue');
             $table->timestamps();
         });
     }

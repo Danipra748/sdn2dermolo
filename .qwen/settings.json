@@ -11,7 +11,8 @@
       "Bash(dir *)",
       "Bash(c:\\laragon\\bin\\php\\php-8.3.20-win32-vs16-x64\\php.exe *)",
       "Bash(del *)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(c:\\laragon\\bin\\php\\php-8.4.10-win32-vs17-x64\\php.exe *)"
     ]
   },
   "$version": 3
