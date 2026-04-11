@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::table('fasilitas', function (Blueprint $table) {
             if (! Schema::hasColumn('fasilitas', 'icon')) {
-                $table->string('icon')->default('')->after('deskripsi');
+                $table->string('icon')->default('-')->after('deskripsi');
             }
 
             if (! Schema::hasColumn('fasilitas', 'warna')) {
