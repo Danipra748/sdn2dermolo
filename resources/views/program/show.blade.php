@@ -154,11 +154,11 @@
                             <div class="gallery-image-wrapper"
                                  data-photo-index="{{ $index }}"
                                  data-photo-caption="{{ $photo['caption'] ?: 'Dokumentasi kegiatan ' . $data['title'] }}">
-                                <img src="{{ asset('storage/' . $photo['photo']) }}" 
+                                <img src="{{ asset('storage/' . $photo['photo']) }}"
                                      alt="Dokumentasi {{ $data['title'] }}"
                                      loading="lazy">
                                 <div class="gallery-image-overlay">
-                                    <span class="gallery-image-overlay-text">🔍 Klik untuk memperbesar</span>
+                                    <span class="gallery-image-overlay-text"><i class="fas fa-search-plus"></i> Klik untuk memperbesar</span>
                                 </div>
                             </div>
                             <p class="text-xs text-slate-600 mt-2 leading-relaxed line-clamp-2">

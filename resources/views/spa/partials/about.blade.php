@@ -29,8 +29,10 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
             {{-- Total Students --}}
             <div class="group bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 text-center border border-blue-200 hover:shadow-xl transition-all duration-300 hover:scale-105">
-                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-3xl shadow-lg group-hover:scale-110 transition-transform">
-                    👨‍🎓
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
                 </div>
                 <div class="text-3xl font-black text-blue-600 mb-2">{{ $profile->total_students ?? '200' }}+</div>
                 <div class="text-sm text-slate-600 font-medium">Total Siswa</div>
@@ -38,8 +40,10 @@
 
             {{-- Total Classes --}}
             <div class="group bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 text-center border border-green-200 hover:shadow-xl transition-all duration-300 hover:scale-105">
-                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white text-3xl shadow-lg group-hover:scale-110 transition-transform">
-                    📚
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
                 </div>
                 <div class="text-3xl font-black text-green-600 mb-2">{{ $profile->total_classes ?? '12' }}</div>
                 <div class="text-sm text-slate-600 font-medium">Ruang Kelas</div>
@@ -47,8 +51,10 @@
 
             {{-- Total Teachers --}}
             <div class="group bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 text-center border border-purple-200 hover:shadow-xl transition-all duration-300 hover:scale-105">
-                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white text-3xl shadow-lg group-hover:scale-110 transition-transform">
-                    👨‍🏫
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
                 </div>
                 <div class="text-3xl font-black text-purple-600 mb-2">{{ $profile->total_teachers ?? '15' }}</div>
                 <div class="text-sm text-slate-600 font-medium">Tenaga Pendidik</div>
@@ -56,8 +62,10 @@
 
             {{-- Land Area --}}
             <div class="group bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl p-6 text-center border border-amber-200 hover:shadow-xl transition-all duration-300 hover:scale-105">
-                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white text-3xl shadow-lg group-hover:scale-110 transition-transform">
-                    🏫
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
+                    </svg>
                 </div>
                 <div class="text-3xl font-black text-amber-600 mb-2">{{ $profile->land_area ?? '1.400' }}</div>
                 <div class="text-sm text-slate-600 font-medium">Luas Tanah (m²)</div>
@@ -65,6 +73,79 @@
         </div>
     </div>
 </section>
+
+{{-- ===== KEPALA SEKOLAH SAMBUTAN SECTION ===== --}}
+@if($fotoKepsek || $sambutanFoto || $sambutanText || $kepsek)
+<section class="py-20 px-4 bg-white">
+    <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-16">
+            <span class="px-4 py-1.5 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold">SAMBUTAN KEPALA SEKOLAH</span>
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mt-4">Pesan dari Pimpinan</h2>
+            <p class="text-slate-600 mt-3 max-w-2xl mx-auto">Sambutan dan visi dari Kepala SD Negeri 2 Dermolo untuk masyarakat</p>
+        </div>
+
+        <div class="grid md:grid-cols-[1fr_1.5fr] gap-12 items-start">
+            {{-- Left: Foto Kepala Sekolah --}}
+            <div class="flex flex-col items-center">
+                @if ($fotoKepsek)
+                    <div class="w-full max-w-sm overflow-hidden rounded-2xl border-4 border-white shadow-2xl mb-6">
+                        <img src="{{ asset('storage/' . $fotoKepsek) }}"
+                             alt="Foto Kepala Sekolah"
+                             class="w-full h-full object-cover aspect-[4/5]">
+                    </div>
+                @elseif ($sambutanFoto)
+                    <div class="w-full max-w-sm overflow-hidden rounded-2xl shadow-xl mb-6">
+                        <img src="{{ asset('storage/' . $sambutanFoto) }}"
+                             alt="Foto Kepala Sekolah"
+                             class="w-full h-full object-cover aspect-[4/5]">
+                    </div>
+                @else
+                    <div class="w-full max-w-sm aspect-[4/5] rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 shadow-xl flex items-center justify-center mb-6">
+                        <svg class="w-32 h-32 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                    </div>
+                @endif
+
+                @if($kepsek)
+                <div class="text-center">
+                    <h3 class="text-xl font-bold text-slate-900">{{ $kepsek->nama }}</h3>
+                    <p class="text-sm text-slate-600">{{ $kepsek->jabatan }}</p>
+                </div>
+                @endif
+            </div>
+
+            {{-- Right: Sambutan Text --}}
+            @if($sambutanText)
+            <div class="bg-gradient-to-br from-slate-50 to-blue-50 rounded-3xl p-8 md:p-10 border border-slate-200">
+                <div class="prose prose-lg max-w-none">
+                    <div class="text-slate-700 leading-relaxed whitespace-pre-line text-base">
+                        {{ $sambutanText }}
+                    </div>
+                </div>
+
+                @if($kepsek)
+                <div class="mt-8 pt-6 border-t border-slate-200">
+                    <p class="font-bold text-slate-900 text-lg">{{ $kepsek->nama }}</p>
+                    <p class="text-sm text-slate-600">{{ $kepsek->jabatan }}</p>
+                </div>
+                @endif
+            </div>
+            @else
+            <div class="flex items-center justify-center h-full">
+                <div class="text-center text-slate-400">
+                    <svg class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                    </svg>
+                    <p class="text-lg font-medium">Sambutan belum tersedia</p>
+                    <p class="text-sm mt-2">Silakan hubungi admin untuk menambahkan sambutan</p>
+                </div>
+            </div>
+            @endif
+        </div>
+    </div>
+</section>
+@endif
 
 {{-- ===== SCHOOL PROFILE & INFORMATION ===== --}}
 <section class="py-16 px-4 bg-gradient-to-br from-slate-50 to-blue-50">
@@ -102,7 +183,10 @@
 
                         {{-- Accreditation Badge --}}
                         <div class="inline-block px-6 py-3 rounded-full bg-white/20 backdrop-blur-sm text-sm font-semibold mb-6 border border-white/30">
-                            🏆 Terakreditasi {{ $profile->accreditation ?? 'B' }}
+                            <svg class="w-4 h-4 inline-block mr-1 -mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            Terakreditasi {{ $profile->accreditation ?? 'B' }}
                         </div>
 
                         {{-- Key Stats --}}
@@ -331,7 +415,9 @@
                         @if($profile->established_year)
                         <div class="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-slate-200">
                             <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                <span class="text-2xl">📅</span>
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
                             </div>
                             <div>
                                 <div class="text-xs text-slate-500 mb-1">Tahun Berdiri</div>
@@ -342,28 +428,34 @@
                         
                         <div class="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-slate-200">
                             <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0">
-                                <span class="text-2xl">🏫</span>
+                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
+                                </svg>
                             </div>
                             <div>
                                 <div class="text-xs text-slate-500 mb-1">Status</div>
                                 <div class="font-bold text-slate-900">{{ $profile->school_status ?? 'Negeri' }}</div>
                             </div>
                         </div>
-                        
+
                         <div class="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-slate-200">
                             <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
-                                <span class="text-2xl">🏆</span>
+                                <svg class="w-6 h-6 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
                             </div>
                             <div>
                                 <div class="text-xs text-slate-500 mb-1">Akreditasi</div>
                                 <div class="font-bold text-slate-900">{{ $profile->accreditation ?? 'B' }}</div>
                             </div>
                         </div>
-                        
+
                         @if($profile->total_classes)
                         <div class="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-slate-200">
                             <div class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
-                                <span class="text-2xl">📚</span>
+                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                </svg>
                             </div>
                             <div>
                                 <div class="text-xs text-slate-500 mb-1">Jumlah Kelas</div>
@@ -371,11 +463,13 @@
                             </div>
                         </div>
                         @endif
-                        
+
                         @if($profile->total_students)
                         <div class="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-slate-200">
                             <div class="w-12 h-12 rounded-xl bg-pink-100 flex items-center justify-center flex-shrink-0">
-                                <span class="text-2xl">👨‍🎓</span>
+                                <svg class="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                </svg>
                             </div>
                             <div>
                                 <div class="text-xs text-slate-500 mb-1">Total Siswa</div>
@@ -387,7 +481,7 @@
                         @if($profile->land_area)
                         <div class="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-slate-200">
                             <div class="w-12 h-12 rounded-xl bg-cyan-100 flex items-center justify-center flex-shrink-0">
-                                <span class="text-2xl">🏠</span>
+                                <i class="fas fa-home text-cyan-600 text-xl"></i>
                             </div>
                             <div>
                                 <div class="text-xs text-slate-500 mb-1">Luas Tanah</div>

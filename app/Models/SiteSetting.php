@@ -15,6 +15,8 @@ class SiteSetting extends Model
     protected $fillable = [
         'key',
         'value',
+        'hero_image',
+        'foto_kepsek',
         'school_latitude',
         'school_longitude',
         'map_zoom',
@@ -132,5 +134,119 @@ class SiteSetting extends Model
         $setting->value = json_encode($payload);
 
         return $setting->save();
+    }
+
+    /**
+     * Get hero image path
+     */
+    public static function getHeroImage(): ?string
+    {
+        if (!Schema::hasTable((new static())->getTable())) {
+            return null;
+        }
+
+        $setting = static::where('key', 'hero_image')->first();
+        return $setting?->hero_image;
+    }
+
+    /**
+     * Upload hero image
+     */
+    public static function uploadHeroImage($image): ?string
+    {
+        if (!Schema::hasTable((new static())->getTable())) {
+            return null;
+        }
+
+        // Delete old image if exists
+        $oldImage = self::getHeroImage();
+        if ($oldImage) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldImage);
+        }
+
+        // Store new image
+        $path = $image->store('hero-backgrounds', 'public');
+
+        // Update or create setting
+        static::updateOrCreate(
+            ['key' => 'hero_image'],
+            ['hero_image' => $path]
+        );
+
+        return $path;
+    }
+
+    /**
+     * Delete hero image
+     */
+    public static function deleteHeroImage(): bool
+    {
+        if (!Schema::hasTable((new static())->getTable())) {
+            return false;
+        }
+
+        $oldImage = self::getHeroImage();
+        if ($oldImage) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldImage);
+        }
+
+        return static::where('key', 'hero_image')->update(['hero_image' => null]);
+    }
+
+    /**
+     * Get kepala sekolah foto path
+     */
+    public static function getFotoKepsek(): ?string
+    {
+        if (!Schema::hasTable((new static())->getTable())) {
+            return null;
+        }
+
+        $setting = static::where('key', 'foto_kepsek')->first();
+        return $setting?->foto_kepsek;
+    }
+
+    /**
+     * Upload kepala sekolah foto
+     */
+    public static function uploadFotoKepsek($image): ?string
+    {
+        if (!Schema::hasTable((new static())->getTable())) {
+            return null;
+        }
+
+        // Delete old foto if exists
+        $oldFoto = self::getFotoKepsek();
+        if ($oldFoto) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldFoto);
+        }
+
+        // Store new foto
+        $path = $image->store('kepala-sekolah', 'public');
+
+        // Update or create setting
+        static::updateOrCreate(
+            ['key' => 'foto_kepsek'],
+            ['foto_kepsek' => $path]
+        );
+
+        return $path;
+    }
+
+    /**
+     * Delete kepala sekolah foto
+     */
+    public static function deleteFotoKepsek(): bool
+    {
+        if (!Schema::hasTable((new static())->getTable())) {
+            return false;
+        }
+
+        $oldFoto = self::getFotoKepsek();
+        if ($oldFoto) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldFoto);
+        }
+
+        return static::where('key', 'foto_kepsek')->update(['foto_kepsek' => null]);
     }
 }

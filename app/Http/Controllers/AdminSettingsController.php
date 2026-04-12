@@ -28,11 +28,13 @@ class AdminSettingsController extends Controller
 
         $sambutanText = '';
         $sambutanFoto = null;
+        $fotoKepsek = null;
 
         if (Schema::hasTable('site_settings')) {
             // Di sini variabel sambutan kepala sekolah diproses.
             $sambutanText = SiteSetting::getValue('kepsek_sambutan_text', '');
             $sambutanFoto = SiteSetting::getValue('kepsek_sambutan_foto');
+            $fotoKepsek = SiteSetting::getFotoKepsek();
         }
 
         return view('admin.settings_hidden', compact(
@@ -40,7 +42,8 @@ class AdminSettingsController extends Controller
             'logoPublicPath',
             'logoStoragePath',
             'sambutanText',
-            'sambutanFoto'
+            'sambutanFoto',
+            'fotoKepsek'
         ));
     }
 
@@ -111,5 +114,43 @@ class AdminSettingsController extends Controller
         sort($paths);
 
         return $paths;
+    }
+
+    /**
+     * Upload kepala sekolah foto resmi untuk halaman tentang kami.
+     */
+    public function uploadFotoKepsek(Request $request)
+    {
+        $request->validate([
+            'foto_kepsek' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:3072'],
+        ]);
+
+        if ($request->hasFile('foto_kepsek')) {
+            $path = SiteSetting::uploadFotoKepsek($request->file('foto_kepsek'));
+
+            if ($path) {
+                return redirect()->route('admin.hidden-settings')
+                    ->with('success', 'Foto kepala sekolah berhasil diupload!');
+            }
+        }
+
+        return redirect()->route('admin.hidden-settings')
+            ->with('error', 'Gagal mengupload foto kepala sekolah.');
+    }
+
+    /**
+     * Delete kepala sekolah foto.
+     */
+    public function deleteFotoKepsek()
+    {
+        $deleted = SiteSetting::deleteFotoKepsek();
+
+        if ($deleted) {
+            return redirect()->route('admin.hidden-settings')
+                ->with('success', 'Foto kepala sekolah berhasil dihapus!');
+        }
+
+        return redirect()->route('admin.hidden-settings')
+            ->with('error', 'Gagal menghapus foto kepala sekolah.');
     }
 }

@@ -55,7 +55,7 @@
                         
                         {{-- Accreditation Badge --}}
                         <div class="inline-block px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm text-sm font-semibold mb-4">
-                            🏆 Akreditasi {{ $profile->accreditation ?? 'B' }}
+                            <i class="fas fa-trophy text-yellow-300"></i> Akreditasi {{ $profile->accreditation ?? 'B' }}
                         </div>
                         
                         {{-- Quick Stats --}}

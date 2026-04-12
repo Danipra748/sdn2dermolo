@@ -12,7 +12,15 @@
       "Bash(c:\\laragon\\bin\\php\\php-8.3.20-win32-vs16-x64\\php.exe *)",
       "Bash(del *)",
       "Bash(node *)",
-      "Bash(c:\\laragon\\bin\\php\\php-8.4.10-win32-vs17-x64\\php.exe *)"
+      "Bash(c:\\laragon\\bin\\php\\php-8.4.10-win32-vs17-x64\\php.exe *)",
+      "Bash(npm run *)",
+      "Bash(artisan *)",
+      "Bash(powershell *)",
+      "Bash(c:\\laragon\\bin\\php\\php-8.2*\\php.exe *)",
+      "Bash(git show *)",
+      "Bash(git checkout *)",
+      "Bash(findstr *)",
+      "Bash(c:\\laragon\\bin\\php\\php-8.3.15-win32-vs16-x64\\php.exe *)"
     ]
   },
   "$version": 3

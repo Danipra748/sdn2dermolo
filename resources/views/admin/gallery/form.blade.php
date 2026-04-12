@@ -41,7 +41,7 @@
                           placeholder="Ceritakan detail kegiatan atau momen foto ini (tidak wajib diisi)"
                           class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-cyan focus:border-cyan transition resize-none">{{ old('deskripsi', $gallery->deskripsi) }}</textarea>
                 <p class="text-xs text-slate-500 mt-1">
-                    💡 Isi deskripsi untuk memberikan konteks tentang foto ini. Bisa dikosongkan jika hanya ingin menampilkan judul dan foto.
+                    <i class="fas fa-lightbulb text-yellow-500"></i> Isi deskripsi untuk memberikan konteks tentang foto ini. Bisa dikosongkan jika hanya ingin menampilkan judul dan foto.
                 </p>
                 @error('deskripsi')
                     <p class="text-xs text-red-600 mt-1 flex items-center gap-1">
@@ -327,7 +327,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    console.log('[Gallery Form] ✅ Drop zone initialized successfully');
+    console.log('[Gallery Form] Drop zone initialized successfully');
 });
 </script>
 @endpush

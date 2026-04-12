@@ -61,7 +61,7 @@
             <div class="mb-5 p-5 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <label class="block text-base font-semibold text-slate-900">📝 Teks Tiap Slide</label>
+                        <label class="block text-base font-semibold text-slate-900">Teks Tiap Slide</label>
                         <p class="text-xs text-slate-600 mt-1">Atur judul dan subjudul yang berbeda untuk setiap gambar slider</p>
                     </div>
                     <button type="button"
@@ -115,7 +115,7 @@
             <div class="mb-5">
                 <div class="flex items-center justify-between mb-3">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700">📸 Media Library</label>
+                        <label class="block text-sm font-medium text-slate-700"><i class="fas fa-images"></i> Media Library</label>
                         <p class="text-xs text-slate-500 mt-1">Pilih gambar untuk slideshow. Klik gambar untuk select/unselect.</p>
                     </div>
                     <button type="button"
@@ -140,7 +140,7 @@
                 <div class="mb-4">
                     <div class="flex items-center justify-between mb-2">
                         <h4 class="text-sm font-semibold text-slate-700">
-                            ✅ Selected for Slideshow (<span id="selected-count">0</span>)
+                            <i class="fas fa-check-circle text-green-600"></i> Selected for Slideshow (<span id="selected-count">0</span>)
                         </h4>
                         <p class="text-xs text-slate-500">First image = Primary</p>
                     </div>
@@ -153,7 +153,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <h4 class="text-sm font-semibold text-slate-700">
-                            📁 Media Library (<span id="library-count">0</span>)
+                            <i class="fas fa-folder-open text-blue-600"></i> Media Library (<span id="library-count">0</span>)
                         </h4>
                         <button type="button"
                                 onclick="selectAllImages()"
@@ -281,7 +281,7 @@
                     submitButton.textContent = '⏳ Menyimpan...';
                 }
                 
-                console.log('✅ Allowing form to submit normally...');
+                console.log('Allowing form to submit normally...');
                 // Biarkan form submit normally dengan data dari hidden inputs
                 // Form akan POST ke route('admin.homepage.update') dengan semua data
             });
@@ -306,7 +306,7 @@
                 slideshow: selectedImages.slice(1)
             });
         } else {
-            console.warn('⚠️ Hidden inputs not found!');
+            console.warn('Hidden inputs not found!');
         }
     }
 
@@ -318,7 +318,7 @@
                 allImages = data.all_images || [];
                 selectedImages = data.selected_images || [];
                 
-                console.log('📚 Media library loaded:', {
+                console.log('Media library loaded:', {
                     allImages: allImages.length,
                     selectedImages: selectedImages.length,
                     firstImage: selectedImages[0] || null
@@ -432,7 +432,7 @@
         const previewImg = document.getElementById('hero-preview-img');
         const placeholder = document.getElementById('hero-preview-placeholder');
 
-        console.log('🖼️ Updating preview...', {
+        console.log('Updating preview...', {
             selectedCount: selectedImages.length,
             firstImage: selectedImages[0] || null,
             hasPreviewImg: !!previewImg,
@@ -445,7 +445,7 @@
             if (previewImg) {
                 previewImg.src = `/storage/${firstImage}`;
                 previewImg.style.display = 'block';
-                console.log('✅ Preview image set:', firstImage);
+                console.log('Preview image set:', firstImage);
             }
             if (placeholder) {
                 placeholder.style.display = 'none';
@@ -458,7 +458,7 @@
             if (placeholder) {
                 placeholder.style.display = 'flex';
             }
-            console.log('⚠️ No images selected, showing placeholder');
+            console.log('No images selected, showing placeholder');
         }
     }
 
@@ -483,7 +483,7 @@
             if (data.success) {
                 console.log('✓ Saved', data.count, 'images for slideshow');
                 if (!showAlertOnError || data.count > 0) {
-                    showNotification(`✅ Berhasil menyimpan ${data.count} gambar untuk slideshow!`);
+                    showNotification(`Berhasil menyimpan ${data.count} gambar untuk slideshow!`);
                 }
             }
             return data;
@@ -491,7 +491,7 @@
         .catch(error => {
             console.error('Error saving selected images:', error);
             if (showAlertOnError) {
-                showNotification('❌ Gagal menyimpan gambar slideshow!', 'error');
+                showNotification('Gagal menyimpan gambar slideshow!', 'error');
             }
             return null;
         });
@@ -517,7 +517,7 @@
 
         for (let i = 0; i < files.length; i++) {
             formData.append('images[]', files[i]);
-            console.log('  📎 File', i + 1 + ':', files[i].name, '(', Math.round(files[i].size / 1024), 'KB )');
+            console.log('  File', i + 1 + ':', files[i].name, '(', Math.round(files[i].size / 1024), 'KB )');
         }
 
         // Show loading
@@ -535,11 +535,11 @@
             }
 
             const data = await res.json();
-            console.log('📥 Upload response:', data);
+            console.log('Upload response:', data);
 
             if (data.success) {
                 const newImages = data.paths || [];
-                console.log('✅ Upload successful, new images:', newImages);
+                console.log('Upload successful, new images:', newImages);
                 
                 allImages = [...new Set([...allImages, ...newImages])];
                 selectedImages = [...new Set([...selectedImages, ...newImages])];
@@ -557,24 +557,24 @@
 
                 const saveResult = await saveSelectedImages(false);
                 if (!saveResult || !saveResult.success) {
-                    console.warn('⚠️ Failed to auto-save selected images, but upload was successful');
+                    console.warn('Failed to auto-save selected images, but upload was successful');
                 }
 
                 loadMediaLibrary();
-                showNotification(`✅ Berhasil mengupload ${data.paths.length} gambar!`);
+                showNotification(`Berhasil mengupload ${data.paths.length} gambar!`);
             } else {
                 const errorMsg = data.error || data.message || 'Unknown error';
-                console.error('❌ Upload failed:', errorMsg);
-                showNotification('❌ Upload failed: ' + errorMsg, 'error');
+                console.error('Upload failed:', errorMsg);
+                showNotification('Upload failed: ' + errorMsg, 'error');
                 loadMediaLibrary();
             }
         } catch (error) {
-            console.error('💥 Upload error:', error);
+            console.error('Upload error:', error);
             let errorMsg = 'Network error or invalid route';
             if (error.message) {
                 errorMsg = error.message;
             }
-            showNotification('❌ Upload failed: ' + errorMsg, 'error');
+            showNotification('Upload failed: ' + errorMsg, 'error');
             loadMediaLibrary();
         }
 
@@ -726,7 +726,7 @@
         slideTexts[index][field] = value;
         updateSlideTextsHidden(slideTexts);
         
-        console.log(`✅ Updated slide ${index + 1} ${field}:`, value);
+        console.log(`Updated slide ${index + 1} ${field}:`, value);
     }
 
     // Update hidden input with slide texts
@@ -752,7 +752,7 @@
         renderSlideTexts(slideTexts);
         updateSlideTextsHidden(slideTexts);
         
-        showNotification('✅ Slide baru ditambahkan!');
+        showNotification('Slide baru ditambahkan!');
     }
 
     // Remove slide

@@ -24,8 +24,8 @@
 @endpush
 
 @section('content')
-<section class="relative overflow-hidden text-white" style="padding-top: 100px; background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0ea5e9 100%);">
-    <div class="mx-auto max-w-[1200px] px-6 py-20 text-center">
+<section class="page-hero relative overflow-hidden text-white" style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0ea5e9 100%);">
+    <div class="mx-auto max-w-[1200px] px-6 py-16 md:py-20 text-center">
         <div class="reveal inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2 text-sm font-semibold tracking-[0.04em] text-white backdrop-blur">
             <x-heroicon-o-camera class="h-4 w-4" /> GALERI SEKOLAH
         </div>

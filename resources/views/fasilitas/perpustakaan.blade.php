@@ -4,11 +4,11 @@
 
 @section('content')
 {{-- Hero Section --}}
-<section class="relative overflow-hidden text-white" style="padding-top: 100px; @if (!empty($data['card_bg_image'])) background-image: url('{{ asset('storage/' . $data['card_bg_image']) }}'); background-size: cover; background-position: center; background-repeat: no-repeat; @else background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0ea5e9 100%); @endif">
+<section class="page-hero relative overflow-hidden text-white" style="@if (!empty($data['card_bg_image'])) background-image: url('{{ asset('storage/' . $data['card_bg_image']) }}'); background-size: cover; background-position: center; @else background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0ea5e9 100%); @endif">
     @if (!empty($data['card_bg_image']))
         <div class="absolute inset-0 bg-slate-900/40"></div>
     @endif
-    <div class="relative z-10 mx-auto max-w-[1200px] px-6 py-20 text-center">
+    <div class="relative z-10 mx-auto max-w-[1200px] px-6 py-16 md:py-20 text-center">
         <div class="reveal inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2 text-sm font-semibold tracking-[0.04em] text-white backdrop-blur">
             <x-heroicon-o-book-open class="h-4 w-4" /> FASILITAS
         </div>

@@ -97,7 +97,7 @@
                 <div class="flex gap-3 pt-4 border-t border-slate-200">
                     <button type="submit"
                             class="flex-1 px-6 py-3 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:opacity-90 transition shadow-lg">
-                        {{ $method === 'PUT' ? '💾 Update' : '✨ Simpan' }}
+                        {{ $method === 'PUT' ? 'Update' : 'Simpan' }}
                     </button>
                     <a href="{{ route('admin.fasilitas.index') }}"
                        class="px-6 py-3 rounded-xl border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition">
@@ -118,7 +118,7 @@
 
         // Validasi ukuran (2MB)
         if (file.size > 2 * 1024 * 1024) {
-            alert('❌ Ukuran file terlalu besar! Maksimal 2MB.');
+            alert('Ukuran file terlalu besar! Maksimal 2MB.');
             event.target.value = '';
             return;
         }
@@ -131,7 +131,7 @@
             previewImg.src = e.target.result;
             preview.classList.remove('hidden');
             
-            console.log('📸 Image preview loaded:', file.name, Math.round(file.size / 1024) + 'KB');
+            console.log('Image preview loaded:', file.name, Math.round(file.size / 1024) + 'KB');
         };
         reader.readAsDataURL(file);
     }

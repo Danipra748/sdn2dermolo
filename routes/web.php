@@ -24,7 +24,7 @@ use App\Http\Controllers\AdminProgramPhotoController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\AdminContactMessageController;
-use App\Http\Controllers\AdminHomepageController;
+use App\Http\Controllers\AdminHeroSlideController;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AdminSchoolProfileController;
 use App\Http\Controllers\AdminSettingsController;
@@ -141,9 +141,16 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('pesan-masuk', [AdminContactMessageController::class, 'index'])
         ->name('messages.index');
 
-    // Homepage Management (Read-only static info)
-    Route::prefix('homepage')->name('homepage.')->group(function () {
-        Route::get('/', [AdminHomepageController::class, 'index'])->name('index');
+    // Hero Slides Management (Multi-Slide System)
+    Route::prefix('hero-slides')->name('hero-slides.')->group(function () {
+        Route::get('/', [AdminHeroSlideController::class, 'index'])->name('index');
+        Route::post('/', [AdminHeroSlideController::class, 'store'])->name('store');
+        Route::put('/{heroSlide}', [AdminHeroSlideController::class, 'update'])->name('update');
+        Route::delete('/{heroSlide}', [AdminHeroSlideController::class, 'destroy'])->name('destroy');
+        Route::post('/reorder', [AdminHeroSlideController::class, 'reorder'])->name('reorder');
+        Route::post('/{heroSlide}/move-up', [AdminHeroSlideController::class, 'moveUp'])->name('move-up');
+        Route::post('/{heroSlide}/move-down', [AdminHeroSlideController::class, 'moveDown'])->name('move-down');
+        Route::post('/{heroSlide}/toggle-active', [AdminHeroSlideController::class, 'toggleActive'])->name('toggle-active');
     });
 
     // School Profile Management
@@ -153,10 +160,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::delete('/logo', [AdminSchoolProfileController::class, 'deleteLogo'])->name('delete-logo');
     });
 
-    // Settings - Logo Upload
+    // Settings - Logo Upload & Foto Kepsek
     Route::prefix('settings')->name('settings.')->group(function () {
         Route::get('/logo', [AdminSettingsController::class, 'logoSettings'])->name('logo');
         Route::post('/logo/upload', [AdminSettingsController::class, 'uploadLogo'])->name('upload-logo');
+        Route::post('/foto-kepsek/upload', [AdminSettingsController::class, 'uploadFotoKepsek'])->name('upload-foto-kepsek');
+        Route::delete('/foto-kepsek/delete', [AdminSettingsController::class, 'deleteFotoKepsek'])->name('delete-foto-kepsek');
     });
 
     // Prestasi Sekolah CRUD

@@ -1,155 +1,137 @@
 {{-- ===== HOME CONTENT ===== --}}
 
-{{-- Hero Section --}}
-<section id="home" class="hero-fullscreen relative overflow-hidden text-white" style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0ea5e9 100%);">
-    @php
-        $heroExtra = $hero->extra_data ?? null;
-        if (is_string($heroExtra)) {
-            $decodedExtra = json_decode($heroExtra, true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $heroExtra = $decodedExtra;
-            }
-        }
-
-        $images = [];
-        $rawImages = data_get($heroExtra, 'slideshow_images', []);
-        if (is_string($rawImages)) {
-            $decodedImages = json_decode($rawImages, true);
-            $rawImages = (json_last_error() === JSON_ERROR_NONE) ? $decodedImages : [$rawImages];
-        }
-        if (is_array($rawImages)) {
-            $images = $rawImages;
-        }
-
-        if (! empty($hero->background_image)) {
-            array_unshift($images, $hero->background_image);
-        }
-
-        $images = array_map(function ($img) {
-            if (is_string($img)) {
-                return $img;
-            }
-            if (is_array($img)) {
-                return $img['path'] ?? $img['url'] ?? $img['image'] ?? null;
-            }
-            if (is_object($img)) {
-                return $img->path ?? $img->url ?? $img->image ?? null;
-            }
-
-            return null;
-        }, $images);
-
-        $images = array_values(array_unique(array_filter($images, function ($img) {
-            return is_string($img) && trim($img) !== '';
-        })));
-
-        $heroBadgeText = data_get($heroExtra, 'badge_text');
-        $heroTitle = data_get($hero, 'title', 'Sekolah yang');
-        $heroSubtitle = data_get($hero, 'subtitle', 'Membentuk');
-        $heroDescription = data_get($hero, 'description');
-        $heroOverlayOpacity = data_get($hero, 'background_overlay_opacity', 0.35);
-        
-        // Extract per-slide texts
-        $slideTexts = data_get($heroExtra, 'slide_texts', []);
-        if (is_string($slideTexts)) {
-            $decodedSlideTexts = json_decode($slideTexts, true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $slideTexts = $decodedSlideTexts;
-            } else {
-                $slideTexts = [];
-            }
-        }
-        if (!is_array($slideTexts)) {
-            $slideTexts = [];
-        }
-    @endphp
-
-    @if($hero && count($images) > 0)
-        <div class="absolute inset-0 z-0 overflow-hidden bg-black">
-            @if(count($images) > 1)
-                @foreach($images as $index => $image)
-                    @php
-                        $slideTitle = $slideTexts[$index]['title'] ?? ($index === 0 ? $heroTitle : '');
-                        $slideSubtitle = $slideTexts[$index]['subtitle'] ?? ($index === 0 ? $heroSubtitle : '');
-                    @endphp
-                    <div class="hero-slide absolute inset-0 transition-opacity duration-[2000ms] ease-in-out"
-                         style="opacity: {{ $index === 0 ? 1 : 0 }};"
-                         data-slide-index="{{ $index }}"
-                         data-slide-title="{{ e($slideTitle) }}"
-                         data-slide-subtitle="{{ e($slideSubtitle) }}">
-                        <img src="{{ asset('storage/' . $image) }}"
-                             alt=""
-                             class="hero-slide-media"
-                             loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
-                             draggable="false">
-                        <div class="absolute inset-0 bg-slate-900"
-                             style="opacity: {{ $heroOverlayOpacity }};"></div>
-                    </div>
-                @endforeach
-            @else
-                <div class="absolute inset-0">
-                    <img src="{{ asset('storage/' . $images[0]) }}"
-                         alt=""
+{{-- Hero Section with Slideshow --}}
+@if(!empty($heroSlides) && count($heroSlides) > 0)
+<section id="home" class="hero-fullscreen relative overflow-hidden text-white">
+    {{-- Slideshow Background --}}
+    <div class="absolute inset-0 z-0 overflow-hidden bg-black">
+        @if(count($heroSlides) > 1)
+            @foreach($heroSlides as $index => $slide)
+                <div class="hero-slide absolute inset-0 transition-opacity duration-[2000ms] ease-in-out"
+                     style="opacity: {{ $index === 0 ? 1 : 0 }};"
+                     data-slide-index="{{ $index }}"
+                     data-slide-title="{!! $slide->title ?? 'SD N 2 Dermolo' !!}"
+                     data-slide-subtitle="{!! $slide->subtitle ?? 'Unggul & Berkarakter' !!}"
+                     data-slide-description="{!! $slide->description ?? '' !!}">
+                    <img src="{{ asset('storage/' . $slide->image_path) }}"
+                         alt="{{ $slide->title ?? 'Slide' }}"
                          class="hero-slide-media"
-                         loading="eager"
+                         loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
                          draggable="false">
-                    <div class="absolute inset-0 bg-slate-900"
-                         style="opacity: {{ $heroOverlayOpacity }};"></div>
+                    <div class="absolute inset-0 bg-black"
+                         style="opacity: 0.5;"></div>
                 </div>
-            @endif
-        </div>
-
-        @if(count($images) > 1)
-        <div class="absolute bottom-8 left-0 right-0 z-20 flex items-center justify-center gap-3" id="slideshow-dots-container">
-            @foreach($images as $index => $image)
-                <button type="button"
-                        class="slideshow-dot h-3 w-3 cursor-pointer rounded-full border-2 border-white/50 transition-all duration-300"
-                        style="background-color: {{ $index === 0 ? '#fbbf24' : 'rgba(255, 255, 255, 0.3)' }}; {{ $index === 0 ? 'transform: scale(1.2); border-color: #fbbf24;' : '' }}"
-                        data-dot-index="{{ $index }}"
-                        aria-label="Go to slide {{ $index + 1 }}">
-                </button>
             @endforeach
-        </div>
+        @else
+            @php $slide = $heroSlides->first(); @endphp
+            <div class="absolute inset-0">
+                <img src="{{ asset('storage/' . $slide->image_path) }}"
+                     alt="{{ $slide->title ?? 'Slide' }}"
+                     class="hero-slide-media"
+                     loading="eager"
+                     draggable="false">
+                <div class="absolute inset-0 bg-black"
+                     style="opacity: 0.5;"></div>
+            </div>
         @endif
+    </div>
+
+    @if(count($heroSlides) > 1)
+    <div class="absolute bottom-8 left-0 right-0 z-20 flex items-center justify-center gap-3" id="slideshow-dots-container">
+        @foreach($heroSlides as $index => $slide)
+            <button type="button"
+                    class="slideshow-dot h-3 w-3 cursor-pointer rounded-full border-2 border-white/50 transition-all duration-300"
+                    style="background-color: {{ $index === 0 ? '#fbbf24' : 'rgba(255, 255, 255, 0.3)' }}; {{ $index === 0 ? 'transform: scale(1.2); border-color: #fbbf24;' : '' }}"
+                    data-dot-index="{{ $index }}"
+                    aria-label="Go to slide {{ $index + 1 }}">
+            </button>
+        @endforeach
+    </div>
     @endif
 
-    <div class="hero-content relative z-10 mx-auto max-w-[1200px] px-6 py-16 text-center">
-        @if($hero && is_scalar($heroBadgeText) && trim((string) $heroBadgeText) !== '')
-            <div class="reveal inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2 text-sm font-semibold tracking-[0.04em] text-white backdrop-blur">
-                <x-heroicon-o-star class="h-4 w-4" /> {{ $heroBadgeText }}
+    {{-- Hero Content Overlay (Centered) --}}
+    <div class="hero-content">
+        <div id="hero-slide-content" class="mx-auto max-w-[1200px] px-6 text-center">
+            {{-- Badge Selamat Datang --}}
+            <div class="reveal inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/30 px-6 py-2.5 text-sm font-medium tracking-wide text-white backdrop-blur-md">
+                <x-heroicon-o-star class="h-4 w-4 text-amber-400" />
+                Selamat Datang di SD N 2 Dermolo
             </div>
-        @else
-            <div class="reveal inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2 text-sm font-semibold tracking-[0.04em] text-white backdrop-blur">
-                <x-heroicon-o-star class="h-4 w-4" /> SELAMAT DATANG DI SD N 2 DermoLO
+
+            {{-- Judul Utama --}}
+            <h1 id="hero-title" class="reveal reveal-delay-1 mt-6 font-display text-[clamp(2rem,5vw,3.5rem)] font-black leading-[1.15] tracking-[-0.02em] text-white">
+                <span id="hero-title-text">{!! $heroSlides->first()->title ?? 'SD N 2 Dermolo' !!}</span>
+            </h1>
+
+            {{-- Sub-judul --}}
+            <div id="hero-subtitle" class="reveal reveal-delay-1 mt-4 text-center">
+                <span id="hero-subtitle-text" class="inline-block bg-gradient-to-r from-amber-400 to-yellow-200 bg-clip-text text-transparent text-[clamp(1.25rem,3vw,2rem)] font-semibold">
+                    {!! $heroSlides->first()->subtitle ?? 'Unggul & Berkarakter' !!}
+                </span>
             </div>
-        @endif
 
-        <h1 id="hero-title" class="reveal reveal-delay-1 mt-6 text-center font-display text-[clamp(2rem,5vw,3.5rem)] font-black leading-[1.15] tracking-[-0.02em] text-white">
-            {{ $heroTitle }}<br>
-            <span id="hero-subtitle" class="bg-gradient-to-r from-amber-400 to-yellow-200 bg-clip-text text-transparent">{{ $heroSubtitle }} Generasi Unggul</span>
-        </h1>
-
-        @if($heroDescription)
-            <p class="reveal reveal-delay-2 mx-auto mt-4 max-w-[700px] text-center text-[clamp(0.95rem,1.8vw,1.15rem)] leading-[1.7] text-white/85">
-                {{ $heroDescription }}
+            {{-- Deskripsi --}}
+            <p id="hero-description" class="reveal reveal-delay-2 mx-auto mt-6 max-w-[700px] text-center text-[clamp(0.95rem,1.8vw,1.15rem)] leading-[1.7] text-white/90">
+                {!! $heroSlides->first()->description ?? 'Membangun siswa yang cerdas, berkarakter, dan berprestasi melalui kurikulum merdeka dan lingkungan belajar yang inspiratif.' !!}
             </p>
-        @else
-            <p class="reveal reveal-delay-2 mx-auto mt-4 max-w-[700px] text-center text-[clamp(0.95rem,1.8vw,1.15rem)] leading-[1.7] text-white/85">
-                Membangun siswa yang cerdas, berkarakter, dan berprestasi melalui
-                kurikulum merdeka dan lingkungan belajar yang inspiratif.
-            </p>
-        @endif
 
-        <div class="reveal reveal-delay-3 mt-6 flex flex-wrap items-center justify-center gap-4">
-            <a href="#tentang" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-[2.2rem] py-[0.9rem] text-base font-bold shadow-[0_8px_30px_rgba(245,158,11,0.4)] transition-all duration-300 hover:-translate-y-[3px] hover:scale-[1.03] hover:shadow-[0_16px_40px_rgba(245,158,11,0.5)]">
-                <x-heroicon-o-book-open class="h-5 w-5" /> Tentang Kami
-            </a>
-            <a href="#kontak" class="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-[2.2rem] py-[0.9rem] text-base font-semibold transition-all duration-300 hover:-translate-y-[3px] hover:bg-white/20 hover:backdrop-blur">
-                <x-heroicon-o-phone class="h-5 w-5" /> Hubungi Kami
-            </a>
+            {{-- Tombol Aksi --}}
+            <div class="reveal reveal-delay-3 mt-8 flex flex-wrap items-center justify-center gap-4">
+                <a href="#tentang" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-[2.2rem] py-[0.9rem] text-base font-bold shadow-[0_8px_30px_rgba(245,158,11,0.4)] transition-all duration-300 hover:-translate-y-[3px] hover:scale-[1.03] hover:shadow-[0_16px_40px_rgba(245,158,11,0.5)]">
+                    <x-heroicon-o-book-open class="h-5 w-5" /> Tentang Kami
+                </a>
+                <a href="#kontak" class="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-[2.2rem] py-[0.9rem] text-base font-semibold transition-all duration-300 hover:-translate-y-[3px] hover:bg-white/20 hover:backdrop-blur">
+                    <x-heroicon-o-phone class="h-5 w-5" /> Hubungi Kami
+                </a>
+            </div>
         </div>
     </div>
 </section>
+
+@else
+{{-- Fallback: Static Hero Section Without Slideshow --}}
+<section id="home" class="hero-fullscreen relative overflow-hidden text-white"
+    style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0ea5e9 100%);">
+
+    {{-- Hero Content Overlay (Centered) --}}
+    <div class="hero-content">
+        <div id="hero-slide-content" class="mx-auto max-w-[1200px] px-6 text-center">
+            {{-- Badge Selamat Datang --}}
+            <div class="reveal inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/30 px-6 py-2.5 text-sm font-medium tracking-wide text-white backdrop-blur-md">
+                <x-heroicon-o-star class="h-4 w-4 text-amber-400" />
+                Selamat Datang di SD N 2 Dermolo
+            </div>
+
+            {{-- Judul Utama --}}
+            <h1 id="hero-title" class="reveal reveal-delay-1 mt-6 font-display text-[clamp(2rem,5vw,3.5rem)] font-black leading-[1.15] tracking-[-0.02em] text-white">
+                SD N 2 Dermolo
+            </h1>
+
+            {{-- Sub-judul --}}
+            <div id="hero-subtitle" class="reveal reveal-delay-1 mt-4 text-center">
+                <span class="inline-block bg-gradient-to-r from-amber-400 to-yellow-200 bg-clip-text text-transparent text-[clamp(1.25rem,3vw,2rem)] font-semibold">
+                    Unggul & Berkarakter
+                </span>
+            </div>
+
+            {{-- Deskripsi --}}
+            <p id="hero-description" class="reveal reveal-delay-2 mx-auto mt-6 max-w-[700px] text-center text-[clamp(0.95rem,1.8vw,1.15rem)] leading-[1.7] text-white/90">
+                Membangun siswa yang cerdas, berkarakter, dan berprestasi melalui kurikulum merdeka dan lingkungan belajar yang inspiratif.
+            </p>
+
+            {{-- Tombol Aksi --}}
+            <div class="reveal reveal-delay-3 mt-8 flex flex-wrap items-center justify-center gap-4">
+                <a href="#tentang" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-[2.2rem] py-[0.9rem] text-base font-bold shadow-[0_8px_30px_rgba(245,158,11,0.4)] transition-all duration-300 hover:-translate-y-[3px] hover:scale-[1.03] hover:shadow-[0_16px_40px_rgba(245,158,11,0.5)]">
+                    <x-heroicon-o-book-open class="h-5 w-5" /> Tentang Kami
+                </a>
+                <a href="#kontak" class="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-[2.2rem] py-[0.9rem] text-base font-semibold transition-all duration-300 hover:-translate-y-[3px] hover:bg-white/20 hover:backdrop-blur">
+                    <x-heroicon-o-phone class="h-5 w-5" /> Hubungi Kami
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+@endif
 
 {{-- Tentang Kami Section --}}
 <section id="tentang" class="section relative bg-white px-6 pb-14 pt-20 md:pb-16 md:pt-24">
@@ -223,7 +205,7 @@
 
 {{-- Galeri Section --}}
 @if($galeri && $galeri->count() > 0)
-<section id="galeri" class="section relative bg-white px-6 py-20 md:py-24">
+<section id="galeri" class="section relative bg-white px-6 pb-20 pt-16 md:pb-24 md:pt-20">
     <div class="section-inner mx-auto max-w-[1200px]">
         <div class="text-center reveal">
             <div class="section-label inline-flex items-center justify-center gap-2 rounded-full bg-blue-100 px-4 py-[0.4rem] text-[0.8rem] font-bold uppercase tracking-[0.12em] text-blue-600">

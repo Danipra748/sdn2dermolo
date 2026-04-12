@@ -21,7 +21,7 @@ class CoordinateSeeder extends Seeder
                 $table->integer('map_zoom')->default(15)->after('school_longitude');
             });
 
-            $this->command->info('✅ Added coordinate columns to site_settings table');
+            $this->command->info('Added coordinate columns to site_settings table');
         }
 
         // Set default coordinates (Jepara center)
@@ -34,9 +34,9 @@ class CoordinateSeeder extends Seeder
             ]);
 
         if ($updated > 0 || $updated === 0) {
-            $this->command->info('✅ Coordinate seeder completed successfully!');
-            $this->command->info('📍 Default coordinates set: -6.8283, 110.6536 (Jepara)');
-            $this->command->info('🔍 Default zoom level: 15');
+            $this->command->info('Coordinate seeder completed successfully!');
+            $this->command->info('Default coordinates set: -6.8283, 110.6536 (Jepara)');
+            $this->command->info('Default zoom level: 15');
         }
     }
 }

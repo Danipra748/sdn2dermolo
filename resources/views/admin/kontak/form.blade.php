@@ -118,7 +118,7 @@
                         
                         <div class="pt-4 border-t border-slate-200">
                             <div class="bg-blue-50 rounded-xl p-3 border border-blue-200">
-                                <p class="text-xs text-blue-800 font-semibold mb-1">💡 Cara Menggunakan:</p>
+                                <p class="text-xs text-blue-800 font-semibold mb-1"><i class="fas fa-lightbulb text-yellow-500"></i> Cara Menggunakan:</p>
                                 <ol class="text-xs text-blue-700 space-y-1 list-decimal list-inside">
                                     <li>Klik peta untuk taruh pin</li>
                                     <li>Drag pin untuk geser posisi</li>

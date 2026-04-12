@@ -14,6 +14,7 @@ use App\Models\SiteSetting;
 use App\Models\Article;
 use App\Models\HomepageSection;
 use App\Models\SchoolProfile;
+use App\Models\HeroSlide;
 use Illuminate\Support\Facades\Schema;
 
 class PageController extends Controller
@@ -47,8 +48,10 @@ class PageController extends Controller
         $mapsEmbed = SchoolConfig::mapsEmbed();
         $mapsOpen = SchoolConfig::mapsOpen();
 
-        // Get hero section from database
-        $hero = HomepageSection::getHero();
+        // Get hero slides from database
+        $heroSlides = Schema::hasTable('hero_slides')
+            ? \App\Models\HeroSlide::getActiveOrdered()
+            : collect();
 
         // Get visi/misi from school profile
         $profile = SchoolProfile::getOrCreate();
@@ -70,7 +73,7 @@ class PageController extends Controller
             : collect();
 
         return view('home', compact(
-            'hero',
+            'heroSlides',
             'kepsek',
             'sambutanText',
             'sambutanFoto',

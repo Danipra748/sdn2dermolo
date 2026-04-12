@@ -35,10 +35,10 @@ if (app()->environment('local') || true) { // Force for development
                 WHERE `school_latitude` IS NULL
             ");
 
-            \Log::info('✅ Auto-migration: Coordinate columns added successfully');
+            \Log::info('Auto-migration: Coordinate columns added successfully');
         }
     } catch (\Exception $e) {
-        \Log::error('❌ Auto-migration failed: ' . $e->getMessage());
+        \Log::error('Auto-migration failed: ' . $e->getMessage());
     }
 }
 
@@ -111,9 +111,9 @@ Route::get('/_check-columns', function() {
     return response()->json([
         'status' => 'success',
         'columns' => [
-            'school_latitude' => $hasLatitude ? 'EXISTS ✅' : 'NOT EXISTS ❌',
-            'school_longitude' => $hasLongitude ? 'EXISTS ✅' : 'NOT EXISTS ❌',
-            'map_zoom' => $hasZoom ? 'EXISTS ✅' : 'NOT EXISTS ❌',
+            'school_latitude' => $hasLatitude ? 'EXISTS' : 'NOT EXISTS',
+            'school_longitude' => $hasLongitude ? 'EXISTS' : 'NOT EXISTS',
+            'map_zoom' => $hasZoom ? 'EXISTS' : 'NOT EXISTS',
         ],
         'coordinates' => $coordinates,
         'ready' => $hasLatitude && $hasLongitude && $hasZoom

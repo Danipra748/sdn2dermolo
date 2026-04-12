@@ -79,6 +79,13 @@
         setupHistoryHandling();
         reinitializeComponents();
         loadInitialContent();
+
+        // Ensure hero slideshow initializes on initial page load
+        // This fixes the issue where slideshow disappears on page refresh
+        window.setTimeout(function () {
+            setupHeroSwiper();
+            console.log('[SPA] Hero Swiper initialized on page load');
+        }, 200);
     }
 
     function setupNavigation() {
@@ -927,6 +934,12 @@
         }
 
         try {
+            setupHeroSwiper();
+        } catch (error) {
+            console.error('[SPA] Error in setupHeroSwiper:', error);
+        }
+
+        try {
             setupFacilityModal();
         } catch (error) {
             console.error('[SPA] Error in setupFacilityModal:', error);
@@ -1510,6 +1523,7 @@
 
             const newTitle = currentSlide.dataset.slideTitle || '';
             const newSubtitle = currentSlide.dataset.slideSubtitle || '';
+            const newDescription = currentSlide.dataset.slideDescription || '';
 
             // Add fade out effect
             heroTitleEl.style.transition = 'opacity 0.3s ease-in-out';
@@ -1520,19 +1534,23 @@
             // Update text after fade out
             setTimeout(() => {
                 if (newTitle) {
-                    // Split title at <br> if it exists
-                    const titleParts = newTitle.split('<br>');
-                    if (titleParts.length > 1) {
-                        heroTitleEl.innerHTML = titleParts[0] + '<br><span id="hero-subtitle" class="bg-gradient-to-r from-amber-400 to-yellow-200 bg-clip-text text-transparent">' + titleParts[1] + '</span>';
-                    } else {
-                        heroTitleEl.textContent = newTitle;
+                    const titleTextEl = document.getElementById('hero-title-text');
+                    if (titleTextEl) {
+                        titleTextEl.textContent = newTitle;
                     }
                 }
-                
+
                 if (newSubtitle) {
-                    const subtitleEl = document.getElementById('hero-subtitle');
-                    if (subtitleEl) {
-                        subtitleEl.textContent = newSubtitle + ' Generasi Unggul';
+                    const subtitleTextEl = document.getElementById('hero-subtitle-text');
+                    if (subtitleTextEl) {
+                        subtitleTextEl.textContent = newSubtitle;
+                    }
+                }
+
+                if (newDescription) {
+                    const descTextEl = document.getElementById('hero-description');
+                    if (descTextEl) {
+                        descTextEl.textContent = newDescription;
                     }
                 }
 
@@ -1849,6 +1867,128 @@
         });
 
         console.log('[SPA] Image previews reinitialized');
+    }
+
+    function setupHeroSwiper() {
+        // Check if Swiper is available
+        if (typeof Swiper === 'undefined') {
+            console.warn('[SPA] Swiper.js not loaded, skipping hero swiper setup');
+            return;
+        }
+
+        // Destroy existing instance if present
+        if (window.heroSwiperInstance) {
+            try {
+                window.heroSwiperInstance.destroy(true, true);
+                window.heroSwiperInstance = null;
+                console.log('[SPA] Previous hero Swiper instance destroyed');
+            } catch (e) {
+                console.error('[SPA] Error destroying previous Swiper instance:', e);
+            }
+        }
+
+        // Check if hero swiper markup exists
+        const swiperContainer = document.querySelector('.hero-swiper-instance');
+        if (!swiperContainer) {
+            console.log('[SPA] No hero swiper container found, skipping');
+            return;
+        }
+
+        // Check if there are at least 2 slides (otherwise no need for slideshow)
+        const slideCount = swiperContainer.querySelectorAll('.swiper-slide').length;
+        if (slideCount < 2) {
+            console.log('[SPA] Less than 2 slides, skipping slideshow');
+            return;
+        }
+
+        try {
+            // Initialize new Swiper instance with autoplay
+            window.heroSwiperInstance = new Swiper('.hero-swiper-instance', {
+                loop: true,
+                speed: 1000,
+                autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true,
+                    waitForTransition: true,
+                },
+                effect: 'fade',
+                fadeEffect: {
+                    crossFade: true
+                },
+                pagination: {
+                    el: '.hero-swiper-pagination',
+                    clickable: true,
+                    bulletClass: 'slideshow-dot',
+                    bulletActiveClass: 'is-active',
+                    renderBullet: function (index, className) {
+                        return '<button type="button" class="' + className + ' h-3 w-3 cursor-pointer rounded-full border-2 border-white/50 transition-all duration-300" aria-label="Go to slide ' + (index + 1) + '"></button>';
+                    },
+                },
+                on: {
+                    init: function () {
+                        console.log('[SPA] Hero Swiper initialized with autoplay enabled');
+                        // Update text content for first slide
+                        updateHeroSlideText(0);
+                        // Force autoplay start
+                        try {
+                            this.autoplay.start();
+                        } catch (e) {
+                            console.warn('[SPA] Could not start autoplay:', e);
+                        }
+                    },
+                    slideChange: function () {
+                        // Update text content when slide changes
+                        const realIndex = this.realIndex;
+                        updateHeroSlideText(realIndex);
+                    },
+                },
+            });
+
+            console.log('[SPA] Hero Swiper initialized successfully with 5s autoplay');
+        } catch (error) {
+            console.error('[SPA] Error initializing Hero Swiper:', error);
+        }
+    }
+
+    function updateHeroSlideText(slideIndex) {
+        try {
+            const slidesData = document.getElementById('hero-slides-data');
+            if (!slidesData) return;
+
+            const slideElement = slidesData.querySelector('[data-slide-index="' + slideIndex + '"]');
+            if (!slideElement) return;
+
+            const title = slideElement.getAttribute('data-title');
+            const subtitle = slideElement.getAttribute('data-subtitle');
+            const description = slideElement.getAttribute('data-description');
+
+            const titleText = document.getElementById('hero-title-text');
+            const subtitleText = document.getElementById('hero-subtitle-text');
+            const descText = document.getElementById('hero-description');
+
+            if (titleText && title) {
+                titleText.textContent = title;
+            }
+            if (subtitleText && subtitle) {
+                subtitleText.textContent = subtitle;
+            }
+            if (descText && description) {
+                descText.textContent = description;
+            }
+
+            // Re-trigger reveal animations
+            const reveals = document.querySelectorAll('#hero-slide-content .reveal');
+            reveals.forEach(function(el) {
+                el.classList.remove('reveal');
+                void el.offsetWidth; // Force reflow
+                el.classList.add('reveal');
+            });
+
+            console.log('[SPA] Updated hero slide text to slide', slideIndex + 1);
+        } catch (error) {
+            console.error('[SPA] Error updating hero slide text:', error);
+        }
     }
 
     window.loadSPAContent = loadContent;

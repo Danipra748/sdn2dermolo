@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/modals.css') }}">
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body, input, textarea, select {
             font-family: "Roboto", system-ui, sans-serif;
@@ -32,56 +32,21 @@
         .hero-badge {
             font-family: "Poppins", system-ui, sans-serif;
         }
-        /* Custom animations - used by utility classes below */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50%       { transform: translateY(-10px); }
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50%       { transform: translateY(-20px); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        /* Animation utility classes */
-        .animate-fadeInUp { animation: fadeInUp 0.8s ease-out; }
-        .animate-bounce { animation: bounce 2s infinite; }
-        .animate-float { animation: float 3s ease-in-out infinite; }
-        .animate-fadeIn { animation: fadeIn 0.6s ease-in; }
-        .reveal {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .reveal.visible {
-            opacity: 1;
-            transform: none;
-        }
-        .reveal-delay-1 { transition-delay: 0.1s; }
-        .reveal-delay-2 { transition-delay: 0.2s; }
-        .reveal-delay-3 { transition-delay: 0.3s; }
-        .reveal-delay-4 { transition-delay: 0.4s; }
-        /* Card hover effects */
-        .card-hover { transition: all 0.3s ease; }
-        .card-hover:hover { transform: translateY(-10px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-        .teacher-card { transition: all 0.3s ease; }
-        .teacher-card:hover { transform: scale(1.05); }
+        /* ===== HERO SECTION CONSISTENCY ===== */
         .hero-fullscreen {
-            min-height: 100vh;
+            height: 100vh;
             padding-top: 76px;
+            position: relative;
+            overflow: hidden;
         }
         .hero-fullscreen .hero-content {
-            min-height: calc(100vh - 76px);
+            height: calc(100vh - 76px);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            position: relative;
+            z-index: 10;
         }
         .hero-slide-media {
             display: block;
@@ -90,18 +55,42 @@
             object-fit: cover;
             object-position: center;
         }
-        .tentang-visual-main {
-            height: 100%;
-            width: 100%;
-            min-height: 350px;
+        .hero-slide {
+            position: absolute;
+            inset: 0;
         }
-        @media (min-width: 768px) {
-            .tentang-grid > div:first-child .tentang-visual-main {
-                min-height: 420px;
-            }
+        /* Page hero (non-homepage) */
+        .page-hero {
+            min-height: 50vh;
+            padding-top: 76px;
+            padding-bottom: 3rem;
+        }
+        /* ===== NAVIGATION FOCUS STYLES ===== */
+        nav a:focus,
+        nav button:focus,
+        nav summary:focus,
+        nav a:focus-visible,
+        nav button:focus-visible,
+        nav summary:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            -webkit-tap-highlight-color: transparent;
+        }
+        nav a:active,
+        nav button:active,
+        nav summary:active {
+            outline: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+        }
+        /* Remove focus ring from dropdown button */
+        nav .group button:focus,
+        nav .group button:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
         }
         /* ===== FOOTER NAVIGATION STYLES ===== */
-        /* Remove all focus/click effects on footer navigation links */
         .footer-nav a:focus,
         .footer-nav a:active,
         .footer-nav a:focus-visible,
@@ -113,7 +102,6 @@
             border: none !important;
             -webkit-tap-highlight-color: transparent;
         }
-
         .footer-nav li a:focus,
         .footer-nav li a:active,
         .footer-nav li a:focus-visible {
@@ -122,8 +110,6 @@
             background: transparent !important;
             -webkit-tap-highlight-color: transparent;
         }
-
-        /* Remove focus effects on footer social media icons */
         .footer-social a:focus,
         .footer-social a:active,
         .footer-social a:focus-visible {
@@ -132,8 +118,6 @@
             background: transparent !important;
             -webkit-tap-highlight-color: transparent;
         }
-
-        /* Remove focus effects on footer Google Maps link */
         .footer-maps a:focus,
         .footer-maps a:active,
         .footer-maps a:focus-visible {
@@ -142,16 +126,12 @@
             background: transparent !important;
             -webkit-tap-highlight-color: transparent;
         }
-
-        /* Remove any default focus ring in footer */
         footer *:focus,
         footer *:focus-visible {
             outline: none !important;
             box-shadow: none !important;
             -webkit-tap-highlight-color: transparent;
         }
-
-        /* Remove focus outline on all SPA navigation links in footer */
         footer a[data-spa]:focus,
         footer a[data-spa]:focus-visible,
         footer a[data-spa]:active {
@@ -159,13 +139,10 @@
             box-shadow: none !important;
             -webkit-tap-highlight-color: transparent;
         }
-
-        /* Smooth hover animation for footer navigation links */
         .footer-nav a {
             position: relative;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         .footer-nav a::before {
             content: '';
             position: absolute;
@@ -179,50 +156,35 @@
             opacity: 0;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         .footer-nav a:hover {
             color: #ffffff !important;
             transform: translateX(6px);
         }
-
         .footer-nav a:hover::before {
             width: 12px;
             opacity: 1;
             left: -8px;
         }
-
-        /* Smooth hover animation for footer contact links */
         .footer-contact a {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         .footer-contact a:hover {
             color: #ffffff !important;
         }
-
-        /* Smooth hover animation for footer social icons */
         .footer-social a {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         .footer-social a:hover {
             transform: scale(1.15) translateY(-2px);
         }
-
-        /* ===== FOOTER ACTIVE LINK STYLES ===== */
-        /* Active state for footer navigation links - NO background highlight */
         footer .spa-nav-link {
             position: relative;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        /* Ensure active footer links don't get unwanted background */
         footer .spa-nav-link.text-white {
             background: transparent !important;
             background-color: transparent !important;
         }
-
-        /* Add subtle underline indicator for active footer link */
         footer .spa-nav-link.text-white::after {
             content: '';
             position: absolute;
@@ -233,69 +195,21 @@
             background: linear-gradient(90deg, #60a5fa, #3b82f6);
             border-radius: 1px;
         }
-
-        /* Ensure footer links don't inherit any unwanted styles */
         footer .footer-nav a {
             background: transparent !important;
         }
-
-        /* ===== ABOUT PAGE ANIMATIONS ===== */
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0) translateX(0);
-            }
-            25% {
-                transform: translateY(-20px) translateX(10px);
-            }
-            50% {
-                transform: translateY(0) translateX(20px);
-            }
-            75% {
-                transform: translateY(20px) translateX(10px);
-            }
+        /* ===== SCROLL TO TOP BUTTON ===== */
+        #scrollToTop {
+            transition: all 0.3s ease;
         }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        #scrollToTop:hover {
+            transform: scale(1.1);
         }
-
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* 
-         * PUBLIC MODAL CONFIRMATION BUTTON FIX
-         * Fix untuk tombol 'Lanjutkan' di modal konfirmasi public
-         */
+        /* ===== PUBLIC MODAL CONFIRMATION BUTTON FIX ===== */
         #public-confirm-ok {
-            background-color: #DC2626 !important;       /* Merah gelap */
-            color: #FFFFFF !important;                   /* Teks putih */
-            border: 2px solid #DC2626 !important;        /* Border merah */
+            background-color: #DC2626 !important;
+            color: #FFFFFF !important;
+            border: 2px solid #DC2626 !important;
             opacity: 1 !important;
             visibility: visible !important;
             display: inline-block !important;
@@ -303,14 +217,12 @@
             cursor: pointer !important;
             transition: all 0.2s ease !important;
         }
-
         #public-confirm-ok:hover {
             background-color: #B91C1C !important;
             border-color: #B91C1C !important;
             box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4) !important;
             transform: translateY(-1px);
         }
-
         #public-confirm-cancel {
             background-color: #FFFFFF !important;
             color: #475569 !important;
@@ -322,13 +234,10 @@
             cursor: pointer !important;
             transition: all 0.2s ease !important;
         }
-
         #public-confirm-cancel:hover {
             background-color: #F1F5F9 !important;
             border-color: #94A3B8 !important;
         }
-
-        /* Force all modal buttons to be visible */
         #public-confirm-modal button[type="button"] {
             opacity: 1 !important;
             visibility: visible !important;
@@ -339,11 +248,11 @@
 <body class="scroll-smooth bg-gray-50">
 
     {{-- ===== NAVBAR ===== --}}
-    <nav class="fixed inset-x-0 top-0 z-50 border-b border-slate-200 bg-gradient-to-b from-slate-50 to-white shadow-[0_10px_30px_rgba(15,23,42,0.08)]">
-        <div class="mx-auto grid h-[76px] max-w-6xl grid-cols-[auto,1fr,auto] items-center gap-6 px-4 lg:px-14">
+    <nav class="fixed inset-x-0 top-0 z-50 border-b border-slate-200 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.08)]">
+        <div class="mx-auto flex h-[76px] max-w-6xl items-center justify-between gap-6 px-6 lg:px-14">
 
             {{-- Logo --}}
-            <a href="{{ route('home') }}" class="inline-flex items-center gap-3.5">
+            <a href="{{ route('home') }}" class="flex items-center gap-3.5">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white border border-slate-200 shadow-sm overflow-hidden">
                     @if($schoolProfile->logo)
                         <img src="{{ asset('storage/' . $schoolProfile->logo) }}" alt="{{ $schoolProfile->school_name }}" class="w-full h-full object-contain p-1">
@@ -353,14 +262,14 @@
                         </div>
                     @endif
                 </div>
-                <div class="mr-8">
+                <div>
                     <h1 class="text-base font-extrabold leading-tight text-slate-900">SD N 2 Dermolo</h1>
                     <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500">Unggul & Berkarakter</p>
                 </div>
             </a>
 
             {{-- Menu Desktop --}}
-            <div class="hidden md:flex items-center justify-center gap-5 font-semibold text-slate-500 md:ml-8">
+            <div class="hidden md:flex items-center gap-5 font-semibold text-slate-500">
                 <a href="{{ route('home') }}#home" data-spa="/spa/home" data-spa-title="Beranda - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('home') && !request()->filled('section') ? 'bg-emerald-50 text-blue-600' : '' }}">Beranda</a>
 
                 {{-- Dropdown Profil dengan Pure CSS --}}
@@ -386,10 +295,8 @@
                 <a href="{{ route('home') }}#kontak" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600">Kontak</a>
             </div>
 
-            {{-- Right Side Actions - Removed for cleaner navigation --}}
-
             {{-- Tombol Hamburger (Mobile) --}}
-            <button id="mobile-menu-button" class="md:hidden rounded-md p-2 text-slate-600 hover:text-blue-600">
+            <button id="mobile-menu-button" class="md:hidden flex items-center justify-center rounded-md p-2 text-slate-600 hover:text-blue-600">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                 </svg>
@@ -495,6 +402,7 @@
                         <li><a href="{{ route('guru.index') }}" data-spa="/spa/data-guru" data-spa-title="Tenaga Kependidikan - SD N 2 Dermolo" class="spa-nav-link inline-block">Tenaga Kependidikan</a></li>
                         <li><a href="{{ route('prestasi.index') }}" data-spa="/spa/prestasi" data-spa-title="Prestasi - SD N 2 Dermolo" class="spa-nav-link inline-block">Prestasi</a></li>
                         <li><a href="{{ route('gallery.index') }}" data-spa="/spa/gallery" data-spa-title="Galeri - SD N 2 Dermolo" class="spa-nav-link inline-block">Galeri</a></li>
+                        <li><a href="{{ route('news.index') }}" data-spa="/spa/berita" data-spa-title="Berita - SD N 2 Dermolo" class="spa-nav-link inline-block">Berita</a></li>
                         <li><a href="{{ route('fasilitas.index') }}" data-spa="/spa/sarana-prasarana" data-spa-title="Fasilitas - SD N 2 Dermolo" class="spa-nav-link inline-block">Fasilitas</a></li>
                         <li><a href="{{ route('home') }}#kontak" data-spa="/spa/home" data-spa-title="Kontak - SD N 2 Dermolo" data-spa-hash="#kontak" class="spa-nav-link inline-block">Kontak</a></li>
                     </ul>
@@ -645,5 +553,93 @@
     </script>
 
     @stack('scripts')
+
+    {{-- Swiper.js CDN for Hero Slideshow --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    {{-- Custom styles for Swiper integration --}}
+    <style>
+        .hero-swiper,
+        .hero-swiper-instance {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .hero-swiper .swiper-wrapper {
+            height: 100%;
+        }
+
+        .hero-swiper .swiper-slide {
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .hero-swiper .swiper-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* Ensure hero-content stays centered over slideshow */
+        .hero-fullscreen .hero-content {
+            min-height: calc(80vh - 76px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .hero-swiper-pagination {
+            position: absolute;
+            bottom: 2rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 20;
+        }
+
+        .hero-swiper-pagination .slideshow-dot {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 9999px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            background-color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0;
+            margin: 0;
+            outline: none;
+        }
+
+        .hero-swiper-pagination .slideshow-dot:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.1);
+        }
+
+        .hero-swiper-pagination .slideshow-dot.is-active {
+            background-color: #fbbf24;
+            border-color: #fbbf24;
+            transform: scale(1.3);
+            box-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+        }
+
+        /* Ensure Swiper autoplay works smoothly */
+        .hero-swiper .swiper-wrapper {
+            transition-timing-function: ease-in-out;
+        }
+    </style>
 </body>
 </html>

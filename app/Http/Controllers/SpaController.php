@@ -24,9 +24,11 @@ class SpaController extends Controller
 {
     public function getHomeContent(Request $request): JsonResponse|RedirectResponse
     {
-        $hero = Schema::hasTable('homepage_sections')
-            ? HomepageSection::getHero()
-            : null;
+        // Get hero slides from hero_slides table
+        $heroSlides = null;
+        if (Schema::hasTable('hero_slides')) {
+            $heroSlides = \App\Models\HeroSlide::getActiveOrdered();
+        }
 
         $guru = $this->getGuruCollection();
         $kepsek = $this->findKepsek($guru);
@@ -38,6 +40,7 @@ class SpaController extends Controller
 
         $sambutanText = SiteSetting::getValue('kepsek_sambutan_text', $defaultSambutan);
         $sambutanFoto = SiteSetting::getValue('kepsek_sambutan_foto');
+        $fotoKepsek = SiteSetting::getFotoKepsek();
 
         $profile = SchoolProfile::getOrCreate();
         $visi = $profile->vision;
@@ -63,8 +66,9 @@ class SpaController extends Controller
             $request,
             'spa.partials.home',
             compact(
-                'hero',
+                'heroSlides',
                 'sambutanFoto',
+                'fotoKepsek',
                 'sambutanText',
                 'kepsek',
                 'visi',
@@ -146,7 +150,15 @@ class SpaController extends Controller
     public function getAboutContent(Request $request): JsonResponse|RedirectResponse
     {
         $profile = SchoolProfile::getOrCreate();
-        
+
+        // Get kepala sekolah data
+        $sambutanText = SiteSetting::getValue('kepsek_sambutan_text', '');
+        $sambutanFoto = SiteSetting::getValue('kepsek_sambutan_foto');
+        $fotoKepsek = SiteSetting::getFotoKepsek();
+
+        $guru = $this->getGuruCollection();
+        $kepsek = $this->findKepsek($guru);
+
         // Get contact info from static config
         $kontak = SchoolConfig::contact();
         $alamatLines = SchoolConfig::addressLines();
@@ -156,7 +168,7 @@ class SpaController extends Controller
         return $this->respond(
             $request,
             'spa.partials.about',
-            compact('profile', 'mapsEmbed', 'mapsOpen', 'alamatLines'),
+            compact('profile', 'sambutanText', 'sambutanFoto', 'fotoKepsek', 'kepsek', 'mapsEmbed', 'mapsOpen', 'alamatLines'),
             'Tentang Kami - SD N 2 Dermolo',
             route('about')
         );
