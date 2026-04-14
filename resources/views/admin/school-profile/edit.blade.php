@@ -10,6 +10,21 @@
         </div>
     @endif
 
+    @if (session('error'))
+        <div class="mb-6 rounded-2xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-800">
+            <div class="font-semibold">Error!</div>
+            {{ session('error') }}
+        </div>
+    @endif
+
+    {{-- Debug Info - Remove after fix is confirmed --}}
+    <div class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <h4 class="font-bold text-sm">Debug Info:</h4>
+        <p class="text-xs">Current logo path: <code class="bg-yellow-100 px-1">{{ $profile->logo ?? 'NULL' }}</code></p>
+        <p class="text-xs">Profile ID: <code class="bg-yellow-100 px-1">{{ $profile->id ?? 'NULL' }}</code></p>
+        <p class="text-xs">Fillable columns: <code class="bg-yellow-100 px-1">{{ implode(', ', $profile->getFillable()) }}</code></p>
+    </div>
+
     <form action="{{ route('admin.school-profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('PUT')
