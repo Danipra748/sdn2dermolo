@@ -9,23 +9,19 @@ use Illuminate\Support\Facades\Schema;
 class AdminSettingsController extends Controller
 {
     /**
-     * Redirect old logo page to hidden settings page.
+     * Redirect old logo page to school profile page.
      */
     public function logoSettings()
     {
-        return redirect()->route('admin.hidden-settings');
+        return redirect()->route('admin.school-profile.edit')
+            ->with('info', 'Pengaturan logo sekolah sekarang berada di halaman Profil Sekolah.');
     }
 
     /**
-     * Show hidden settings page for logo upload and principal greeting.
+     * Show hidden settings page for principal greeting.
      */
     public function hiddenSettings()
     {
-        // Di sini lokasi penyimpanan path logonya.
-        $logoStoragePath = $this->resolveCurrentLogoStoragePath();
-        $logoPublicPath = $this->resolveCurrentLogoPublicPath();
-        $logoExists = $logoStoragePath !== null;
-
         $sambutanText = '';
         $sambutanFoto = null;
         $fotoKepsek = null;
@@ -38,82 +34,10 @@ class AdminSettingsController extends Controller
         }
 
         return view('admin.settings_hidden', compact(
-            'logoExists',
-            'logoPublicPath',
-            'logoStoragePath',
             'sambutanText',
             'sambutanFoto',
             'fotoKepsek'
         ));
-    }
-
-    /**
-     * Upload school logo.
-     */
-    public function uploadLogo(Request $request)
-    {
-        \Log::info('Logo upload started');
-
-        $request->validate([
-            'logo' => ['required', 'image', 'mimes:png,jpg,jpeg,webp,svg', 'max:5120'],
-        ]);
-
-        if ($request->hasFile('logo')) {
-            $file = $request->file('logo');
-
-            \Log::info('Processing logo upload', [
-                'filename' => $file->getClientOriginalName(),
-                'size' => $file->getSize(),
-                'extension' => $file->getClientOriginalExtension(),
-            ]);
-
-            $directory = storage_path('app/public/logos');
-            if (! file_exists($directory)) {
-                mkdir($directory, 0755, true);
-            }
-
-            foreach ($this->resolveAllLogoStoragePaths() as $existingLogoPath) {
-                if (file_exists($existingLogoPath)) {
-                    unlink($existingLogoPath);
-                    \Log::info('Old logo deleted', ['path' => $existingLogoPath]);
-                }
-            }
-
-            $extension = $file->getClientOriginalExtension();
-            $filename = 'sd-negeri-2-dermolo.' . $extension;
-
-            // Di sini lokasi penyimpanan path logonya.
-            $path = $file->storeAs('logos', $filename, 'public');
-
-            \Log::info('Logo stored successfully', ['path' => $path]);
-        }
-
-        return redirect()->to(route('admin.hidden-settings') . '#logo-settings')
-            ->with('success', 'Logo sekolah berhasil diupload!');
-    }
-
-    private function resolveCurrentLogoStoragePath(): ?string
-    {
-        return $this->resolveAllLogoStoragePaths()[0] ?? null;
-    }
-
-    private function resolveCurrentLogoPublicPath(): ?string
-    {
-        $logoStoragePath = $this->resolveCurrentLogoStoragePath();
-
-        if (! $logoStoragePath) {
-            return null;
-        }
-
-        return 'storage/logos/' . basename($logoStoragePath);
-    }
-
-    private function resolveAllLogoStoragePaths(): array
-    {
-        $paths = glob(storage_path('app/public/logos/sd-negeri-2-dermolo.*')) ?: [];
-        sort($paths);
-
-        return $paths;
     }
 
     /**

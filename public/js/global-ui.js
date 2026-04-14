@@ -11,6 +11,8 @@
         return;
     }
 
+    let pendingConfirmForm = null;
+
     // Initialize on DOM ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
@@ -48,46 +50,49 @@
      * Confirmation modal for forms
      */
     function setupConfirmModal() {
-        const modal = document.getElementById('public-confirm-modal');
-        const message = document.getElementById('public-confirm-message');
-        const okBtn = document.getElementById('public-confirm-ok');
-        const cancelBtn = document.getElementById('public-confirm-cancel');
-        let pendingForm = null;
-
-        if (!modal || !message || !okBtn) {
+        if (document.body.dataset.confirmModalBound === 'true') {
             return;
         }
 
-        const closeModal = () => {
-            pendingForm = null;
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        };
+        document.body.dataset.confirmModalBound = 'true';
 
-        // Setup form listeners
-        document.querySelectorAll('form[data-confirm]').forEach((form) => {
-            form.addEventListener('submit', (event) => {
-                event.preventDefault();
-                pendingForm = form;
-                message.textContent = form.dataset.confirm || 'Apakah Anda yakin?';
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            });
+        document.addEventListener('submit', (event) => {
+            const form = event.target;
+            if (!(form instanceof HTMLFormElement) || !form.matches('form[data-confirm]')) {
+                return;
+            }
+
+            const modal = document.getElementById('public-confirm-modal');
+            const message = document.getElementById('public-confirm-message');
+            if (!modal || !message) {
+                return;
+            }
+
+            event.preventDefault();
+            pendingConfirmForm = form;
+            message.textContent = form.dataset.confirm || 'Apakah Anda yakin?';
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         });
 
-        cancelBtn?.addEventListener('click', closeModal);
-
-        modal?.addEventListener('click', (event) => {
-            if (event.target?.dataset?.confirmClose) {
-                closeModal();
+        document.addEventListener('click', (event) => {
+            const target = event.target;
+            if (!(target instanceof Element)) {
+                return;
             }
-        });
 
-        okBtn?.addEventListener('click', () => {
-            if (pendingForm) {
-                pendingForm.submit();
+            if (target.closest('[data-confirm-close], #public-confirm-cancel')) {
+                closeConfirmModal();
+                return;
             }
-            closeModal();
+
+            if (target.closest('#public-confirm-ok')) {
+                if (pendingConfirmForm) {
+                    HTMLFormElement.prototype.submit.call(pendingConfirmForm);
+                }
+
+                closeConfirmModal();
+            }
         });
     }
 
@@ -101,11 +106,21 @@
             return;
         }
 
-        window.addEventListener('scroll', () => {
-            scrollToTopBtn.classList.toggle('hidden', window.pageYOffset <= 300);
-        });
+        updateScrollToTopVisibility();
 
-        scrollToTopBtn.addEventListener('click', () => {
+        if (document.body.dataset.scrollToTopBound === 'true') {
+            return;
+        }
+
+        document.body.dataset.scrollToTopBound = 'true';
+
+        window.addEventListener('scroll', updateScrollToTopVisibility, { passive: true });
+        document.addEventListener('click', (event) => {
+            const target = event.target;
+            if (!(target instanceof Element) || !target.closest('#scrollToTop')) {
+                return;
+            }
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
@@ -145,10 +160,31 @@
      * Called by spa.js after content is loaded
      */
     window.reinitializeGlobalUI = function() {
-        setupConfirmModal();
-        setupScrollToTop();
         setupCardAnimations();
+        updateScrollToTopVisibility();
         console.log('[GlobalUI] Components reinitialized after SPA navigation');
     };
+
+    function closeConfirmModal() {
+        const modal = document.getElementById('public-confirm-modal');
+
+        pendingConfirmForm = null;
+
+        if (!modal) {
+            return;
+        }
+
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    function updateScrollToTopVisibility() {
+        const scrollToTopBtn = document.getElementById('scrollToTop');
+        if (!scrollToTopBtn) {
+            return;
+        }
+
+        scrollToTopBtn.classList.toggle('hidden', window.pageYOffset <= 300);
+    }
 
 })();

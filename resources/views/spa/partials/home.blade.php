@@ -268,7 +268,7 @@
 </section>
 
 {{-- Gallery Modal for Homepage --}}
-<div id="gallery-modal" class="gallery-modal" aria-hidden="true" style="position: fixed; inset: 0; display: none; align-items: center; justify-content: center; padding: 1.5rem; z-index: 60;">
+<div id="gallery-modal" class="fixed inset-0 hidden items-center justify-center p-6 z-[60]" aria-hidden="true">
     <div class="absolute inset-0 bg-slate-900/60" data-gallery-close></div>
     <div class="relative bg-white rounded-[1.5rem] overflow-hidden max-w-[900px] w-full grid grid-cols-1 md:grid-cols-[1.2fr_1fr] shadow-[0_30px_60px_rgba(15,23,42,0.2)] z-10" role="dialog" aria-modal="true" aria-labelledby="gallery-modal-title">
         <button type="button" class="absolute top-[0.75rem] right-[0.75rem] w-[38px] h-[38px] rounded-full bg-white border border-slate-200 inline-flex items-center justify-center shadow-[0_8px_18px_rgba(15,23,42,0.12)] cursor-pointer z-20" data-gallery-close aria-label="Tutup">
@@ -284,53 +284,6 @@
     </div>
 </div>
 
-@push('scripts')
-<script>
-(() => {
-    const modal = document.getElementById('gallery-modal');
-    if (!modal) return;
-    const imageEl = document.getElementById('gallery-modal-image');
-    const titleEl = document.getElementById('gallery-modal-title');
-    const descEl  = document.getElementById('gallery-modal-desc');
-
-    const openModal = (card) => {
-        const title = card.dataset.title || '';
-        const desc  = card.dataset.desc || '';
-        const img   = card.dataset.image || '';
-        titleEl.textContent = title;
-        descEl.textContent = desc || 'Deskripsi belum tersedia.';
-        if (img) {
-            imageEl.src = img;
-            imageEl.style.display = 'block';
-        } else {
-            imageEl.removeAttribute('src');
-            imageEl.style.display = 'none';
-        }
-        modal.classList.add('is-open');
-        modal.setAttribute('aria-hidden', 'false');
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    };
-
-    const closeModal = () => {
-        modal.classList.remove('is-open');
-        modal.setAttribute('aria-hidden', 'true');
-        modal.style.display = 'none';
-        document.body.style.overflow = '';
-    };
-
-    document.querySelectorAll('[data-gallery-card]').forEach(card => {
-        card.addEventListener('click', () => openModal(card));
-    });
-    modal.querySelectorAll('[data-gallery-close]').forEach(btn => {
-        btn.addEventListener('click', closeModal);
-    });
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
-    });
-})();
-</script>
-@endpush
 @endif
 
 {{-- Berita Section --}}

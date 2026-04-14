@@ -1,3 +1,5 @@
+@php use Illuminate\Support\Str; @endphp
+
 {{-- Sarana Prasarana SPA Partial --}}
 
 <section class="relative overflow-hidden text-white" style="padding-top: 80px; background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0ea5e9 100%);">
@@ -65,8 +67,8 @@
                     </div>
                     <div class="facility-body flex flex-1 flex-col gap-3 overflow-hidden px-5 py-5">
                         <div class="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-teal-600">Fasilitas</div>
-                        <div class="facility-card-title text-[1.02rem] font-bold leading-6 text-slate-900">{{ $nama }}</div>
-                        <div class="facility-card-desc text-[0.9rem] leading-6 text-slate-500">{{ Str::limit($desk, 120) }}</div>
+                        <div class="line-clamp-2 text-[1.02rem] font-bold leading-6 text-slate-900">{{ $nama }}</div>
+                        <div class="line-clamp-4 text-[0.9rem] leading-6 text-slate-500">{{ Str::limit($desk, 120) }}</div>
                         <div class="mt-auto pt-2 text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-slate-400">Klik untuk detail</div>
                     </div>
                     </div>
@@ -76,7 +78,7 @@
     </div>
 </section>
 
-<div id="facility-modal" class="fixed inset-0 hidden items-center justify-center p-6 z-60" aria-hidden="true">
+<div id="facility-modal" class="fixed inset-0 hidden items-center justify-center p-6 z-[60]" aria-hidden="true">
     <div class="absolute inset-0 bg-slate-900/60" data-facility-close></div>
     <div class="relative bg-white rounded-[1.5rem] overflow-hidden max-w-[900px] w-full grid grid-cols-1 md:grid-cols-[1.2fr_1fr] shadow-[0_30px_60px_rgba(15,23,42,0.2)] z-10" role="dialog" aria-modal="true">
         <button type="button" class="absolute top-[0.75rem] right-[0.75rem] w-[38px] h-[38px] rounded-full bg-white border border-slate-200 inline-flex items-center justify-center shadow-[0_8px_18px_rgba(15,23,42,0.12)] cursor-pointer z-20" data-facility-close aria-label="Tutup">
@@ -90,4 +92,10 @@
             <p id="facility-modal-desc" class="mt-[0.75rem] text-slate-500 leading-[1.7]"></p>
         </div>
     </div>
+</div>
+<div class="flex flex-wrap gap-4 justify-center mb-16">
+    <a href="{{ route('home') }}" class="group inline-flex items-center gap-3 px-8 py-4 rounded-full  text-blue-600 font-bold hover:bg-blue-50 transition shadow-2xl hover:shadow-3xl text-lg">
+                <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                Kembali ke Beranda
+    </a>
 </div>

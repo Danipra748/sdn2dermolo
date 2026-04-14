@@ -7,14 +7,13 @@
     'use strict';
 
     const config = {
-        contentContainer: '#spa-content, #main-content',
+        contentContainer: '#main-content',
         animationDuration: 220,
         loadingDelay: 200,
         cachePrefix: 'sdn2-dermolo-spa-cache:v4',
         // Routes that should always fetch fresh data (no cache)
         noCacheRoutes: [
             '/spa/data-guru',
-            '/spa/berita',
             '/spa/prestasi',
             '/spa/gallery',
             '/spa/sarana-prasarana',
@@ -48,10 +47,6 @@
         '/tentang-kami': {
             route: '/spa/about',
             title: 'Tentang Kami - SD N 2 Dermolo',
-        },
-        '/news': {
-            route: '/spa/berita',
-            title: 'Berita - SD N 2 Dermolo',
         },
         '/program': {
             route: '/spa/program',
@@ -308,10 +303,14 @@
 
         console.log('[SPA] Fetching content from:', cacheBustUrl, isNoCache ? '(no-cache)' : '(cached)');
 
+        // Get CSRF token from meta tag
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
         return fetch(cacheBustUrl, {
             headers: {
                 Accept: 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken,
             },
             // Add cache control for no-cache routes
             cache: isNoCache ? 'no-store' : 'default',
@@ -1071,299 +1070,245 @@
     }
 
     function setupDynamicClickHandlers() {
-        // Setup click handlers for facility cards
-        setupFacilityCardClicks();
-        
-        // Setup click handlers for prestasi cards
-        setupPrestasiCardClicks();
-        
-        // Setup click handlers for program/ekstrakurikuler cards
-        setupProgramCardClicks();
-        
-        // Setup click handlers for any other dynamic elements
-        setupGeneralClickHandlers();
-        
-        // Setup event delegation for news cards
-        setupNewsCardDelegation();
-        
-        // Setup event delegation for program cards
-        setupProgramCardDelegation();
-        
-        // Setup event delegation for prestasi cards
-        setupPrestasiCardDelegation();
-        
+        if (document.body.dataset.spaDynamicHandlersBound === 'true') {
+            console.log('[SPA] Dynamic click handlers initialized');
+            return;
+        }
+
+        document.body.dataset.spaDynamicHandlersBound = 'true';
+        document.addEventListener('click', handleDynamicClick);
+        document.addEventListener('keydown', handleDynamicKeydown);
+
         console.log('[SPA] Dynamic click handlers initialized');
     }
 
-    function setupProgramCardClicks() {
-        // Program cards might have links or modals
-        document.querySelectorAll('[data-program-card]').forEach(card => {
-            const link = card.querySelector('a');
-            if (link) {
-                card.style.cursor = 'pointer';
-                card.addEventListener('click', (e) => {
-                    // Don't trigger if clicking on interactive elements
-                    if (e.target.closest('a, button, input, [data-toggle]')) {
-                        return;
-                    }
-                    link.click();
-                });
-            }
-        });
-        console.log('[SPA] Program card clicks setup');
+    function handleDynamicClick(event) {
+        const target = event.target;
+        if (!(target instanceof Element)) {
+            return;
+        }
+
+        if (handleFacilityModalClick(target)) {
+            return;
+        }
+
+        if (handlePrestasiModalClick(target)) {
+            return;
+        }
+
+        if (handleGalleryModalClick(target)) {
+            return;
+        }
+
+        if (handleProgramCardClick(target)) {
+            return;
+        }
+
+        handleGeneralInteractiveClick(event, target);
     }
 
-    function setupNewsCardDelegation() {
-        // Event delegation for news cards (already using <a> tags, so they work natively)
-        // This ensures they work even after DOM updates
-        document.addEventListener('click', (e) => {
-            const newsCard = e.target.closest('[data-news-card]');
-            if (newsCard) {
-                const link = newsCard.querySelector('a[href]');
-                if (link && !e.target.closest('a[href]')) {
-                    // Card is clickable but user didn't click a link
-                    // The card itself is an <a> tag, so it will work natively
-                }
-            }
-        });
-        console.log('[SPA] News card delegation setup');
+    function handleDynamicKeydown(event) {
+        if (event.key !== 'Escape') {
+            return;
+        }
+
+        if (isModalOpen('gallery-modal')) {
+            closeGalleryModal();
+            return;
+        }
+
+        if (isModalOpen('prestasi-modal')) {
+            closePrestasiModal();
+            return;
+        }
+
+        if (isModalOpen('facility-modal')) {
+            closeFacilityModal();
+        }
     }
 
-    function setupProgramCardDelegation() {
-        // Event delegation for program/ekstrakurikuler cards
-        document.addEventListener('click', (e) => {
-            const programCard = e.target.closest('[data-program-card]');
-            if (programCard) {
-                const link = programCard.querySelector('a[href]');
-                if (link && !e.target.closest('a[href], button, input')) {
-                    window.location.href = link.href;
-                }
-            }
-        });
-        console.log('[SPA] Program card delegation setup');
+    function handleFacilityModalClick(target) {
+        if (target.closest('[data-facility-close]')) {
+            closeFacilityModal();
+            return true;
+        }
+
+        const card = target.closest('[data-facility-card]');
+        if (!card || hasNestedInteractiveTarget(target, card, 'a[href], button, input, textarea, select')) {
+            return false;
+        }
+
+        openFacilityModal(card);
+        return true;
     }
 
-    function setupPrestasiCardDelegation() {
-        // Event delegation for prestasi cards
-        // These cards use data attributes to open modals
-        document.addEventListener('click', (e) => {
-            const prestasiCard = e.target.closest('[data-prestasi-card]');
-            if (prestasiCard && !e.target.closest('[data-prestasi-close]')) {
-                openPrestasiModal(prestasiCard);
+    function handlePrestasiModalClick(target) {
+        if (target.closest('[data-prestasi-close]')) {
+            closePrestasiModal();
+            return true;
+        }
+
+        const card = target.closest('[data-prestasi-card]');
+        if (!card || hasNestedInteractiveTarget(target, card, 'a[href], button, input, textarea, select')) {
+            return false;
+        }
+
+        openPrestasiModal(card);
+        return true;
+    }
+
+    function handleGalleryModalClick(target) {
+        if (target.closest('[data-gallery-close]')) {
+            closeGalleryModal();
+            return true;
+        }
+
+        const card = target.closest('[data-gallery-card]');
+        if (!card || hasNestedInteractiveTarget(target, card, 'a[href], button, input, textarea, select')) {
+            return false;
+        }
+
+        openGalleryModal(card);
+        return true;
+    }
+
+    function handleProgramCardClick(target) {
+        const card = target.closest('[data-program-card]');
+        if (!card || card.matches('a[href]') || hasNestedInteractiveTarget(target, card, 'a[href], button, input, textarea, select, [data-toggle]')) {
+            return false;
+        }
+
+        const link = card.querySelector('a[href]');
+        if (!link) {
+            return false;
+        }
+
+        window.location.href = link.href;
+        return true;
+    }
+
+    function handleGeneralInteractiveClick(event, target) {
+        const toggle = target.closest('[data-toggle], .accordion-toggle');
+        if (toggle) {
+            event.preventDefault();
+
+            const selector = toggle.dataset.target || toggle.getAttribute('href');
+            if (!selector) {
+                return true;
             }
-            
-            // Handle close buttons
-            const closeBtn = e.target.closest('[data-prestasi-close]');
-            if (closeBtn) {
-                closePrestasiModal();
+
+            const panel = document.querySelector(selector);
+            if (panel) {
+                panel.classList.toggle('hidden');
+                toggle.classList.toggle('active');
             }
-        });
-        
-        // Escape key handler for prestasi modal
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                const modal = document.getElementById('prestasi-modal');
-                if (modal && modal.classList.contains('is-open')) {
-                    closePrestasiModal();
-                }
-            }
-        });
-        
-        console.log('[SPA] Prestasi card delegation setup');
+
+            return true;
+        }
+
+        const tab = target.closest('[data-tab]');
+        if (!tab) {
+            return false;
+        }
+
+        event.preventDefault();
+
+        const tabGroup = tab.closest('[data-tab-group]');
+        if (!tabGroup) {
+            return true;
+        }
+
+        tabGroup.querySelectorAll('[data-tab]').forEach((item) => item.classList.remove('active'));
+        tabGroup.querySelectorAll('[data-tab-content]').forEach((item) => item.classList.add('hidden'));
+
+        tab.classList.add('active');
+
+        const contentId = tab.dataset.tab;
+        if (!contentId) {
+            return true;
+        }
+
+        const content = document.querySelector(`[data-tab-content="${contentId}"]`);
+        if (content) {
+            content.classList.remove('hidden');
+        }
+
+        return true;
+    }
+
+    function openFacilityModal(card) {
+        openContentModal('facility', card, 'Deskripsi fasilitas belum tersedia.');
+    }
+
+    function closeFacilityModal() {
+        closeContentModal('facility');
     }
 
     function openPrestasiModal(card) {
-        const modal = document.getElementById('prestasi-modal');
-        if (!modal) return;
+        openContentModal('prestasi', card, 'Deskripsi prestasi belum tersedia.');
+    }
 
-        const imageEl = document.getElementById('prestasi-modal-image');
-        const titleEl = document.getElementById('prestasi-modal-title');
-        const descEl = document.getElementById('prestasi-modal-desc');
+    function closePrestasiModal() {
+        closeContentModal('prestasi');
+    }
 
-        if (!imageEl || !titleEl || !descEl) return;
+    function openGalleryModal(card) {
+        openContentModal('gallery', card, 'Deskripsi belum tersedia.');
+    }
 
-        const title = card.dataset.title || '';
-        const desc = card.dataset.desc || 'Deskripsi prestasi belum tersedia.';
-        const img = card.dataset.image || '';
+    function closeGalleryModal() {
+        closeContentModal('gallery');
+    }
 
-        titleEl.textContent = title;
-        descEl.textContent = desc;
+    function openContentModal(prefix, card, fallbackDescription) {
+        const modal = document.getElementById(`${prefix}-modal`);
+        const imageEl = document.getElementById(`${prefix}-modal-image`);
+        const titleEl = document.getElementById(`${prefix}-modal-title`);
+        const descEl = document.getElementById(`${prefix}-modal-desc`);
 
-        if (img) {
-            imageEl.src = img;
+        if (!modal || !imageEl || !titleEl || !descEl) {
+            return;
+        }
+
+        titleEl.textContent = card.dataset.title || '';
+        descEl.textContent = card.dataset.desc || fallbackDescription;
+
+        if (card.dataset.image) {
+            imageEl.src = card.dataset.image;
             imageEl.style.display = 'block';
         } else {
             imageEl.removeAttribute('src');
             imageEl.style.display = 'none';
         }
 
-        modal.classList.remove('hidden');
-        modal.classList.add('flex', 'is-open');
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
+        setModalState(modal, true);
     }
 
-    function closePrestasiModal() {
-        const modal = document.getElementById('prestasi-modal');
-        if (!modal) return;
+    function closeContentModal(prefix) {
+        const modal = document.getElementById(`${prefix}-modal`);
+        if (!modal) {
+            return;
+        }
 
-        modal.classList.add('hidden');
-        modal.classList.remove('flex', 'is-open');
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
+        setModalState(modal, false);
     }
 
-    function setupFacilityCardClicks() {
-        const modal = document.getElementById('facility-modal');
-        if (!modal) return;
-
-        const imageEl = document.getElementById('facility-modal-image');
-        const titleEl = document.getElementById('facility-modal-title');
-        const descEl = document.getElementById('facility-modal-desc');
-
-        if (!imageEl || !titleEl || !descEl) return;
-
-        const openModal = (card) => {
-            titleEl.textContent = card.dataset.title || '';
-            descEl.textContent = card.dataset.desc || 'Deskripsi fasilitas belum tersedia.';
-
-            if (card.dataset.image) {
-                imageEl.src = card.dataset.image;
-                imageEl.style.display = 'block';
-            } else {
-                imageEl.removeAttribute('src');
-                imageEl.style.display = 'none';
-            }
-
-            modal.classList.remove('hidden');
-            modal.classList.add('flex', 'is-open');
-            modal.setAttribute('aria-hidden', 'false');
-            document.body.style.overflow = 'hidden';
-        };
-
-        const closeModal = () => {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex', 'is-open');
-            modal.setAttribute('aria-hidden', 'true');
-            document.body.style.overflow = '';
-        };
-
-        // Remove old event listeners by cloning nodes
-        document.querySelectorAll('[data-facility-card]').forEach(card => {
-            const newCard = card.cloneNode(true);
-            card.parentNode.replaceChild(newCard, card);
-            newCard.addEventListener('click', () => openModal(newCard));
-        });
-
-        modal.querySelectorAll('[data-facility-close]').forEach(button => {
-            const newButton = button.cloneNode(true);
-            button.parentNode.replaceChild(newButton, button);
-            newButton.addEventListener('click', closeModal);
-        });
-
-        // Add Escape key handler
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && modal.classList.contains('is-open')) {
-                closeModal();
-            }
-        });
+    function setModalState(modal, isOpen) {
+        modal.classList.toggle('hidden', !isOpen);
+        modal.classList.toggle('flex', isOpen);
+        modal.classList.toggle('is-open', isOpen);
+        modal.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+        document.body.style.overflow = isOpen ? 'hidden' : '';
     }
 
-    function setupPrestasiCardClicks() {
-        const modal = document.getElementById('prestasi-modal');
-        if (!modal) return;
-
-        const imageEl = document.getElementById('prestasi-modal-image');
-        const titleEl = document.getElementById('prestasi-modal-title');
-        const descEl = document.getElementById('prestasi-modal-desc');
-
-        if (!imageEl || !titleEl || !descEl) return;
-
-        const openModal = (card) => {
-            titleEl.textContent = card.dataset.title || '';
-            descEl.textContent = card.dataset.desc || 'Deskripsi prestasi belum tersedia.';
-
-            if (card.dataset.image) {
-                imageEl.src = card.dataset.image;
-                imageEl.style.display = 'block';
-            } else {
-                imageEl.removeAttribute('src');
-                imageEl.style.display = 'none';
-            }
-
-            modal.classList.remove('hidden');
-            modal.classList.add('flex', 'is-open');
-            modal.setAttribute('aria-hidden', 'false');
-            document.body.style.overflow = 'hidden';
-        };
-
-        const closeModal = () => {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex', 'is-open');
-            modal.setAttribute('aria-hidden', 'true');
-            document.body.style.overflow = '';
-        };
-
-        // Remove old event listeners by cloning nodes
-        document.querySelectorAll('[data-prestasi-card]').forEach(card => {
-            const newCard = card.cloneNode(true);
-            card.parentNode.replaceChild(newCard, card);
-            newCard.addEventListener('click', () => openModal(newCard));
-        });
-
-        modal.querySelectorAll('[data-prestasi-close]').forEach(button => {
-            const newButton = button.cloneNode(true);
-            button.parentNode.replaceChild(newButton, button);
-            newButton.addEventListener('click', closeModal);
-        });
-
-        // Add Escape key handler
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && modal.classList.contains('is-open')) {
-                closeModal();
-            }
-        });
+    function isModalOpen(modalId) {
+        const modal = document.getElementById(modalId);
+        return Boolean(modal && modal.classList.contains('is-open'));
     }
 
-    function setupGeneralClickHandlers() {
-        // Handle accordion/toggle elements
-        document.querySelectorAll('[data-toggle], .accordion-toggle').forEach(toggle => {
-            const newToggle = toggle.cloneNode(true);
-            toggle.parentNode.replaceChild(newToggle, toggle);
-            
-            newToggle.addEventListener('click', (e) => {
-                e.preventDefault();
-                const target = document.querySelector(newToggle.dataset.target || newToggle.getAttribute('href'));
-                if (target) {
-                    target.classList.toggle('hidden');
-                    newToggle.classList.toggle('active');
-                }
-            });
-        });
-
-        // Handle tabs
-        document.querySelectorAll('[data-tab]').forEach(tab => {
-            const newTab = tab.cloneNode(true);
-            tab.parentNode.replaceChild(newTab, tab);
-            
-            newTab.addEventListener('click', (e) => {
-                e.preventDefault();
-                const tabGroup = newTab.closest('[data-tab-group]');
-                if (tabGroup) {
-                    tabGroup.querySelectorAll('[data-tab]').forEach(t => t.classList.remove('active'));
-                    tabGroup.querySelectorAll('[data-tab-content]').forEach(c => c.classList.add('hidden'));
-                    
-                    newTab.classList.add('active');
-                    const contentId = newTab.dataset.tab;
-                    const content = document.querySelector(`[data-tab-content="${contentId}"]`);
-                    if (content) {
-                        content.classList.remove('hidden');
-                    }
-                }
-            });
-        });
-
-        console.log('[SPA] General click handlers initialized');
+    function hasNestedInteractiveTarget(target, container, selector) {
+        const interactiveTarget = target.closest(selector);
+        return Boolean(interactiveTarget && interactiveTarget !== container);
     }
 
     function refreshExternalLibraries() {
@@ -1659,8 +1604,7 @@
             return;
         }
 
-        // Event listeners are now handled in setupFacilityCardClicks
-        // This function just marks the modal as initialized
+        // Event listeners are handled by the global SPA delegation.
         modal.dataset.initialized = 'true';
         
         console.log('[SPA] Facility modal initialized');
@@ -1681,8 +1625,7 @@
             return;
         }
 
-        // Event listeners are now handled in setupPrestasiCardClicks
-        // This function just marks the modal as initialized
+        // Event listeners are handled by the global SPA delegation.
         modal.dataset.initialized = 'true';
 
         console.log('[SPA] Prestasi modal initialized');
@@ -1703,8 +1646,7 @@
             return;
         }
 
-        // Event listeners are handled inline via data-gallery-card attributes
-        // This function just marks the modal as initialized
+        // Event listeners are handled by the global SPA delegation.
         modal.dataset.initialized = 'true';
 
         console.log('[SPA] Gallery modal initialized');

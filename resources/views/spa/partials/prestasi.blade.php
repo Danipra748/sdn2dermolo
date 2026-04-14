@@ -39,9 +39,9 @@
                         </div>
                     @endif
                     <div class="p-4">
-                        <h3 class="prestasi-card-title mb-2 text-[0.95rem] font-bold leading-snug text-slate-900">{{ \Illuminate\Support\Str::limit($item->judul, 56) }}</h3>
+                        <h3 class="mb-2 line-clamp-2 text-[0.95rem] font-bold leading-snug text-slate-900">{{ \Illuminate\Support\Str::limit($item->judul, 56) }}</h3>
                         @if ($item->deskripsi)
-                            <p class="prestasi-card-desc text-[0.8rem] leading-5 text-slate-600">{{ \Illuminate\Support\Str::limit($item->deskripsi, 88) }}</p>
+                            <p class="line-clamp-3 text-[0.8rem] leading-5 text-slate-600">{{ \Illuminate\Support\Str::limit($item->deskripsi, 88) }}</p>
                         @endif
                         <div class="mt-3 pt-2 border-t border-slate-100 text-[0.72rem] font-semibold uppercase tracking-[0.1em] text-purple-600">
                             Klik untuk detail
@@ -62,7 +62,7 @@
 </section>
 
 {{-- Prestasi Modal --}}
-<div id="prestasi-modal" class="prestasi-modal" aria-hidden="true">
+<div id="prestasi-modal" class="fixed inset-0 hidden items-center justify-center p-6 z-[60]" aria-hidden="true">
     <div class="prestasi-modal-backdrop absolute inset-0 bg-slate-900/60" data-prestasi-close></div>
     <div class="prestasi-modal-content relative bg-white rounded-[1.5rem] overflow-hidden max-w-[900px] w-full grid grid-cols-1 md:grid-cols-[1.2fr_1fr] shadow-[0_30px_60px_rgba(15,23,42,0.2)] z-10" role="dialog" aria-modal="true" aria-labelledby="prestasi-modal-title">
         <button type="button" class="prestasi-modal-close absolute top-[0.75rem] right-[0.75rem] w-[38px] h-[38px] rounded-full bg-white border border-slate-200 inline-flex items-center justify-center shadow-[0_8px_18px_rgba(15,23,42,0.12)] cursor-pointer z-20" data-prestasi-close aria-label="Tutup">
@@ -77,3 +77,10 @@
         </div>
     </div>
 </div>
+<div class="flex flex-wrap gap-4 justify-center mb-16">
+    <a href="{{ route('home') }}" class="group inline-flex items-center gap-3 px-8 py-4 rounded-full  text-blue-600 font-bold hover:bg-blue-50 transition shadow-2xl hover:shadow-3xl text-lg">
+                <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                Kembali ke Beranda
+    </a>
+</div>
+

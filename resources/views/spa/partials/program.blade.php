@@ -41,7 +41,13 @@
                     ];
                     $gradient = $gradients[$colorKey] ?? $gradients['blue'];
                 @endphp
-                <div class="group bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden reveal transition-all duration-[400ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-[6px] hover:shadow-[0_20px_40px_rgba(15,23,42,0.12)] hover:border-slate-300" style="transition-delay: {{ $loop->index * 0.08 }}s;">
+                @php
+                    $routeName = $slug ? 'program.' . $slug : null;
+                    $link = $routeName ? route($routeName) : '#';
+                @endphp
+                <a href="{{ $link }}"
+                   class="group block overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm reveal transition-all duration-[400ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-[6px] hover:shadow-[0_20px_40px_rgba(15,23,42,0.12)] hover:border-slate-300"
+                   style="transition-delay: {{ $loop->index * 0.08 }}s;">
                     @php
                         $bgStyle = !empty($cardBg)
                             ? "background-image: url('" . asset('storage/' . $cardBg) . "'); background-size: cover; background-position: center; background-repeat: no-repeat;"
@@ -64,8 +70,14 @@
                     <div class="p-5">
                         <h3 class="font-semibold text-slate-900 text-lg">{{ $title }}</h3>
                     </div>
-                </div>
+                </a>
             @endforeach
         </div>
     </div>
 </section>
+<div class="flex flex-wrap gap-4 justify-center mb-16">
+    <a href="{{ route('home') }}" class="group inline-flex items-center gap-3 px-8 py-4 rounded-full  text-blue-600 font-bold hover:bg-blue-50 transition shadow-2xl hover:shadow-3xl text-lg">
+                <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                Kembali ke Beranda
+    </a>
+</div>

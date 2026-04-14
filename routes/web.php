@@ -153,17 +153,15 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::post('/{heroSlide}/toggle-active', [AdminHeroSlideController::class, 'toggleActive'])->name('toggle-active');
     });
 
-    // School Profile Management
+    // School Profile Management (includes Logo)
     Route::prefix('school-profile')->name('school-profile.')->group(function () {
         Route::get('/', [AdminSchoolProfileController::class, 'edit'])->name('edit');
         Route::put('/', [AdminSchoolProfileController::class, 'update'])->name('update');
         Route::delete('/logo', [AdminSchoolProfileController::class, 'deleteLogo'])->name('delete-logo');
     });
 
-    // Settings - Logo Upload & Foto Kepsek
+    // Settings - Foto Kepsek Only
     Route::prefix('settings')->name('settings.')->group(function () {
-        Route::get('/logo', [AdminSettingsController::class, 'logoSettings'])->name('logo');
-        Route::post('/logo/upload', [AdminSettingsController::class, 'uploadLogo'])->name('upload-logo');
         Route::post('/foto-kepsek/upload', [AdminSettingsController::class, 'uploadFotoKepsek'])->name('upload-foto-kepsek');
         Route::delete('/foto-kepsek/delete', [AdminSettingsController::class, 'deleteFotoKepsek'])->name('delete-foto-kepsek');
     });

@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'SD N 2 Dermolo')</title>
+    @include('partials.favicon')
     @if (trim($__env->yieldContent('meta_description')))
         <meta name="description" content="@yield('meta_description')">
     @endif
@@ -254,13 +256,7 @@
             {{-- Logo --}}
             <a href="{{ route('home') }}" class="flex items-center gap-3.5">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white border border-slate-200 shadow-sm overflow-hidden">
-                    @if($schoolProfile->logo)
-                        <img src="{{ asset('storage/' . $schoolProfile->logo) }}" alt="{{ $schoolProfile->school_name }}" class="w-full h-full object-contain p-1">
-                    @else
-                        <div class="w-full h-full bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-sm font-extrabold text-white">
-                            SD
-                        </div>
-                    @endif
+                    <img src="/storage/school-profile/logosd.png" alt="SD N 2 Dermolo" class="w-full h-full object-contain p-1">
                 </div>
                 <div>
                     <h1 class="text-base font-extrabold leading-tight text-slate-900">SD N 2 Dermolo</h1>
@@ -289,7 +285,7 @@
                 </div>
 
                 <a href="{{ route('guru.index') }}" data-spa="/spa/data-guru" data-spa-title="Data Guru - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('guru.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Data Guru</a>
-                <a href="{{ route('news.index') }}" data-spa="/spa/berita" data-spa-title="Berita - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('news.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Berita</a>
+                <a href="{{ route('news.index') }}" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('news.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Berita</a>
                 <a href="{{ route('prestasi.index') }}" data-spa="/spa/prestasi" data-spa-title="Prestasi - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('prestasi.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Prestasi</a>
                 <a href="{{ route('gallery.index') }}" data-spa="/spa/gallery" data-spa-title="Galeri - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('gallery.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Galeri</a>
                 <a href="{{ route('home') }}#kontak" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600">Kontak</a>
@@ -315,7 +311,7 @@
                 </div>
             </details>
             <a href="{{ route('guru.index') }}" data-spa="/spa/data-guru" data-spa-title="Data Guru - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('guru.*') ? 'text-blue-600' : '' }}">Data Guru</a>
-            <a href="{{ route('news.index') }}" data-spa="/spa/berita" data-spa-title="Berita - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('news.*') ? 'text-blue-600' : '' }}">Berita</a>
+            <a href="{{ route('news.index') }}" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('news.*') ? 'text-blue-600' : '' }}">Berita</a>
             <a href="{{ route('prestasi.index') }}" data-spa="/spa/prestasi" data-spa-title="Prestasi - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('prestasi.*') ? 'text-blue-600' : '' }}">Prestasi</a>
             <a href="{{ route('gallery.index') }}" data-spa="/spa/gallery" data-spa-title="Galeri - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('gallery.*') ? 'text-blue-600' : '' }}">Galeri</a>
             <a href="{{ route('home') }}#kontak" class="block py-2 font-semibold text-slate-600">Kontak</a>
@@ -354,7 +350,7 @@
                     <div class="flex items-center mb-5">
                         <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-md mr-3 overflow-hidden">
                             @if($schoolProfile->logo)
-                                <img src="{{ asset('storage/' . $schoolProfile->logo) }}" alt="{{ $schoolProfile->school_name }}" class="w-full h-full object-contain p-1">
+                                <img src="{{ asset('storage/' . $schoolProfile->logo) }}" class="w-full h-full object-contain p-1" alt="Logo Sekolah">
                             @else
                                 <div class="w-full h-full bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
                                     SD
@@ -402,7 +398,7 @@
                         <li><a href="{{ route('guru.index') }}" data-spa="/spa/data-guru" data-spa-title="Tenaga Kependidikan - SD N 2 Dermolo" class="spa-nav-link inline-block">Tenaga Kependidikan</a></li>
                         <li><a href="{{ route('prestasi.index') }}" data-spa="/spa/prestasi" data-spa-title="Prestasi - SD N 2 Dermolo" class="spa-nav-link inline-block">Prestasi</a></li>
                         <li><a href="{{ route('gallery.index') }}" data-spa="/spa/gallery" data-spa-title="Galeri - SD N 2 Dermolo" class="spa-nav-link inline-block">Galeri</a></li>
-                        <li><a href="{{ route('news.index') }}" data-spa="/spa/berita" data-spa-title="Berita - SD N 2 Dermolo" class="spa-nav-link inline-block">Berita</a></li>
+                        <li><a href="{{ route('news.index') }}" class="spa-nav-link inline-block">Berita</a></li>
                         <li><a href="{{ route('fasilitas.index') }}" data-spa="/spa/sarana-prasarana" data-spa-title="Fasilitas - SD N 2 Dermolo" class="spa-nav-link inline-block">Fasilitas</a></li>
                         <li><a href="{{ route('home') }}#kontak" data-spa="/spa/home" data-spa-title="Kontak - SD N 2 Dermolo" data-spa-hash="#kontak" class="spa-nav-link inline-block">Kontak</a></li>
                     </ul>
@@ -523,34 +519,6 @@
 
     {{-- SPA JavaScript for dynamic content loading --}}
     <script src="{{ asset('js/spa.js') }}"></script>
-
-    {{-- Footer Navigation Enhancement Script --}}
-    <script>
-        // Ensure footer SPA links work correctly
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add click handlers to all footer SPA links
-            const footerSpaLinks = document.querySelectorAll('footer a[data-spa]');
-
-            footerSpaLinks.forEach(function(link) {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-
-                    const route = this.dataset.spa;
-                    const title = this.dataset.spaTitle || document.title;
-                    const hash = this.dataset.spaHash || this.hash || '';
-
-                    // Trigger SPA navigation if spa.js is loaded
-                    if (typeof window.loadContent === 'function') {
-                        window.loadContent(route, title, true, hash);
-                    } else {
-                        // Fallback: navigate directly to the URL
-                        const url = new URL(this.href, window.location.origin);
-                        window.location.href = url;
-                    }
-                });
-            });
-        });
-    </script>
 
     @stack('scripts')
 
