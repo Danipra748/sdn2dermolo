@@ -257,7 +257,7 @@
             <a href="{{ route('home') }}" class="flex items-center gap-3.5">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white border border-slate-200 shadow-sm overflow-hidden">
                     @if($schoolProfile->logo)
-                        <img src="{{ asset('storage/' . $schoolProfile->logo) }}" alt="{{ $schoolProfile->school_name ?? 'SD N 2 Dermolo' }}" class="w-full h-full object-contain p-1">
+                        <img src="/storage/school-profile/logosdreal.png" alt="'SD N 2 Dermolo'" class="w-full h-full object-contain p-1">
                     @else
                         <div class="w-full h-full bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
                             SD
@@ -355,13 +355,9 @@
                 <div>
                     <div class="flex items-center mb-5">
                         <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-md mr-3 overflow-hidden">
-                            @if($schoolProfile->logo)
-                                <img src="{{ asset('storage/' . $schoolProfile->logo) }}" class="w-full h-full object-contain p-1" alt="Logo Sekolah">
-                            @else
-                                <div class="w-full h-full bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
-                                    SD
+                            <div class="w-full h-full    flex items-center justify-center text-white font-bold text-lg">
+                                    <img src="/storage/school-profile/logosdreal.png" alt="">
                                 </div>
-                            @endif
                         </div>
                         <div>
                             <h3 class="font-bold text-lg">{{ $schoolProfile->school_name ?? 'SD N 2 Dermolo' }}</h3>

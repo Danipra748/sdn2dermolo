@@ -41,7 +41,7 @@
                         {{-- Logo --}}
                         <div class="w-36 h-36 mx-auto mb-6 rounded-2xl bg-white shadow-2xl overflow-hidden border-4 border-white/30">
                             @if($profile->logo)
-                                <img src="{{ asset('storage/' . $profile->logo) }}" alt="{{ $profile->school_name }}" class="w-full h-full object-cover">
+                                <img src="/storage/school-profile/logosdreal.png" alt="{{ $profile->school_name }}" class="w-full h-full object-cover">
                             @else
                                 <div class="w-full h-full flex items-center justify-center">
                                     <div class="text-6xl font-black text-blue-600">SD</div>

@@ -221,34 +221,7 @@
             </div>
         </div>
 
-        {{-- School Logo --}}
-        <div class="glass rounded-3xl p-6">
-            <h2 class="text-lg font-semibold text-slate-900 mb-4">Logo Sekolah</h2>
-            
-            <div class="flex items-start gap-6">
-                @if($profile->logo)
-                    <div class="relative">
-                        <img src="{{ asset('storage/' . $profile->logo) }}" alt="Logo" class="w-32 h-32 object-contain rounded-xl border border-slate-200 bg-white p-2">
-                        <button type="button" onclick="deleteLogo()" class="absolute -top-2 -right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition">
-                            <x-heroicon-o-trash class="w-4 h-4" />
-                        </button>
-                    </div>
-                @endif
-                
-                <div class="flex-1">
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Upload Logo</label>
-                    <input type="file" name="logo" accept="image/*" onchange="previewLogo(event)"
-                           class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                    <p class="text-xs text-slate-500 mt-1">Format: JPG, PNG, SVG (Max 2MB)</p>
-                    
-                    @if($profile->logo)
-                        <div id="logo-preview" class="mt-3 hidden">
-                            <img id="logo-preview-img" src="" alt="Preview" class="w-32 h-32 object-contain rounded-xl border border-slate-200 bg-white p-2">
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
+        
 
         {{-- Actions --}}
         <div class="flex gap-3 pb-8">
