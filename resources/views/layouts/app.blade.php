@@ -256,6 +256,7 @@
             {{-- Logo --}}
             <a href="{{ route('home') }}" class="flex items-center gap-3.5">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white border border-slate-200 shadow-sm overflow-hidden">
+                    {{-- Pastikan file logosdreal.png ada di folder public/ --}}
                     <img src="{{ asset('logosdreal.png') }}" alt="Logo SD N 2 Dermolo" class="w-full h-full object-contain p-1">
                 </div>
                 <div>
@@ -349,7 +350,7 @@
                 <div>
                     <div class="flex items-center mb-5">
                         <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-md mr-3 overflow-hidden">
-                            <img src="{{ asset('logosdreal.png') }}" alt="Logo SD N 2 Dermolo" class="w-full h-full object-contain">
+                            <img src="{{ asset('school-profile/logosdreal.png') }}" alt="Logo SD N 2 Dermolo" class="w-full h-full object-contain">
                         </div>
                         <div>
                             <h3 class="font-bold text-lg">{{ $schoolProfile->school_name ?? 'SD N 2 Dermolo' }}</h3>

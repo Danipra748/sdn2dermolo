@@ -12,6 +12,15 @@ class SiteSetting extends Model
 
     private const SCHOOL_LOCATION_KEY = 'school_location';
 
+    /**
+     * Define uploadable columns for this model.
+     * These columns can hold uploaded file paths.
+     */
+    protected $uploadableColumns = [
+        'hero_image',
+        'foto_kepsek',
+    ];
+
     protected $fillable = [
         'key',
         'value',
@@ -215,22 +224,27 @@ class SiteSetting extends Model
             return null;
         }
 
-        // Delete old foto if exists
-        $oldFoto = self::getFotoKepsek();
-        if ($oldFoto) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldFoto);
+        try {
+            // Delete old foto if exists
+            $oldFoto = self::getFotoKepsek();
+            if ($oldFoto) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldFoto);
+            }
+
+            // Store new foto
+            $path = $image->store('kepala-sekolah', 'public');
+
+            // Update or create setting using updateOrCreate for safety
+            static::updateOrCreate(
+                ['key' => 'foto_kepsek'],
+                ['foto_kepsek' => $path]
+            );
+
+            return $path;
+        } catch (\Exception $e) {
+            \Log::error('Upload foto kepsek failed: ' . $e->getMessage());
+            return null;
         }
-
-        // Store new foto
-        $path = $image->store('kepala-sekolah', 'public');
-
-        // Update or create setting
-        static::updateOrCreate(
-            ['key' => 'foto_kepsek'],
-            ['foto_kepsek' => $path]
-        );
-
-        return $path;
     }
 
     /**
@@ -242,11 +256,22 @@ class SiteSetting extends Model
             return false;
         }
 
-        $oldFoto = self::getFotoKepsek();
-        if ($oldFoto) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldFoto);
-        }
+        try {
+            $oldFoto = self::getFotoKepsek();
+            if ($oldFoto) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldFoto);
+            }
 
-        return static::where('key', 'foto_kepsek')->update(['foto_kepsek' => null]);
+            // Set to null instead of deleting row - keeps structure intact
+            static::updateOrCreate(
+                ['key' => 'foto_kepsek'],
+                ['foto_kepsek' => null]
+            );
+
+            return true;
+        } catch (\Exception $e) {
+            \Log::error('Delete foto kepsek failed: ' . $e->getMessage());
+            return false;
+        }
     }
 }

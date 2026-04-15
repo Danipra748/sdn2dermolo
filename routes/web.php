@@ -105,6 +105,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         ->name('program-sekolah.card-background.update');
     Route::put('program-sekolah/{programSekolah}/icon', [AdminProgramController::class, 'updateIcon'])
         ->name('program-sekolah.icon.update');
+    
+    // Delete individual program files (set to null, don't delete row)
+    Route::delete('program-sekolah/{programSekolah}/foto', [AdminProgramController::class, 'deleteFoto'])
+        ->name('program-sekolah.foto.delete');
+    Route::delete('program-sekolah/{programSekolah}/card-bg', [AdminProgramController::class, 'deleteCardBg'])
+        ->name('program-sekolah.card-bg.delete');
+    Route::delete('program-sekolah/{programSekolah}/logo', [AdminProgramController::class, 'deleteLogo'])
+        ->name('program-sekolah.logo.delete');
 
     Route::get('program-sekolah/{programSekolah}/photos', [AdminProgramPhotoController::class, 'index'])
         ->name('program-sekolah.photos.index');

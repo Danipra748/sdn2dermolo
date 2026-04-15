@@ -29,15 +29,17 @@ class AdminSambutanController extends Controller
 
         $existingFoto = SiteSetting::getValue('kepsek_sambutan_foto');
 
+        // Handle deletion (set to null/empty, don't delete row)
         if (! empty($validated['remove_foto']) && $existingFoto) {
-            Storage::disk('public')->delete($existingFoto);
-            SiteSetting::setValue('kepsek_sambutan_foto', '');
+            $this->deletePhysicalFile($existingFoto);
+            SiteSetting::setValue('kepsek_sambutan_foto', null);
             $existingFoto = null;
         }
 
+        // Handle upload (replace old file)
         if ($request->hasFile('foto')) {
             if ($existingFoto) {
-                Storage::disk('public')->delete($existingFoto);
+                $this->deletePhysicalFile($existingFoto);
             }
 
             $path = $request->file('foto')->store('sambutan', 'public');

@@ -49,17 +49,23 @@ class AdminSettingsController extends Controller
             'foto_kepsek' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:3072'],
         ]);
 
-        if ($request->hasFile('foto_kepsek')) {
-            $path = SiteSetting::uploadFotoKepsek($request->file('foto_kepsek'));
+        try {
+            if ($request->hasFile('foto_kepsek')) {
+                $path = SiteSetting::uploadFotoKepsek($request->file('foto_kepsek'));
 
-            if ($path) {
-                return redirect()->route('admin.hidden-settings')
-                    ->with('success', 'Foto kepala sekolah berhasil diupload!');
+                if ($path) {
+                    return redirect()->route('admin.hidden-settings')
+                        ->with('success', 'Foto kepala sekolah berhasil diupload!');
+                }
             }
-        }
 
-        return redirect()->route('admin.hidden-settings')
-            ->with('error', 'Gagal mengupload foto kepala sekolah.');
+            return redirect()->route('admin.hidden-settings')
+                ->with('error', 'Gagal mengupload foto kepala sekolah.');
+        } catch (\Exception $e) {
+            \Log::error('Upload foto kepsek error: ' . $e->getMessage());
+            return redirect()->route('admin.hidden-settings')
+                ->with('error', 'Terjadi error saat upload: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -67,14 +73,20 @@ class AdminSettingsController extends Controller
      */
     public function deleteFotoKepsek()
     {
-        $deleted = SiteSetting::deleteFotoKepsek();
+        try {
+            $deleted = SiteSetting::deleteFotoKepsek();
 
-        if ($deleted) {
+            if ($deleted) {
+                return redirect()->route('admin.hidden-settings')
+                    ->with('success', 'Foto kepala sekolah berhasil dihapus!');
+            }
+
             return redirect()->route('admin.hidden-settings')
-                ->with('success', 'Foto kepala sekolah berhasil dihapus!');
+                ->with('error', 'Gagal menghapus foto kepala sekolah.');
+        } catch (\Exception $e) {
+            \Log::error('Delete foto kepsek error: ' . $e->getMessage());
+            return redirect()->route('admin.hidden-settings')
+                ->with('error', 'Terjadi error saat menghapus: ' . $e->getMessage());
         }
-
-        return redirect()->route('admin.hidden-settings')
-            ->with('error', 'Gagal menghapus foto kepala sekolah.');
     }
 }

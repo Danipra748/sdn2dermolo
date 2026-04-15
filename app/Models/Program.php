@@ -4,10 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\UploadableTrait;
 
 class Program extends Model
 {
-    use HasFactory;
+    use HasFactory, UploadableTrait;
+
+    /**
+     * Define uploadable columns for this model.
+     * These columns can hold uploaded file paths.
+     */
+    protected function getUploadableColumns(): array
+    {
+        return [
+            'foto',
+            'card_bg_image',
+            'logo',
+        ];
+    }
 
     protected $fillable = [
         'slug',

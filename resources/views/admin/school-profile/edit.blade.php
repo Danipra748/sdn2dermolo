@@ -17,14 +17,6 @@
         </div>
     @endif
 
-    {{-- Debug Info - Remove after fix is confirmed --}}
-    <div class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <h4 class="font-bold text-sm">Debug Info:</h4>
-        <p class="text-xs">Current logo path: <code class="bg-yellow-100 px-1">{{ $profile->logo ?? 'NULL' }}</code></p>
-        <p class="text-xs">Profile ID: <code class="bg-yellow-100 px-1">{{ $profile->id ?? 'NULL' }}</code></p>
-        <p class="text-xs">Fillable columns: <code class="bg-yellow-100 px-1">{{ implode(', ', $profile->getFillable()) }}</code></p>
-    </div>
-
     <form action="{{ route('admin.school-profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('PUT')
@@ -183,7 +175,7 @@
         {{-- Vision & Mission --}}
         <div class="glass rounded-3xl p-6">
             <h2 class="text-lg font-semibold text-slate-900 mb-4">Visi & Misi</h2>
-            
+
             <div class="space-y-5">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Visi Sekolah</label>
@@ -193,7 +185,7 @@
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Misi Sekolah</label>
                     <p class="text-xs text-slate-500 mb-3">Isi setiap misi dalam kotak terpisah. Kosongkan jika tidak ada.</p>
-                    
+
                     <div id="missions-container" class="space-y-3">
                         @php
                             $missions = old('mission_items', $profile->missions ?? []);
@@ -202,7 +194,7 @@
                                 $missions[] = '';
                             }
                         @endphp
-                        
+
                         @foreach($missions as $index => $mission)
                         <div class="mission-item flex gap-3">
                             <span class="flex items-center justify-center w-8 h-10 rounded-lg bg-blue-100 text-blue-600 font-bold text-sm flex-shrink-0">
@@ -212,11 +204,63 @@
                         </div>
                         @endforeach
                     </div>
-                    
+
                     <button type="button" onclick="addMission()" class="mt-3 inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-semibold">
                         <x-heroicon-o-plus class="w-4 h-4" />
                         Tambah Misi
                     </button>
+                </div>
+            </div>
+        </div>
+
+        {{-- Logo Upload Section - ALWAYS VISIBLE --}}
+        <div class="glass rounded-3xl p-6">
+            <h2 class="text-lg font-semibold text-slate-900 mb-4">Logo Sekolah</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Upload Logo Baru</label>
+                    <input type="file" 
+                           name="logo" 
+                           accept=".jpg,.jpeg,.png,.svg" 
+                           onchange="previewLogo(event)"
+                           class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                    <p class="mt-2 text-xs text-slate-500">Format: JPG, PNG, SVG. Maksimal 2MB. Kosongkan jika tidak ingin mengganti.</p>
+                    
+                    @if ($profile->logo)
+                        <div class="mt-4">
+                            <button type="button" 
+                                    onclick="deleteLogo()" 
+                                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                                Hapus Logo Saat Ini
+                            </button>
+                        </div>
+                    @endif
+                </div>
+
+                <div>
+                    <div class="text-sm font-semibold text-slate-700 mb-2">Preview Logo Saat Ini</div>
+                    @if ($profile->logo)
+                        <div id="logo-preview" class="rounded-2xl overflow-hidden border-2 border-slate-200 shadow-lg bg-white p-4">
+                            <img src="{{ asset('storage/' . $profile->logo) }}" 
+                                 alt="Logo Sekolah" 
+                                 class="w-full h-auto max-h-48 object-contain mx-auto">
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500 text-center">Logo saat ini</p>
+                    @else
+                        <div id="logo-preview" class="w-full h-48 rounded-2xl border-2 border-dashed border-slate-300 flex items-center justify-center text-sm text-slate-400 bg-slate-50">
+                            <div class="text-center">
+                                <svg class="w-12 h-12 mx-auto mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <div>Belum ada logo</div>
+                                <div class="text-xs mt-1">Upload logo untuk menampilkannya di sini</div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -261,9 +305,15 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const preview = document.getElementById('logo-preview');
-                const previewImg = document.getElementById('logo-preview-img');
-                previewImg.src = e.target.result;
-                preview.classList.remove('hidden');
+                
+                // Replace entire preview content with new image
+                preview.innerHTML = `
+                    <img src="${e.target.result}" 
+                         alt="Preview Logo Baru" 
+                         class="w-full h-auto max-h-48 object-contain mx-auto">
+                `;
+                preview.classList.remove('bg-slate-50', 'border-dashed');
+                preview.classList.add('bg-white', 'border-solid');
             };
             reader.readAsDataURL(file);
         }

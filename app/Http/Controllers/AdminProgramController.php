@@ -91,43 +91,22 @@ class AdminProgramController extends Controller
         $program = Program::findOrFail($programSekolah);
         $data = $this->validateProgram($request, $program->id);
 
-        if ($request->boolean('remove_foto') && $program->foto) {
-            Storage::disk('public')->delete($program->foto);
-            $data['foto'] = null;
+        // Handle file uploads using base controller methods
+        $data = array_merge($data, $this->handleFileUpload($program, 'foto', $request, 'foto', 'program'));
+        $data = array_merge($data, $this->handleFileUpload($program, 'card_bg_image', $request, 'card_bg_image', 'program/card'));
+        $data = array_merge($data, $this->handleFileUpload($program, 'logo', $request, 'logo', 'program/logo'));
+
+        // Handle explicit deletions (set to null, don't delete row)
+        if ($request->boolean('remove_foto')) {
+            $data = array_merge($data, $this->handleFileDeletion($program, 'foto'));
         }
 
-        if ($request->boolean('remove_card_bg_image') && $program->card_bg_image) {
-            Storage::disk('public')->delete($program->card_bg_image);
-            $data['card_bg_image'] = null;
+        if ($request->boolean('remove_card_bg_image')) {
+            $data = array_merge($data, $this->handleFileDeletion($program, 'card_bg_image'));
         }
 
-        if ($request->hasFile('foto')) {
-            if ($program->foto) {
-                Storage::disk('public')->delete($program->foto);
-            }
-
-            $data['foto'] = $request->file('foto')->store('program', 'public');
-        }
-
-        if ($request->hasFile('card_bg_image')) {
-            if ($program->card_bg_image) {
-                Storage::disk('public')->delete($program->card_bg_image);
-            }
-
-            $data['card_bg_image'] = $request->file('card_bg_image')->store('program/card', 'public');
-        }
-
-        if ($request->boolean('remove_logo') && $program->logo) {
-            Storage::disk('public')->delete($program->logo);
-            $data['logo'] = null;
-        }
-
-        if ($request->hasFile('logo')) {
-            if ($program->logo) {
-                Storage::disk('public')->delete($program->logo);
-            }
-
-            $data['logo'] = $request->file('logo')->store('program/logo', 'public');
+        if ($request->boolean('remove_logo')) {
+            $data = array_merge($data, $this->handleFileDeletion($program, 'logo'));
         }
 
         $program->update($data);
@@ -254,20 +233,73 @@ class AdminProgramController extends Controller
             'remove_card_bg_image' => ['nullable', 'boolean'],
         ]);
 
-        if ($request->boolean('remove_card_bg_image') && $program->card_bg_image) {
-            Storage::disk('public')->delete($program->card_bg_image);
-            $program->update(['card_bg_image' => null]);
+        // Handle deletion (set to null, don't delete row)
+        if ($request->boolean('remove_card_bg_image')) {
+            $deleteData = $this->handleFileDeletion($program, 'card_bg_image');
+            $program->update($deleteData);
         }
 
+        // Handle upload
         if ($request->hasFile('card_bg_image')) {
-            if ($program->card_bg_image) {
-                Storage::disk('public')->delete($program->card_bg_image);
-            }
-            $path = $request->file('card_bg_image')->store('program/card', 'public');
-            $program->update(['card_bg_image' => $path]);
+            $uploadData = $this->handleFileUpload($program, 'card_bg_image', $request, 'card_bg_image', 'program/card');
+            $program->update($uploadData);
         }
 
         return redirect()->route('admin.program-sekolah.index')
             ->with('status', 'Background kartu program berhasil diperbarui.');
+    }
+
+    /**
+     * Delete program foto (set to null, don't delete row).
+     */
+    public function deleteFoto(Request $request, string $programSekolah)
+    {
+        if (! Schema::hasTable('programs')) {
+            return redirect()->route('admin.dashboard')
+                ->with('status', 'Tabel program belum tersedia. Jalankan: php artisan migrate');
+        }
+
+        $program = Program::findOrFail($programSekolah);
+        $deleteData = $this->handleFileDeletion($program, 'foto');
+        $program->update($deleteData);
+
+        return redirect()->route('admin.program-sekolah.edit', $program)
+            ->with('success', 'Foto program berhasil dihapus. Anda bisa mengupload foto baru.');
+    }
+
+    /**
+     * Delete program card background (set to null, don't delete row).
+     */
+    public function deleteCardBg(Request $request, string $programSekolah)
+    {
+        if (! Schema::hasTable('programs')) {
+            return redirect()->route('admin.dashboard')
+                ->with('status', 'Tabel program belum tersedia. Jalankan: php artisan migrate');
+        }
+
+        $program = Program::findOrFail($programSekolah);
+        $deleteData = $this->handleFileDeletion($program, 'card_bg_image');
+        $program->update($deleteData);
+
+        return redirect()->route('admin.program-sekolah.edit', $program)
+            ->with('success', 'Background kartu berhasil dihapus. Anda bisa mengupload background baru.');
+    }
+
+    /**
+     * Delete program logo (set to null, don't delete row).
+     */
+    public function deleteLogo(Request $request, string $programSekolah)
+    {
+        if (! Schema::hasTable('programs')) {
+            return redirect()->route('admin.dashboard')
+                ->with('status', 'Tabel program belum tersedia. Jalankan: php artisan migrate');
+        }
+
+        $program = Program::findOrFail($programSekolah);
+        $deleteData = $this->handleFileDeletion($program, 'logo');
+        $program->update($deleteData);
+
+        return redirect()->route('admin.program-sekolah.edit', $program)
+            ->with('success', 'Logo berhasil dihapus. Anda bisa mengupload logo baru.');
     }
 }
