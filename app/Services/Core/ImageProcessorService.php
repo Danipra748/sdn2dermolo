@@ -10,7 +10,7 @@ class ImageProcessorService
     /**
      * Process image: crop, resize and convert.
      */
-    public function processAndSave(UploadedFile $file, array $cropData, string $directory, int $targetSize = 512, string $filenamePrefix = 'img'): ?string
+    public function processAndSave(UploadedFile $file, array $cropData, string $directory, int|array $targetSize = 512, string $filenamePrefix = 'img'): ?array
     {
         try {
             $extension = $file->getClientOriginalExtension();
@@ -18,6 +18,10 @@ class ImageProcessorService
 
             $src = $this->createImageFromPath($path, $extension);
             if (!$src) return null;
+
+            // Determine target width and height
+            $tw = is_array($targetSize) ? ($targetSize['w'] ?? 512) : $targetSize;
+            $th = is_array($targetSize) ? ($targetSize['h'] ?? 512) : $targetSize;
 
             // Perform crop
             $cropped = imagecreatetruecolor($cropData['w'], $cropData['h']);
@@ -32,12 +36,12 @@ class ImageProcessorService
             );
 
             // Resize to target size
-            $finalImage = imagecreatetruecolor($targetSize, $targetSize);
+            $finalImage = imagecreatetruecolor($tw, $th);
             $this->handleTransparency($finalImage);
             imagecopyresampled(
                 $finalImage, $cropped,
                 0, 0, 0, 0,
-                $targetSize, $targetSize,
+                $tw, $th,
                 $cropData['w'], $cropData['h']
             );
 
@@ -51,7 +55,7 @@ class ImageProcessorService
             $fullPath = storage_path('app/public/' . $directory . '/' . $filename);
             imagewebp($finalImage, $fullPath, 90);
 
-            // Clean up
+            // Clean up resources that won't be used
             imagedestroy($src);
             imagedestroy($cropped);
             

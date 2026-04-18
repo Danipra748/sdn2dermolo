@@ -35,6 +35,10 @@ class AdminHeroSlideController extends Controller
             'title' => 'nullable|string|max:255',
             'subtitle' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'crop_x' => 'nullable|numeric',
+            'crop_y' => 'nullable|numeric',
+            'crop_w' => 'nullable|numeric',
+            'crop_h' => 'nullable|numeric',
         ]);
 
         try {
@@ -57,6 +61,10 @@ class AdminHeroSlideController extends Controller
             'subtitle' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'is_active' => 'boolean',
+            'crop_x' => 'nullable|numeric',
+            'crop_y' => 'nullable|numeric',
+            'crop_w' => 'nullable|numeric',
+            'crop_h' => 'nullable|numeric',
         ]);
 
         try {
