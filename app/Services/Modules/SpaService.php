@@ -3,22 +3,16 @@
 namespace App\Services\Modules;
 
 use App\Models\Article;
-use App\Models\Category;
-use App\Models\Fasilitas;
 use App\Models\Gallery;
 use App\Models\Guru;
-use App\Models\Prestasi;
-use App\Models\Program;
+use App\Models\HeroSlide;
 use App\Models\SchoolProfile;
 use App\Models\SiteSetting;
-use App\Models\PpdbSetting;
-use App\Models\PpdbBanner;
-use App\Models\HeroSlide;
 use App\Support\SchoolConfig;
 use App\Support\SchoolData;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 class SpaService
 {
@@ -31,14 +25,14 @@ class SpaService
             $heroSlides = Schema::hasTable('hero_slides') ? HeroSlide::getActiveOrdered() : null;
             $guru = $this->getGuruCollection();
             $kepsek = $this->findKepsek($guru);
-            
+
             $defaultSambutan = implode("\n", [
                 'SD N 2 Dermolo adalah lembaga pendidikan dasar yang berkomitmen memberikan pendidikan berkualitas tinggi.',
-                'Kami terus berinovasi menghadirkan metode pembelajaran yang efektif dan menyenangkan.'
+                'Kami terus berinovasi menghadirkan metode pembelajaran yang efektif dan menyenangkan.',
             ]);
 
             $profile = SchoolProfile::getOrCreate();
-            
+
             return [
                 'heroSlides' => $heroSlides,
                 'sambutanFoto' => SiteSetting::getValue('kepsek_sambutan_foto'),
@@ -63,9 +57,10 @@ class SpaService
     public function getGuruCollection(): Collection
     {
         return Cache::rememberForever('spa_guru_collection', function () {
-            if (!Schema::hasTable('gurus')) {
+            if (! Schema::hasTable('gurus')) {
                 return collect(SchoolData::guru())->map(fn ($item) => (object) $item);
             }
+
             return Guru::orderBy('no')->get();
         });
     }
@@ -77,6 +72,7 @@ class SpaService
     {
         return $guru->first(function ($item) {
             $jabatan = strtolower((string) data_get($item, 'jabatan', ''));
+
             return str_contains($jabatan, 'kepala') || str_contains($jabatan, 'kepsek');
         }) ?? $guru->first();
     }
@@ -86,10 +82,10 @@ class SpaService
      */
     public function getPublishedNews(?int $limit = null): Collection
     {
-        $cacheKey = 'spa_published_news_' . ($limit ?? 'all');
+        $cacheKey = 'spa_published_news_'.($limit ?? 'all');
 
         return Cache::rememberForever($cacheKey, function () use ($limit) {
-            if (!Schema::hasTable('articles')) {
+            if (! Schema::hasTable('articles')) {
                 return collect();
             }
 

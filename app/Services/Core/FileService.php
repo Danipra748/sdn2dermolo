@@ -12,13 +12,13 @@ class FileService
      */
     public function upload(Request $request, string $fieldName, string $storagePath, string $disk = 'public'): ?string
     {
-        if (!$request->hasFile($fieldName)) {
+        if (! $request->hasFile($fieldName)) {
             return null;
         }
 
         $file = $request->file($fieldName);
-        
-        if (!$file->isValid()) {
+
+        if (! $file->isValid()) {
             return null;
         }
 
@@ -42,13 +42,14 @@ class FileService
      */
     public function delete(?string $filePath, string $disk = 'public'): bool
     {
-        if (!$filePath) {
+        if (! $filePath) {
             return false;
         }
 
         if (Storage::disk($disk)->exists($filePath)) {
             return Storage::disk($disk)->delete($filePath);
         }
+
         return false;
     }
 

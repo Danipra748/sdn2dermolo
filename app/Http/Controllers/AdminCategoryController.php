@@ -17,7 +17,7 @@ class AdminCategoryController extends Controller
 
     public function create()
     {
-        $category = new Category();
+        $category = new Category;
 
         return view('admin.categories.form', [
             'category' => $category,
@@ -80,7 +80,7 @@ class AdminCategoryController extends Controller
         while (Category::where('slug', $slug)
             ->when($categoryId, fn ($q) => $q->where('id', '!=', $categoryId))
             ->exists()) {
-            $slug = $base . '-' . $counter;
+            $slug = $base.'-'.$counter;
             $counter++;
         }
 

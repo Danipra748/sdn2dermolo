@@ -4,12 +4,13 @@ namespace App\Services\Modules;
 
 use App\Models\Guru;
 use App\Services\Core\FileService;
-use Illuminate\Http\Request;
 use App\Traits\CacheableService;
+use Illuminate\Http\Request;
 
 class GuruService
 {
     use CacheableService;
+
     protected $fileService;
 
     public function __construct(FileService $fileService)
@@ -26,6 +27,7 @@ class GuruService
         if ($request->hasFile('photo')) {
             $data['photo'] = $this->fileService->upload($request, 'photo', 'guru');
         }
+
         return Guru::create($data);
     }
 
@@ -44,6 +46,7 @@ class GuruService
         }
 
         $guru->update($data);
+
         return $guru;
     }
 
@@ -54,6 +57,7 @@ class GuruService
     {
         $this->clearModuleCache();
         $this->fileService->delete($guru->photo);
+
         return $guru->delete();
     }
 }

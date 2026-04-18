@@ -4,12 +4,13 @@ namespace App\Services\Modules;
 
 use App\Models\Gallery;
 use App\Services\Core\FileService;
-use Illuminate\Http\Request;
 use App\Traits\CacheableService;
+use Illuminate\Http\Request;
 
 class GalleryService
 {
     use CacheableService;
+
     protected $fileService;
 
     public function __construct(FileService $fileService)
@@ -26,6 +27,7 @@ class GalleryService
         if ($request->hasFile('foto')) {
             $data['foto'] = $this->fileService->upload($request, 'foto', 'gallery');
         }
+
         return Gallery::create($data);
     }
 
@@ -39,6 +41,7 @@ class GalleryService
             $data['foto'] = $this->fileService->replace($gallery->foto, $request, 'foto', 'gallery');
         }
         $gallery->update($data);
+
         return $gallery;
     }
 
@@ -49,6 +52,7 @@ class GalleryService
     {
         $this->clearModuleCache();
         $this->fileService->delete($gallery->foto);
+
         return $gallery->delete();
     }
 }

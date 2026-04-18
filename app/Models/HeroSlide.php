@@ -40,6 +40,7 @@ class HeroSlide extends Model
     public static function getMaxOrder(): int
     {
         $max = self::max('display_order');
+
         return $max !== null ? (int) $max : 0;
     }
 

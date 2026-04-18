@@ -4,10 +4,9 @@ namespace App\Services\Modules;
 
 use App\Models\Fasilitas;
 use App\Services\Core\FileService;
-use Illuminate\Http\Request;
 use App\Traits\CacheableService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
 
 class FasilitasService
 {
@@ -34,10 +33,11 @@ class FasilitasService
      */
     public function store(array $validated, Request $request): Fasilitas
     {
-        $this->clearModuleCache(['fasilitas_public_' . ($validated['nama'] ?? '')]);
+        $this->clearModuleCache(['fasilitas_public_'.($validated['nama'] ?? '')]);
         if ($request->hasFile('foto')) {
             $validated['foto'] = $this->fileService->upload($request, 'foto', 'fasilitas');
         }
+
         return Fasilitas::create($validated);
     }
 
@@ -46,7 +46,7 @@ class FasilitasService
      */
     public function update(Fasilitas $fasilitas, array $validated, Request $request): Fasilitas
     {
-        $this->clearModuleCache(['fasilitas_public_' . $fasilitas->nama, 'fasilitas_public_' . ($validated['nama'] ?? '')]);
+        $this->clearModuleCache(['fasilitas_public_'.$fasilitas->nama, 'fasilitas_public_'.($validated['nama'] ?? '')]);
         if ($request->boolean('remove_foto')) {
             $validated = array_merge($validated, $this->fileService->handleModelDeletion($fasilitas, 'foto'));
         }
@@ -56,6 +56,7 @@ class FasilitasService
         }
 
         $fasilitas->update($validated);
+
         return $fasilitas;
     }
 
@@ -64,13 +65,13 @@ class FasilitasService
      */
     public function buildPublicData(string $nama): array
     {
-        $cacheKey = 'fasilitas_public_' . $nama;
+        $cacheKey = 'fasilitas_public_'.$nama;
 
         return Cache::rememberForever($cacheKey, function () use ($nama) {
             $item = Fasilitas::where('nama', $nama)->first();
             $default = $this->getDefaultData($nama);
             $data = $default;
-            
+
             $kontenValue = $item?->konten;
             if (is_array($kontenValue)) {
                 $data = array_replace_recursive($data, $kontenValue);
@@ -86,7 +87,7 @@ class FasilitasService
             $data['subtitle'] = ($item && filled($item->deskripsi)) ? $item->deskripsi : ($default['subtitle'] ?? '');
             $data['card_bg_image'] = $item?->card_bg_image;
             $data['hero_color'] = self::WARNA_TO_HERO[$warna] ?? self::WARNA_TO_HERO['blue'];
-            
+
             return $data;
         });
     }

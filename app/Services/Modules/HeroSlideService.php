@@ -5,13 +5,15 @@ namespace App\Services\Modules;
 use App\Models\HeroSlide;
 use App\Services\Core\FileService;
 use App\Services\Core\ImageProcessorService;
-use Illuminate\Http\Request;
 use App\Traits\CacheableService;
+use Illuminate\Http\Request;
 
 class HeroSlideService
 {
     use CacheableService;
+
     protected $fileService;
+
     protected $imageProcessor;
 
     public function __construct(FileService $fileService, ImageProcessorService $imageProcessor)
@@ -37,7 +39,7 @@ class HeroSlideService
                     'w' => $request->input('crop_w'),
                     'h' => $request->input('crop_h'),
                 ];
-                
+
                 $result = $this->imageProcessor->processAndSave(
                     $request->file('image'),
                     $cropData,
@@ -75,7 +77,7 @@ class HeroSlideService
                     'w' => $request->input('crop_w'),
                     'h' => $request->input('crop_h'),
                 ];
-                
+
                 $result = $this->imageProcessor->processAndSave(
                     $request->file('image'),
                     $cropData,
@@ -94,6 +96,7 @@ class HeroSlideService
         }
 
         $slide->update($data);
+
         return $slide;
     }
 
@@ -104,6 +107,7 @@ class HeroSlideService
     {
         $this->clearModuleCache();
         $this->fileService->delete($slide->image_path);
+
         return $slide->delete();
     }
 }

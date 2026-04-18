@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ContactReceivedMail;
 use App\Models\ContactMessage;
 use Illuminate\Http\Request;
-use App\Mail\ContactReceivedMail;
 use Illuminate\Support\Facades\Mail;
 
 class ContactMessageController extends Controller
@@ -28,7 +28,7 @@ class ContactMessageController extends Controller
         try {
             Mail::to('sdndermolo728@gmail.com')->send(new ContactReceivedMail($validated));
         } catch (\Exception $e) {
-            \Log::error('Gagal mengirim email kontak: ' . $e->getMessage());
+            \Log::error('Gagal mengirim email kontak: '.$e->getMessage());
             // We still proceed even if email fails, as it's saved in DB
         }
 

@@ -2,16 +2,17 @@
 
 namespace App\Services\Modules;
 
-use App\Models\PpdbSetting;
 use App\Models\PpdbBanner;
+use App\Models\PpdbSetting;
 use App\Services\Core\FileService;
-use Illuminate\Http\Request;
-use Carbon\Carbon;
 use App\Traits\CacheableService;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class PpdbService
 {
     use CacheableService;
+
     protected $fileService;
 
     public function __construct(FileService $fileService)
@@ -27,7 +28,7 @@ class PpdbService
         $settings = PpdbSetting::getInstance();
         $now = Carbon::now('Asia/Jakarta');
 
-        if (!$settings->start_date || !$settings->end_date) {
+        if (! $settings->start_date || ! $settings->end_date) {
             return 'closed';
         }
 
@@ -54,6 +55,7 @@ class PpdbService
         $this->clearModuleCache();
         $settings = PpdbSetting::getInstance();
         $settings->update($data);
+
         return $settings;
     }
 
@@ -67,6 +69,7 @@ class PpdbService
         if ($request->hasFile('image')) {
             $data['image_path'] = $this->fileService->upload($request, 'image', 'ppdb/banners');
         }
+
         return PpdbBanner::create($data);
     }
 
@@ -81,6 +84,7 @@ class PpdbService
             $data['image_path'] = $this->fileService->replace($banner->image_path, $request, 'image', 'ppdb/banners');
         }
         $banner->update($data);
+
         return $banner;
     }
 
@@ -91,6 +95,7 @@ class PpdbService
     {
         $this->clearModuleCache();
         $this->fileService->delete($banner->image_path);
+
         return $banner->delete();
     }
 }

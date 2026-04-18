@@ -1,34 +1,37 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PageController;
-use App\Http\Controllers\FasilitasController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\GuruController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\AdminProgramController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FasilitasController;
+use App\Http\Controllers\GuruController;
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\ProgramController;
+use Illuminate\Support\Facades\Route;
 
 // Load migration routes (development only)
 if (file_exists(__DIR__.'/migration.php')) {
     require __DIR__.'/migration.php';
 }
-use App\Http\Controllers\AdminPrestasiController;
-use App\Http\Controllers\PrestasiController;
-use App\Http\Controllers\GalleryController;
-use App\Http\Controllers\AdminGalleryController;
-use App\Http\Controllers\AdminSambutanController;
+use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AdminArticleController;
 use App\Http\Controllers\AdminCategoryController;
-use App\Http\Controllers\AdminProgramPhotoController;
-use App\Http\Controllers\AdminPpdbController;
-use App\Http\Controllers\NewsController;
-use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\AdminContactMessageController;
+use App\Http\Controllers\AdminGalleryController;
+use App\Http\Controllers\AdminHeroImageController;
 use App\Http\Controllers\AdminHeroSlideController;
-use App\Http\Controllers\AboutController;
+use App\Http\Controllers\AdminHomepageController;
+use App\Http\Controllers\AdminKontakController;
+use App\Http\Controllers\AdminPpdbController;
+use App\Http\Controllers\AdminPrestasiController;
+use App\Http\Controllers\AdminProgramPhotoController;
+use App\Http\Controllers\AdminSambutanController;
 use App\Http\Controllers\AdminSchoolProfileController;
 use App\Http\Controllers\AdminSettingsController;
+use App\Http\Controllers\ContactMessageController;
+use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\NewsController;
+use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\SpaController;
 
 Route::get('/', [PageController::class, 'index'])->name('home');
@@ -54,22 +57,26 @@ Route::prefix('spa')->name('spa.')->group(function () {
     Route::get('/ppdb/daftar', [SpaController::class, 'getPpdbRegistrationContent'])->name('ppdb.registration');
 });
 
-
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
+    Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.attempt');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 // ── FASILITAS PUBLIK (halaman detail) ──
-// (detail fasilitas publik dihapus)
+Route::get('/fasilitas/ruang-kelas', [FasilitasController::class, 'ruangKelas'])->name('fasilitas.ruang-kelas');
+Route::get('/fasilitas/perpustakaan', [FasilitasController::class, 'perpustakaan'])->name('fasilitas.perpustakaan');
+Route::get('/fasilitas/musholla', [FasilitasController::class, 'musholla'])->name('fasilitas.musholla');
+Route::get('/fasilitas/lapangan-olahraga', [FasilitasController::class, 'lapanganOlahraga'])->name('fasilitas.lapangan-olahraga');
 
 // ── PROGRAM ──
 Route::prefix('program')->name('program.')->group(function () {
-    Route::get('/pramuka',    [ProgramController::class, 'pramuka'])->name('pramuka');
-    Route::get('/seni-ukir',  [ProgramController::class, 'seniUkir'])->name('seni-ukir');
-    Route::get('/drumband',   [ProgramController::class, 'drumband'])->name('drumband');
+    Route::get('/pramuka', [ProgramController::class, 'pramuka'])->name('pramuka');
+    Route::get('/seni-ukir', [ProgramController::class, 'seniUkir'])->name('seni-ukir');
+    Route::get('/drumband', [ProgramController::class, 'drumband'])->name('drumband');
 });
 
 // ── PRESTASI ──
@@ -110,7 +117,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::resource('program-sekolah', AdminProgramController::class)
         ->except(['show'])
         ->parameters(['program-sekolah' => 'programSekolah']);
-    
+
     // Custom routes for file handling etc. if still needed
     Route::put('program-sekolah/{programSekolah}/hero-background', [AdminProgramController::class, 'updateHeroBackground'])
         ->name('program-sekolah.hero-background.update');
@@ -127,6 +134,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         ->name('program-sekolah.photos.update');
     Route::delete('program-sekolah/{programSekolah}/photos/{photo}', [AdminProgramPhotoController::class, 'destroy'])
         ->name('program-sekolah.photos.destroy');
+
+    // Program file deletion routes
+    Route::delete('program-sekolah/{programSekolah}/card-bg', [AdminProgramController::class, 'deleteCardBg'])
+        ->name('program-sekolah.card-bg.delete');
+    Route::delete('program-sekolah/{programSekolah}/foto', [AdminProgramController::class, 'deleteFoto'])
+        ->name('program-sekolah.foto.delete');
+    Route::delete('program-sekolah/{programSekolah}/logo', [AdminProgramController::class, 'deleteLogo'])
+        ->name('program-sekolah.logo.delete');
 
     // Ringkasan Prestasi
     Route::get('prestasi-sekolah/ringkasan/edit', [AdminPrestasiController::class, 'editRingkasan'])
@@ -146,9 +161,19 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::put('sambutan-kepsek', [AdminSambutanController::class, 'update'])
         ->name('sambutan-kepsek.update');
 
+    // Kontak Sekolah
+    Route::get('kontak', [AdminKontakController::class, 'edit'])
+        ->name('kontak.edit');
+    Route::put('kontak', [AdminKontakController::class, 'update'])
+        ->name('kontak.update');
+
     // Pesan Masuk
     Route::get('pesan-masuk', [AdminContactMessageController::class, 'index'])
         ->name('messages.index');
+    Route::get('pesan-masuk/{message}', [AdminContactMessageController::class, 'show'])
+        ->name('messages.show');
+    Route::delete('pesan-masuk/{message}', [AdminContactMessageController::class, 'destroy'])
+        ->name('messages.destroy');
 
     // Hero Slides Management (Multi-Slide System)
     Route::prefix('hero-slides')->name('hero-slides.')->group(function () {
@@ -169,11 +194,26 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::delete('/logo', [AdminSchoolProfileController::class, 'deleteLogo'])->name('delete-logo');
     });
 
-    // Settings - Foto Kepsek Only
+    // Settings (foto-kepsek & logo)
     Route::prefix('settings')->name('settings.')->group(function () {
+        // Original routes (foto kepsek)
         Route::post('/foto-kepsek/upload', [AdminSettingsController::class, 'uploadFotoKepsek'])->name('upload-foto-kepsek');
         Route::delete('/foto-kepsek/delete', [AdminSettingsController::class, 'deleteFotoKepsek'])->name('delete-foto-kepsek');
+        // New route (logo)
+        Route::post('/upload-logo', [AdminSettingsController::class, 'uploadLogo'])->name('upload-logo');
     });
+
+    // Hero Image Management
+    Route::put('hero-image', [AdminHeroImageController::class, 'update'])
+        ->name('hero-image.update');
+    Route::delete('hero-image', [AdminHeroImageController::class, 'destroy'])
+        ->name('hero-image.destroy');
+
+    // Homepage Management
+    Route::get('homepage', [AdminHomepageController::class, 'index'])
+        ->name('homepage.index');
+    Route::put('homepage/{section}', [AdminHomepageController::class, 'update'])
+        ->name('homepage.update');
 
     // Prestasi Sekolah CRUD
     Route::resource('prestasi-sekolah', AdminPrestasiController::class)
@@ -193,11 +233,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     // PPDB Management
     Route::prefix('ppdb')->name('ppdb.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\AdminPpdbController::class, 'index'])->name('index');
-        Route::post('/settings', [\App\Http\Controllers\AdminPpdbController::class, 'updateSettings'])->name('settings.update');
-        Route::post('/banners', [\App\Http\Controllers\AdminPpdbController::class, 'storeBanner'])->name('banners.store');
-        Route::post('/banners/{banner}', [\App\Http\Controllers\AdminPpdbController::class, 'updateBanner'])->name('banners.update');
-        Route::patch('/banners/{banner}/toggle', [\App\Http\Controllers\AdminPpdbController::class, 'toggleBanner'])->name('banners.toggle');
-        Route::delete('/banners/{banner}', [\App\Http\Controllers\AdminPpdbController::class, 'destroyBanner'])->name('banners.destroy');
+        Route::get('/', [AdminPpdbController::class, 'index'])->name('index');
+        Route::post('/settings', [AdminPpdbController::class, 'updateSettings'])->name('settings.update');
+        Route::get('/banners/create', [AdminPpdbController::class, 'createBanner'])->name('banners.create');
+        Route::post('/banners', [AdminPpdbController::class, 'storeBanner'])->name('banners.store');
+        Route::get('/banners/{banner}/edit', [AdminPpdbController::class, 'editBanner'])->name('banners.edit');
+        Route::post('/banners/{banner}', [AdminPpdbController::class, 'updateBanner'])->name('banners.update');
+        Route::patch('/banners/{banner}/toggle', [AdminPpdbController::class, 'toggleBanner'])->name('banners.toggle');
+        Route::delete('/banners/{banner}', [AdminPpdbController::class, 'destroyBanner'])->name('banners.destroy');
     });
 });

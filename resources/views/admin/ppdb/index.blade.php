@@ -16,10 +16,10 @@
         </div>
     @endif
 
-    <div class="grid lg:grid-cols-3 gap-8">
+        <div class="grid lg:grid-cols-3 gap-8">
         {{-- Settings Form --}}
         <div class="lg:col-span-1">
-            <form action="{{ route('admin.ppdb.update') }}" method="POST" class="glass-card p-6 space-y-4">
+            <form action="{{ route('admin.ppdb.settings.update') }}" method="POST" class="glass-card p-6 space-y-4">
                 @csrf
                 @method('PUT')
                 <h3 class="text-lg font-bold">Jadwal Pendaftaran</h3>
@@ -42,7 +42,7 @@
         <div class="lg:col-span-2">
              <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-bold">Banner Promosi</h3>
-                <x-admin.button href="{{ route('admin.banners.create') }}" variant="primary" size="sm">
+                 <x-admin.button href="{{ route('admin.ppdb.banners.create') }}" variant="primary" size="sm">
                     <x-slot:icon><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg></x-slot:icon>
                     Tambah Banner
                 </x-admin.button>
@@ -61,8 +61,8 @@
                         <td class="px-6 py-4 font-bold text-slate-500">{{ $banner->order }}</td>
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-2">
-                                <x-admin.button variant="secondary" size="sm" href="{{ route('admin.banners.edit', $banner) }}">Edit</x-admin.button>
-                                <form action="{{ route('admin.banners.destroy', $banner) }}" method="POST" data-confirm="Yakin ingin menghapus banner ini?">
+                                <x-admin.button variant="secondary" size="sm" href="{{ route('admin.ppdb.banners.edit', $banner) }}">Edit</x-admin.button>
+                                <form action="{{ route('admin.ppdb.banners.destroy', $banner) }}" method="POST" data-confirm="Yakin ingin menghapus banner ini?">
                                     @csrf
                                     @method('DELETE')
                                     <x-admin.button type="submit" variant="destructive" size="sm">Hapus</x-admin.button>

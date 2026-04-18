@@ -76,7 +76,7 @@ class HomepageSection extends Model
         // Store new image
         $path = $image->store('homepage-backgrounds', 'public');
         $this->update(['background_image' => $path]);
-        
+
         return $path;
     }
 

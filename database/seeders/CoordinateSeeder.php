@@ -14,7 +14,7 @@ class CoordinateSeeder extends Seeder
     public function run(): void
     {
         // Check if columns exist before adding
-        if (!Schema::hasColumn('site_settings', 'school_latitude')) {
+        if (! Schema::hasColumn('site_settings', 'school_latitude')) {
             Schema::table('site_settings', function ($table) {
                 $table->decimal('school_latitude', 10, 8)->nullable()->after('value');
                 $table->decimal('school_longitude', 11, 8)->nullable()->after('school_latitude');

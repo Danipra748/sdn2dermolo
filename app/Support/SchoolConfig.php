@@ -2,9 +2,11 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Collection;
+
 /**
  * Static School Configuration Helper
- * 
+ *
  * Provides clean access to hardcoded school configuration data
  * that was previously stored in the database.
  */
@@ -67,9 +69,10 @@ class SchoolConfig
     /**
      * Get address lines (split by newline)
      */
-    public static function addressLines(): \Illuminate\Support\Collection
+    public static function addressLines(): Collection
     {
         $contact = self::contact();
+
         return collect(explode("\n", $contact['address'] ?? ''))
             ->map(fn ($line) => trim($line))
             ->filter()
@@ -85,7 +88,7 @@ class SchoolConfig
         $latitude = $contact['latitude'];
         $longitude = $contact['longitude'];
         $zoom = $contact['zoom'];
-        
+
         return "https://www.google.com/maps?q={$latitude},{$longitude}&z={$zoom}&output=embed";
     }
 
@@ -99,7 +102,7 @@ class SchoolConfig
         $latitude = $contact['latitude'];
         $longitude = $contact['longitude'];
         $zoom = $contact['zoom'];
-        
+
         return $mapsUrl ?: "https://www.google.com/maps?q={$latitude},{$longitude}&z={$zoom}";
     }
 
@@ -109,6 +112,7 @@ class SchoolConfig
     public static function whatsappUrl(): string
     {
         $school = self::school();
+
         return "https://wa.me/{$school['whatsapp']}";
     }
 }

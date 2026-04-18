@@ -61,7 +61,7 @@ class SchoolProfile extends Model
             'province' => 'Jawa Tengah',
         ];
 
-        if (! Schema::hasTable((new static())->getTable())) {
+        if (! Schema::hasTable((new static)->getTable())) {
             return new self($defaults);
         }
 

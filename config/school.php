@@ -2,8 +2,8 @@
 
 /**
  * Static School Configuration
- * 
- * This file contains hardcoded configuration data for Contact School 
+ *
+ * This file contains hardcoded configuration data for Contact School
  * and Homepage Settings that were previously stored in the database.
  * These values are now static for better performance and simplicity.
  */
@@ -32,7 +32,7 @@ return [
             'saturday' => 'Sabtu: 07.00 - 13.00 WIB',
         ],
     ],
-  
+
     /*
     |--------------------------------------------------------------------------
     | Homepage Settings (Hero Section)
@@ -76,4 +76,3 @@ return [
         'whatsapp' => '6289668982633', // Format: country code + number without +
     ],
 ];
- 

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PpdbSetting;
 use App\Models\PpdbBanner;
+use App\Models\PpdbSetting;
 use App\Services\Modules\PpdbService;
 use Illuminate\Http\Request;
 
@@ -26,6 +26,30 @@ class AdminPpdbController extends Controller
         $banners = PpdbBanner::orderBy('order')->get();
 
         return view('admin.ppdb.index', compact('settings', 'status', 'banners'));
+    }
+
+    /**
+     * Show the form for creating a new banner.
+     */
+    public function createBanner()
+    {
+        return view('admin.ppdb.form-banner', [
+            'banner' => null,
+            'isEdit' => false,
+            'title' => 'Tambah Banner PPDB',
+        ]);
+    }
+
+    /**
+     * Show the form for editing an existing banner.
+     */
+    public function editBanner(PpdbBanner $banner)
+    {
+        return view('admin.ppdb.form-banner', [
+            'banner' => $banner,
+            'isEdit' => true,
+            'title' => 'Edit Banner PPDB',
+        ]);
     }
 
     /**
@@ -87,11 +111,11 @@ class AdminPpdbController extends Controller
      */
     public function toggleBanner(PpdbBanner $banner)
     {
-        $banner->update(['is_active' => !$banner->is_active]);
+        $banner->update(['is_active' => ! $banner->is_active]);
 
         return response()->json([
             'success' => true,
-            'is_active' => $banner->is_active
+            'is_active' => $banner->is_active,
         ]);
     }
 

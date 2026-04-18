@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class PpdbSetting extends Model
 {
@@ -33,7 +33,7 @@ class PpdbSetting extends Model
     public function getStatus()
     {
         // If dates are not set, consider it closed
-        if (!$this->start_date || !$this->end_date) {
+        if (! $this->start_date || ! $this->end_date) {
             return 'closed';
         }
 

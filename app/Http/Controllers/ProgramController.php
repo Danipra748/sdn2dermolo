@@ -86,7 +86,7 @@ class ProgramController extends Controller
             }
         }
 
-        $fromStatic = collect(SchoolData::program())->firstWhere('route', 'program.' . $slug);
+        $fromStatic = collect(SchoolData::program())->firstWhere('route', 'program.'.$slug);
 
         if ($fromStatic) {
             return array_merge($fallback, [

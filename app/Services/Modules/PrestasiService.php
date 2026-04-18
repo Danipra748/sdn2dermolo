@@ -5,12 +5,13 @@ namespace App\Services\Modules;
 use App\Models\Prestasi;
 use App\Models\SiteSetting;
 use App\Services\Core\FileService;
-use Illuminate\Http\Request;
 use App\Traits\CacheableService;
+use Illuminate\Http\Request;
 
 class PrestasiService
 {
     use CacheableService;
+
     protected $fileService;
 
     public function __construct(FileService $fileService)
@@ -27,6 +28,7 @@ class PrestasiService
         if ($request->hasFile('foto')) {
             $data['foto'] = $this->fileService->upload($request, 'foto', 'prestasi');
         }
+
         return Prestasi::create($data);
     }
 
@@ -40,6 +42,7 @@ class PrestasiService
             $data['foto'] = $this->fileService->replace($prestasi->foto, $request, 'foto', 'prestasi');
         }
         $prestasi->update($data);
+
         return $prestasi;
     }
 
@@ -50,6 +53,7 @@ class PrestasiService
     {
         $this->clearModuleCache();
         $this->fileService->delete($prestasi->foto);
+
         return $prestasi->delete();
     }
 

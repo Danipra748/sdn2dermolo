@@ -18,7 +18,7 @@ class AdminGalleryController extends Controller
 
     public function index()
     {
-        if (!Schema::hasTable('galleries')) {
+        if (! Schema::hasTable('galleries')) {
             return redirect()->route('admin.dashboard')
                 ->with('status', 'Tabel galeri belum tersedia. Jalankan: php artisan migrate');
         }
@@ -31,7 +31,7 @@ class AdminGalleryController extends Controller
     public function create()
     {
         return view('admin.gallery.form', [
-            'gallery' => new Gallery(),
+            'gallery' => new Gallery,
             'action' => route('admin.gallery.store'),
             'method' => 'POST',
             'title' => 'Tambah Foto Galeri',

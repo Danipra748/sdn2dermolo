@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 
 class SiteSetting extends Model
 {
@@ -39,7 +40,7 @@ class SiteSetting extends Model
 
     public static function getValue(string $key, mixed $default = null): mixed
     {
-        if (! Schema::hasTable((new static())->getTable())) {
+        if (! Schema::hasTable((new static)->getTable())) {
             return $default;
         }
 
@@ -50,7 +51,7 @@ class SiteSetting extends Model
 
     public static function setValue(string $key, mixed $value): void
     {
-        if (! Schema::hasTable((new static())->getTable())) {
+        if (! Schema::hasTable((new static)->getTable())) {
             return;
         }
 
@@ -71,7 +72,7 @@ class SiteSetting extends Model
             'zoom' => 15,
         ];
 
-        if (! Schema::hasTable((new static())->getTable())) {
+        if (! Schema::hasTable((new static)->getTable())) {
             return $defaults;
         }
 
@@ -114,7 +115,7 @@ class SiteSetting extends Model
      */
     public static function updateSchoolLocation(float $latitude, float $longitude, int $zoom = 15): bool
     {
-        if (! Schema::hasTable((new static())->getTable())) {
+        if (! Schema::hasTable((new static)->getTable())) {
             return false;
         }
 
@@ -150,11 +151,12 @@ class SiteSetting extends Model
      */
     public static function getHeroImage(): ?string
     {
-        if (!Schema::hasTable((new static())->getTable())) {
+        if (! Schema::hasTable((new static)->getTable())) {
             return null;
         }
 
         $setting = static::where('key', 'hero_image')->first();
+
         return $setting?->hero_image;
     }
 
@@ -163,14 +165,14 @@ class SiteSetting extends Model
      */
     public static function uploadHeroImage($image): ?string
     {
-        if (!Schema::hasTable((new static())->getTable())) {
+        if (! Schema::hasTable((new static)->getTable())) {
             return null;
         }
 
         // Delete old image if exists
         $oldImage = self::getHeroImage();
         if ($oldImage) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldImage);
+            Storage::disk('public')->delete($oldImage);
         }
 
         // Store new image
@@ -190,13 +192,13 @@ class SiteSetting extends Model
      */
     public static function deleteHeroImage(): bool
     {
-        if (!Schema::hasTable((new static())->getTable())) {
+        if (! Schema::hasTable((new static)->getTable())) {
             return false;
         }
 
         $oldImage = self::getHeroImage();
         if ($oldImage) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldImage);
+            Storage::disk('public')->delete($oldImage);
         }
 
         return static::where('key', 'hero_image')->update(['hero_image' => null]);
@@ -207,11 +209,12 @@ class SiteSetting extends Model
      */
     public static function getFotoKepsek(): ?string
     {
-        if (!Schema::hasTable((new static())->getTable())) {
+        if (! Schema::hasTable((new static)->getTable())) {
             return null;
         }
 
         $setting = static::where('key', 'foto_kepsek')->first();
+
         return $setting?->foto_kepsek;
     }
 
@@ -220,7 +223,7 @@ class SiteSetting extends Model
      */
     public static function uploadFotoKepsek($image): ?string
     {
-        if (!Schema::hasTable((new static())->getTable())) {
+        if (! Schema::hasTable((new static)->getTable())) {
             return null;
         }
 
@@ -228,7 +231,7 @@ class SiteSetting extends Model
             // Delete old foto if exists
             $oldFoto = self::getFotoKepsek();
             if ($oldFoto) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldFoto);
+                Storage::disk('public')->delete($oldFoto);
             }
 
             // Store new foto
@@ -242,7 +245,8 @@ class SiteSetting extends Model
 
             return $path;
         } catch (\Exception $e) {
-            \Log::error('Upload foto kepsek failed: ' . $e->getMessage());
+            \Log::error('Upload foto kepsek failed: '.$e->getMessage());
+
             return null;
         }
     }
@@ -252,14 +256,14 @@ class SiteSetting extends Model
      */
     public static function deleteFotoKepsek(): bool
     {
-        if (!Schema::hasTable((new static())->getTable())) {
+        if (! Schema::hasTable((new static)->getTable())) {
             return false;
         }
 
         try {
             $oldFoto = self::getFotoKepsek();
             if ($oldFoto) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldFoto);
+                Storage::disk('public')->delete($oldFoto);
             }
 
             // Set to null instead of deleting row - keeps structure intact
@@ -270,7 +274,8 @@ class SiteSetting extends Model
 
             return true;
         } catch (\Exception $e) {
-            \Log::error('Delete foto kepsek failed: ' . $e->getMessage());
+            \Log::error('Delete foto kepsek failed: '.$e->getMessage());
+
             return false;
         }
     }

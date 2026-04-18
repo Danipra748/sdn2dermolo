@@ -18,13 +18,14 @@ class GuruController extends Controller
     public function index()
     {
         $guru = Guru::orderBy('no')->get();
+
         return view('admin.guru.index', compact('guru'));
     }
 
     public function create()
     {
         return view('admin.guru.form', [
-            'guru' => new Guru(),
+            'guru' => new Guru,
             'action' => route('admin.guru.store'),
             'method' => 'POST',
             'title' => 'Tambah Guru',
@@ -60,6 +61,7 @@ class GuruController extends Controller
     public function destroy(Guru $guru)
     {
         $this->guruService->delete($guru);
+
         return redirect()->route('admin.guru.index')->with('status', 'Data guru berhasil dihapus.');
     }
 

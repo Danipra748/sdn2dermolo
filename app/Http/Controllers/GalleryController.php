@@ -9,7 +9,7 @@ class GalleryController extends Controller
 {
     public function index()
     {
-        if (!Schema::hasTable('galleries')) {
+        if (! Schema::hasTable('galleries')) {
             return redirect()->route('home')
                 ->with('status', 'Tabel galeri belum tersedia.');
         }

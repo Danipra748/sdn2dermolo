@@ -21,6 +21,7 @@ class FasilitasController extends Controller
     public function index()
     {
         $fasilitas = Fasilitas::latest()->get();
+
         return view('admin.fasilitas.index', compact('fasilitas'));
     }
 
@@ -30,7 +31,7 @@ class FasilitasController extends Controller
     public function create()
     {
         return view('admin.fasilitas.form', [
-            'fasilitas' => new Fasilitas(),
+            'fasilitas' => new Fasilitas,
             'action' => route('admin.fasilitas.store'),
             'method' => 'POST',
             'title' => 'Tambah Fasilitas',
@@ -104,24 +105,28 @@ class FasilitasController extends Controller
     public function ruangKelas()
     {
         $data = $this->fasilitasService->buildPublicData('Ruang Kelas');
+
         return view('fasilitas.ruang-kelas', compact('data'));
     }
 
     public function perpustakaan()
     {
         $data = $this->fasilitasService->buildPublicData('Perpustakaan');
+
         return view('fasilitas.perpustakaan', compact('data'));
     }
 
     public function musholla()
     {
         $data = $this->fasilitasService->buildPublicData('Musholla');
+
         return view('fasilitas.musholla', compact('data'));
     }
 
     public function lapanganOlahraga()
     {
         $data = $this->fasilitasService->buildPublicData('Lapangan Olahraga');
+
         return view('fasilitas.lapangan-olahraga', compact('data'));
     }
 }

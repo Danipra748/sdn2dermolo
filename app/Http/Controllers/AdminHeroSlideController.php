@@ -22,7 +22,18 @@ class AdminHeroSlideController extends Controller
     public function index()
     {
         $slides = HeroSlide::orderBy('display_order')->get();
+
         return view('admin.hero-slides.index', compact('slides'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('admin.hero-slides.form', [
+            'slide' => new HeroSlide,
+        ]);
     }
 
     /**
@@ -43,11 +54,23 @@ class AdminHeroSlideController extends Controller
 
         try {
             $this->heroSlideService->store($validated, $request);
-            return back()->with('success', 'Slide baru berhasil ditambahkan.');
+
+            return redirect()->route('admin.hero-slides.index')->with('success', 'Slide baru berhasil ditambahkan.');
         } catch (\Exception $e) {
-            Log::error('Hero slide upload failed: ' . $e->getMessage());
+            Log::error('Hero slide upload failed: '.$e->getMessage());
+
             return back()->with('error', 'Gagal mengunggah slide.');
         }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(HeroSlide $heroSlide)
+    {
+        return view('admin.hero-slides.form', [
+            'slide' => $heroSlide,
+        ]);
     }
 
     /**
@@ -69,9 +92,11 @@ class AdminHeroSlideController extends Controller
 
         try {
             $this->heroSlideService->update($heroSlide, $validated, $request);
-            return back()->with('success', 'Slide berhasil diperbarui.');
+
+            return redirect()->route('admin.hero-slides.index')->with('success', 'Slide berhasil diperbarui.');
         } catch (\Exception $e) {
-            Log::error('Hero slide update failed: ' . $e->getMessage());
+            Log::error('Hero slide update failed: '.$e->getMessage());
+
             return back()->with('error', 'Gagal memperbarui slide.');
         }
     }
@@ -82,6 +107,7 @@ class AdminHeroSlideController extends Controller
     public function destroy(HeroSlide $heroSlide)
     {
         $this->heroSlideService->delete($heroSlide);
+
         return back()->with('success', 'Slide berhasil dihapus.');
     }
 
@@ -109,6 +135,7 @@ class AdminHeroSlideController extends Controller
     public function moveUp(HeroSlide $heroSlide)
     {
         $heroSlide->moveUp();
+
         return back()->with('success', 'Slide dipindahkan ke atas.');
     }
 
@@ -118,6 +145,7 @@ class AdminHeroSlideController extends Controller
     public function moveDown(HeroSlide $heroSlide)
     {
         $heroSlide->moveDown();
+
         return back()->with('success', 'Slide dipindahkan ke bawah.');
     }
 
@@ -126,7 +154,8 @@ class AdminHeroSlideController extends Controller
      */
     public function toggleActive(HeroSlide $heroSlide)
     {
-        $heroSlide->update(['is_active' => !$heroSlide->is_active]);
+        $heroSlide->update(['is_active' => ! $heroSlide->is_active]);
+
         return back()->with('success', 'Status slide berhasil diubah.');
     }
 }

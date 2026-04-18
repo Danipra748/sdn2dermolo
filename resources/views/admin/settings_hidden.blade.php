@@ -1,18 +1,20 @@
 @extends('admin.layout')
 
-@section('title', 'Hidden Settings')
-@section('heading', 'Hidden Settings')
+@section('title', 'Sambutan & Foto Kepala Sekolah')
+@section('heading', 'Sambutan & Foto Kepala Sekolah')
+
+@push('styles')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    <style>
+        .cropper-container { max-height: 450px; }
+        #crop-image { max-width: 100%; display: block; }
+    </style>
+@endpush
 
 @section('content')
-    @if (session('success'))
-        <div class="mb-6 rounded-2xl bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if (session('status'))
-        <div class="mb-6 rounded-2xl bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800">
-            {{ session('status') }}
+    @if (session('success') || session('status'))
+        <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl text-emerald-800 text-sm font-bold">
+            {{ session('success') ?? session('status') }}
         </div>
     @endif
 
@@ -27,152 +29,143 @@
         </div>
     @endif
 
-    <div class="grid gap-6">
-        <section id="sambutan-settings" class="glass rounded-3xl p-6">
-            <div class="mb-6">
-                <h2 class="text-lg font-semibold text-slate-900">Sambutan Kepala Sekolah Tersembunyi</h2>
-                <p class="text-sm text-slate-500">Form sambutan dipindahkan ke halaman rahasia agar dashboard utama tetap bersih.</p>
-            </div>
+    <div class="glass-card p-6 lg:p-8">
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-slate-900">Pengaturan Sambutan & Foto Resmi</h2>
+            <p class="text-sm text-slate-500">Atur teks sambutan dan foto resmi yang akan ditampilkan di halaman depan dan halaman 'Tentang Kami'.</p>
+        </div>
 
-            <form action="{{ route('admin.sambutan-kepsek.update') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
-                @csrf
-                @method('PUT')
+        <form action="{{ route('admin.sambutan-kepsek.update') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
+            @csrf
+            @method('PUT')
 
-                <div class="grid gap-6 md:grid-cols-2">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Foto Kepala Sekolah (Sambutan)</label>
-                        <input type="file"
-                               name="foto"
-                               accept=".jpg,.jpeg,.png,.webp"
-                               class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+            <div class="grid gap-8 md:grid-cols-5">
+                {{-- Form Kiri (Teks & Aksi) --}}
+                <div class="md:col-span-3 space-y-6">
+                    <x-admin.form-group label="Teks Sambutan" name="sambutan" required>
+                        <textarea name="sambutan" rows="16" class="form-input">{{ old('sambutan', $sambutanText) }}</textarea>
+                    </x-admin.form-group>
 
-                        @if (! empty($sambutanFoto))
-                            <img src="{{ asset('storage/' . $sambutanFoto) }}"
-                                 alt="Foto Kepala Sekolah"
-                                 class="mt-4 w-full max-w-xs aspect-[4/3] rounded-3xl object-cover border border-slate-200">
+                    <div class="flex items-center justify-end">
+                        <x-admin.button type="submit" variant="primary">
+                            <x-slot:icon><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></x-slot:icon>
+                            Simpan Perubahan
+                        </x-admin.button>
+                    </div>
+                </div>
 
-                            <label class="mt-3 inline-flex items-center gap-2 text-xs text-slate-600">
-                                <input type="checkbox" name="remove_foto" value="1" class="rounded border-slate-300 text-slate-900 focus:ring-slate-300">
-                                Hapus foto saat ini
+                {{-- Form Kanan (Foto & Preview) --}}
+                <div class="md:col-span-2">
+                    <x-admin.form-group label="Foto Resmi Kepala Sekolah" name="foto" help="Rasio 4:5 sangat disarankan.">
+                        <input type="file" name="foto" id="image-input" class="file-input" accept="image/*">
+                    </x-admin.form-group>
+
+                    <div class="mt-4">
+                        <div class="text-sm font-semibold text-slate-700 mb-2">Preview</div>
+                        <div class="w-full aspect-[4/5] rounded-xl border-2 border-dashed border-slate-200 flex items-center justify-center text-sm text-slate-400 bg-slate-50 overflow-hidden">
+                             <img id="image-preview" src="{{ $fotoKepsek ? asset('storage/' . $fotoKepsek) : '' }}" alt="Preview" class="{{ $fotoKepsek ? '' : 'hidden' }} w-full h-full object-cover">
+                            <span id="image-placeholder" class="{{ $fotoKepsek ? 'hidden' : '' }} text-center">
+                                <svg class="w-12 h-12 mx-auto mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                Belum ada foto
+                            </span>
+                        </div>
+                    </div>
+                    
+                    @if ($fotoKepsek)
+                        <div class="mt-4">
+                            <label class="inline-flex items-center gap-2 text-xs">
+                                <input type="checkbox" name="remove_foto" value="1" class="rounded"> Hapus foto saat ini
                             </label>
-                        @else
-                            <div class="mt-4 w-full max-w-xs aspect-[4/3] rounded-3xl border border-dashed border-slate-300 flex items-center justify-center text-xs text-slate-500">
-                                Belum ada foto sambutan
-                            </div>
-                        @endif
-                    </div>
+                        </div>
+                    @endif
 
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Teks Sambutan Kepala Sekolah</label>
-                        {{-- Di sini variabel sambutan kepala sekolah diproses. --}}
-                        <textarea name="sambutan"
-                                  rows="12"
-                                  class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">{{ old('sambutan', $sambutanText) }}</textarea>
-                        <p class="mt-2 text-xs text-slate-500">Teks ini tetap dipakai di halaman publik seperti sebelumnya.</p>
-                    </div>
+                    {{-- Hidden inputs for crop data --}}
+                    <input type="hidden" name="crop_x" id="crop_x">
+                    <input type="hidden" name="crop_y" id="crop_y">
+                    <input type="hidden" name="crop_w" id="crop_w">
+                    <input type="hidden" name="crop_h" id="crop_h">
                 </div>
-
-                <div class="flex items-center justify-end">
-                    <button type="submit"
-                            class="px-5 py-2.5 rounded-2xl bg-slate-900 text-white text-sm font-semibold hover:opacity-90 transition">
-                        Simpan Sambutan
-                    </button>
-                </div>
-            </form>
-        </section>
-
-        <section id="foto-kepsek-settings" class="glass rounded-3xl p-6">
-            <div class="mb-6">
-                <h2 class="text-lg font-semibold text-slate-900">Foto Resmi Kepala Sekolah (Halaman Tentang Kami)</h2>
-                <p class="text-sm text-slate-500">Foto ini akan ditampilkan di halaman "Tentang Kami" pada bagian sambutan.</p>
             </div>
+        </form>
+    </div>
 
-            <form action="{{ route('admin.settings.upload-foto-kepsek') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
-                @csrf
-
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Upload Foto Kepala Sekolah</label>
-                        <input type="file"
-                               name="foto_kepsek"
-                               accept=".jpg,.jpeg,.png,.webp"
-                               onchange="previewFotoKepsek(event)"
-                               class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                        <p class="mt-2 text-xs text-slate-500">Format: JPG, PNG, WebP. Maksimal 3MB. Rasio 4:5 disarankan.</p>
-                        <p class="mt-1 text-xs text-blue-600 font-semibold">✏️ Upload foto baru untuk mengganti atau menambah foto.</p>
-                    </div>
-
-                    <div>
-                        <div class="text-sm font-semibold text-slate-700 mb-2">Preview Foto Saat Ini</div>
-                        @if($fotoKepsek)
-                            <div class="rounded-2xl overflow-hidden border-2 border-slate-200 shadow-lg">
-                                <img id="current-foto-kepsek" src="{{ asset('storage/' . $fotoKepsek) }}" alt="Foto Kepala Sekolah" class="w-full aspect-[4/5] object-cover">
-                            </div>
-                            <div class="mt-3">
-                                <form action="{{ route('admin.settings.delete-foto-kepsek') }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus foto kepala sekolah?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition">
-                                        Hapus Foto
-                                    </button>
-                                </form>
-                            </div>
-                        @else
-                            <div id="foto-kepsek-placeholder" class="w-full aspect-[4/5] rounded-2xl border-2 border-dashed border-slate-300 flex items-center justify-center text-sm text-slate-400 bg-slate-50">
-                                <div class="text-center">
-                                    <svg class="w-12 h-12 mx-auto mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                    </svg>
-                                    <div class="font-semibold">Belum ada foto</div>
-                                    <div class="text-xs mt-1">Silakan upload foto di sebelah kiri</div>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-
-                <div id="foto-kepsek-preview" class="hidden rounded-2xl bg-blue-50 border border-blue-200 p-5">
-                    <div class="text-sm font-semibold text-blue-900">Preview Foto Baru (Akan Diupload)</div>
-                    <img id="foto-kepsek-preview-image" src="" alt="Preview foto kepala sekolah" class="mt-4 w-full max-w-xs aspect-[4/5] rounded-2xl object-cover border border-slate-200 shadow-sm">
-                </div>
-
-                <div class="flex items-center justify-end">
-                    <button type="submit"
-                            class="px-5 py-2.5 rounded-2xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition">
-                        <svg class="w-4 h-4 inline-block mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                        </svg>
-                        Upload / Ganti Foto Kepala Sekolah
-                    </button>
-                </div>
-            </form>
-        </section>
+    {{-- Cropping Modal --}}
+    <div id="crop-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl">
+            <h3 class="text-xl font-bold text-slate-900 mb-4">Crop Foto (4:5)</h3>
+            <div class="cropper-container mb-6 bg-slate-100 rounded-xl overflow-hidden flex items-center justify-center">
+                <img id="crop-image" src="">
+            </div>
+            <div class="flex gap-3">
+                <x-admin.button type="button" onclick="closeCropModal()" variant="secondary" class="w-full">Batal</x-admin.button>
+                <x-admin.button type="button" onclick="confirmCrop()" variant="primary" class="w-full">Gunakan Hasil Crop</x-admin.button>
+            </div>
+        </div>
     </div>
 @endsection
 
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 <script>
-    function previewFotoKepsek(event) {
-        const file = event.target.files[0];
-        if (!file) {
-            return;
+    let cropper = null;
+    const imageInput = document.getElementById('image-input');
+    const cropModal = document.getElementById('crop-modal');
+    const cropImage = document.getElementById('crop-image');
+    const imagePreview = document.getElementById('image-preview');
+    const imagePlaceholder = document.getElementById('image-placeholder');
+
+    imageInput.addEventListener('change', function(e) {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                cropImage.src = e.target.result;
+                openCropModal();
+            };
+            reader.readAsDataURL(files[0]);
         }
+    });
 
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const preview = document.getElementById('foto-kepsek-preview');
-            const previewImage = document.getElementById('foto-kepsek-preview-image');
+    function openCropModal() {
+        cropModal.classList.remove('hidden');
+        cropModal.classList.add('flex');
+        
+        if (cropper) cropper.destroy();
+        
+        setTimeout(() => {
+            cropper = new Cropper(cropImage, {
+                aspectRatio: 4 / 5,
+                viewMode: 2,
+                autoCropArea: 1,
+            });
+        }, 100);
+    }
 
-            previewImage.src = e.target.result;
-            preview.classList.remove('hidden');
+    function closeCropModal() {
+        cropModal.classList.add('hidden');
+        cropModal.classList.remove('flex');
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+        imageInput.value = '';
+    }
 
-            const placeholder = document.getElementById('foto-kepsek-placeholder');
-            if (placeholder) {
-                placeholder.style.display = 'none';
-            }
-        };
-
-        reader.readAsDataURL(file);
+    function confirmCrop() {
+        if (!cropper) return;
+        
+        const data = cropper.getData();
+        document.getElementById('crop_x').value = Math.round(data.x);
+        document.getElementById('crop_y').value = Math.round(data.y);
+        document.getElementById('crop_w').value = Math.round(data.width);
+        document.getElementById('crop_h').value = Math.round(data.height);
+        
+        const canvas = cropper.getCroppedCanvas();
+        imagePreview.src = canvas.toDataURL();
+        imagePreview.classList.remove('hidden');
+        imagePlaceholder.classList.add('hidden');
+        
+        closeCropModal();
     }
 </script>
 @endpush

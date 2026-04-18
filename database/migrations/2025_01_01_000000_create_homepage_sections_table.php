@@ -17,19 +17,19 @@ return new class extends Migration
             $table->string('section_name', 100);
             $table->boolean('is_active')->default(true);
             $table->integer('display_order')->default(0);
-            
+
             // Content Fields
             $table->string('title', 255)->nullable();
             $table->string('subtitle', 255)->nullable();
             $table->text('description')->nullable();
-            
+
             // Media
             $table->string('background_image')->nullable();
             $table->decimal('background_overlay_opacity', 3, 2)->default(0.40);
-            
+
             // Flexible Data
             $table->json('extra_data')->nullable();
-            
+
             $table->timestamps();
         });
     }

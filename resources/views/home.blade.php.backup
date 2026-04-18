@@ -595,7 +595,7 @@
                     </div>
                 @endif
             </div>
-            <form class="kontak-form rounded-[1.25rem] border border-slate-200 bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)] flex flex-col gap-4" method="POST" action="{{ url('/kirim-pesan') }}">
+            <form class="kontak-form rounded-[1.25rem] border border-slate-200 bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)] flex flex-col gap-4" method="POST" action="{{ route('contact-messages.store') }}">
                 @csrf
                 <h3 class="font-black text-xl text-slate-900">Kirim Pesan</h3>
                 <p class="text-slate-500 text-[0.92rem] leading-[1.6]">Isi formulir di bawah ini dan kami akan segera menghubungi Anda.</p>

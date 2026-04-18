@@ -19,12 +19,13 @@ class AdminProgramPhotoController extends Controller
 
     public function index(Program $programSekolah)
     {
-        if (!Schema::hasTable('program_photos')) {
+        if (! Schema::hasTable('program_photos')) {
             return redirect()->route('admin.program-sekolah.index')
                 ->with('status', 'Tabel dokumentasi program belum tersedia. Jalankan: php artisan migrate');
         }
 
         $photos = $programSekolah->photos()->get();
+
         return view('admin.program.photos.index', compact('programSekolah', 'photos'));
     }
 
@@ -32,7 +33,7 @@ class AdminProgramPhotoController extends Controller
     {
         return view('admin.program.photos.form', [
             'programSekolah' => $programSekolah,
-            'photo' => new ProgramPhoto(),
+            'photo' => new ProgramPhoto,
             'action' => route('admin.program-sekolah.photos.store', $programSekolah),
             'method' => 'POST',
         ]);

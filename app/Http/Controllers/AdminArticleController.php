@@ -19,7 +19,7 @@ class AdminArticleController extends Controller
 
     public function index(Request $request)
     {
-        if (!Schema::hasTable('articles')) {
+        if (! Schema::hasTable('articles')) {
             return redirect()->route('admin.dashboard')
                 ->with('status', 'Tabel artikel belum tersedia. Jalankan migrasi terlebih dahulu.');
         }
@@ -33,9 +33,9 @@ class AdminArticleController extends Controller
         if ($request->filled('q')) {
             $search = $request->string('q');
             $query->where(function ($builder) use ($search) {
-                $builder->where('title', 'like', '%' . $search . '%')
-                    ->orWhere('subtitle', 'like', '%' . $search . '%')
-                    ->orWhere('summary', 'like', '%' . $search . '%');
+                $builder->where('title', 'like', '%'.$search.'%')
+                    ->orWhere('subtitle', 'like', '%'.$search.'%')
+                    ->orWhere('summary', 'like', '%'.$search.'%');
             });
         }
 
@@ -88,6 +88,7 @@ class AdminArticleController extends Controller
     public function destroy(Article $article)
     {
         $this->articleService->delete($article);
+
         return redirect()->route('admin.articles.index')->with('status', 'Artikel berhasil dihapus.');
     }
 
@@ -99,7 +100,7 @@ class AdminArticleController extends Controller
 
         $data = $this->articleService->generateAiDraft($request->input('topic'));
 
-        if (!$data) {
+        if (! $data) {
             return response()->json([
                 'message' => 'Gagal menghasilkan draft. Pastikan API KEY sudah benar.',
             ], 422);
