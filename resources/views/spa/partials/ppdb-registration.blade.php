@@ -21,13 +21,13 @@
         <div class="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200" id="iframe-wrapper">
             <div class="w-full relative" style="height: 1200px;">
                 @if($settings->form_url)
-                    <iframe 
+                    <iframe
                         id="ppdb-iframe"
-                        src="{{ $settings->form_url }}" 
-                        width="100%" 
-                        height="100%" 
-                        frameborder="0" 
-                        marginheight="0" 
+                        src="{{ $settings->form_url }}"
+                        width="100%"
+                        height="100%"
+                        frameborder="0"
+                        marginheight="0"
                         marginwidth="0"
                         class="w-full h-full"
                     >Memuat…</iframe>
@@ -38,9 +38,9 @@
                 @endif
             </div>
         </div>
-        
+
         <div class="mt-8 text-center">
-            <a href="{{ route('ppdb') }}" data-spa="/spa/ppdb" class="inline-flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold transition">
+            <a href="{{ route('spa.ppdb') }}" data-spa="/spa/ppdb" class="inline-flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                 Batal dan Kembali
             </a>
