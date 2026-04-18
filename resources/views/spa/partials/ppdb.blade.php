@@ -105,7 +105,8 @@
                          class="w-full h-full object-cover" 
                          alt="Background {{ $index }}"
                          loading="{{ $index === 0 ? 'eager' : 'lazy' }}">
-                    <div class="absolute inset-0 bg-blue-900/60 backdrop-blur-[1px]"></div>
+                    {{-- Strong Blue Gradient Overlay to match other pages --}}
+                    <div class="absolute inset-0 bg-gradient-to-br from-[#1e3a8a]/90 via-[#1e40af]/85 to-[#0ea5e9]/80 backdrop-blur-[1px]"></div>
                 </div>
             @endforeach
         @endif
