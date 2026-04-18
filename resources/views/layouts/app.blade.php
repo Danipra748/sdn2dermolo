@@ -297,7 +297,7 @@
 
                 {{-- Prominent PPDB Button --}}
                 <a href="{{ route('ppdb') }}" data-spa="/spa/ppdb" data-spa-title="PPDB - SD N 2 Dermolo" data-spa-ignore-active="true"
-                   class="ml-2 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-amber-500/30 transition-all hover:scale-105 hover:shadow-amber-500/50 active:scale-95">
+                   class="ml-2 inline-flex items-center justify-center rounded-full {{ request()->routeIs('ppdb*') ? 'bg-gradient-to-r from-blue-600 to-cyan-500 shadow-blue-500/30 hover:shadow-blue-500/50' : 'bg-gradient-to-r from-amber-400 to-orange-500 shadow-amber-500/30 hover:shadow-amber-500/50' }} px-5 py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95">
                     PPDB
                 </a>
             </div>
@@ -305,7 +305,7 @@
             {{-- Tombol Hamburger (Mobile) --}}
             <div class="flex items-center gap-3 md:hidden">
                 <a href="{{ route('ppdb') }}" data-spa="/spa/ppdb" data-spa-title="PPDB - SD N 2 Dermolo" data-spa-ignore-active="true"
-                   class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-2 text-xs font-bold text-white shadow-md">
+                   class="inline-flex items-center justify-center rounded-full {{ request()->routeIs('ppdb*') ? 'bg-gradient-to-r from-blue-600 to-cyan-500' : 'bg-gradient-to-r from-amber-400 to-orange-500' }} px-4 py-2 text-xs font-bold text-white shadow-md">
                     PPDB
                 </a>
                 <button id="mobile-menu-button" class="flex items-center justify-center rounded-md p-2 text-slate-600 hover:text-blue-600">

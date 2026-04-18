@@ -679,6 +679,15 @@
     }
 
     function updateActiveNav(route) {
+        // Reset PPDB buttons to default amber gradient
+        document.querySelectorAll('a[data-spa="/spa/ppdb"], a[data-spa="/spa/ppdb/daftar"]').forEach((link) => {
+            link.classList.remove('from-blue-600', 'to-cyan-500', 'shadow-blue-500/30', 'hover:shadow-blue-500/50');
+            link.classList.add('from-amber-400', 'to-orange-500');
+            if (link.classList.contains('shadow-lg')) {
+                link.classList.add('shadow-amber-500/30', 'hover:shadow-amber-500/50');
+            }
+        });
+
         // Target all SPA links (Desktop & Mobile) EXCEPT footer and explicitly ignored buttons
         document.querySelectorAll('a[data-spa], #mobile-menu a[data-spa]').forEach((link) => {
             // Skip if this link is inside footer or has ignore-active attribute
@@ -701,6 +710,17 @@
 
         if (! route) {
             return;
+        }
+
+        // Handle active state for PPDB buttons
+        if (route.startsWith('/spa/ppdb')) {
+            document.querySelectorAll('a[data-spa="/spa/ppdb"], a[data-spa="/spa/ppdb/daftar"]').forEach((link) => {
+                link.classList.remove('from-amber-400', 'to-orange-500', 'shadow-amber-500/30', 'hover:shadow-amber-500/50');
+                link.classList.add('from-blue-600', 'to-cyan-500');
+                if (link.classList.contains('shadow-lg')) {
+                    link.classList.add('shadow-blue-500/30', 'hover:shadow-blue-500/50');
+                }
+            });
         }
 
         // Add active state to matching links
