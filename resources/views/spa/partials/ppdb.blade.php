@@ -93,7 +93,7 @@
      HERO SECTION WITH INFINITE LOOP
 ══════════════════════════════════════════════ --}}
 <section class="relative overflow-hidden text-white"
-         style="padding-top:80px; min-height: 480px;">
+         style="padding-top:80px; min-height: 480px; background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0ea5e9 100%);">
     
     {{-- Background Slideshow --}}
     <div class="absolute inset-0 z-0">
@@ -105,11 +105,9 @@
                          class="w-full h-full object-cover" 
                          alt="Background {{ $index }}"
                          loading="{{ $index === 0 ? 'eager' : 'lazy' }}">
-                    <div class="absolute inset-0 bg-blue-950/70 backdrop-blur-[1px]"></div>
+                    <div class="absolute inset-0 bg-blue-900/60 backdrop-blur-[1px]"></div>
                 </div>
             @endforeach
-        @else
-            <div class="absolute inset-0 bg-gradient-to-br from-[#1e3a8a] via-[#1e40af] to-[#0ea5e9]"></div>
         @endif
     </div>
 
