@@ -52,16 +52,17 @@
     .ppdb-cd-row {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 12px;
         justify-content: center;
+        padding: 12px 0;
     }
     .ppdb-cd-box {
         background: #fff;
         border: 2px solid #dbeafe;
         border-radius: 14px;
-        padding: 14px 12px 10px;
+        padding: 16px 14px 12px;
         text-align: center;
-        min-width: 64px;
+        min-width: 70px;
         flex: 1 1 64px;
         max-width: 90px;
         box-shadow: 0 4px 16px rgba(30,58,138,.08);
@@ -218,7 +219,7 @@
                         Pukul {{ $settings->start_date->format('H:i') }} WIB
                     </div>
                 </div>
-                <div class="px-6 sm:px-8 py-7">
+                <div class="px-8 sm:px-10 py-10 md:py-12">
                     <div id="ppdb-countdown" data-until="{{ $settings->start_date->toIso8601String() }}" class="ppdb-cd-row">
                         @foreach(['d'=>'Hari','h'=>'Jam','m'=>'Menit','s'=>'Detik'] as $unit => $label)
                             <div class="ppdb-cd-box">

@@ -1870,21 +1870,21 @@
                     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
                     
                     countdownEl.innerHTML = `
-                        <div class="flex flex-col bg-white p-4 rounded-2xl shadow-lg min-w-[80px]">
-                            <span class="text-3xl font-black text-blue-600">${days}</span>
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hari</span>
+                        <div class="ppdb-cd-box">
+                            <div class="ppdb-cd-num">${days}</div>
+                            <div class="ppdb-cd-lbl">Hari</div>
                         </div>
-                        <div class="flex flex-col bg-white p-4 rounded-2xl shadow-lg min-w-[80px]">
-                            <span class="text-3xl font-black text-blue-600">${hours}</span>
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Jam</span>
+                        <div class="ppdb-cd-box">
+                            <div class="ppdb-cd-num">${hours}</div>
+                            <div class="ppdb-cd-lbl">Jam</div>
                         </div>
-                        <div class="flex flex-col bg-white p-4 rounded-2xl shadow-lg min-w-[80px]">
-                            <span class="text-3xl font-black text-blue-600">${minutes}</span>
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Menit</span>
+                        <div class="ppdb-cd-box">
+                            <div class="ppdb-cd-num">${minutes}</div>
+                            <div class="ppdb-cd-lbl">Menit</div>
                         </div>
-                        <div class="flex flex-col bg-white p-4 rounded-2xl shadow-lg min-w-[80px]">
-                            <span class="text-3xl font-black text-blue-600">${seconds}</span>
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Detik</span>
+                        <div class="ppdb-cd-box">
+                            <div class="ppdb-cd-num">${seconds}</div>
+                            <div class="ppdb-cd-lbl">Detik</div>
                         </div>
                     `;
                 }
