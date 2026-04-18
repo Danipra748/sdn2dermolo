@@ -330,7 +330,7 @@
             {{-- Mobile PPDB Prominent Button --}}
             <div class="pt-2 pb-1 border-t border-slate-100 mt-2">
                 <a href="{{ route('ppdb') }}" data-spa="/spa/ppdb" data-spa-title="PPDB - SD N 2 Dermolo" data-spa-ignore-active="true"
-                   class="block w-full py-3.5 px-4 rounded-xl {{ request()->routeIs('ppdb*') ? 'bg-gradient-to-r from-blue-600 to-cyan-500' : 'bg-gradient-to-r from-amber-400 to-orange-500' }} text-white text-base font-bold text-center shadow-lg">
+                   class="block w-full py-3 px-4 rounded-xl {{ request()->routeIs('ppdb*') ? 'bg-gradient-to-r from-blue-600 to-cyan-500' : 'bg-gradient-to-r from-amber-400 to-orange-500' }} text-white text-sm font-semibold text-center shadow-md">
                     PPDB
                 </a>
             </div>
