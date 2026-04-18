@@ -679,10 +679,10 @@
     }
 
     function updateActiveNav(route) {
-        // Target all SPA links (Desktop & Mobile) EXCEPT footer
+        // Target all SPA links (Desktop & Mobile) EXCEPT footer and explicitly ignored buttons
         document.querySelectorAll('a[data-spa], #mobile-menu a[data-spa]').forEach((link) => {
-            // Skip if this link is inside footer
-            if (link.closest('footer')) {
+            // Skip if this link is inside footer or has ignore-active attribute
+            if (link.closest('footer') || link.dataset.spaIgnoreActive === 'true') {
                 return;
             }
             link.classList.remove('bg-emerald-50', 'text-blue-600', 'text-blue-600');
@@ -705,8 +705,8 @@
 
         // Add active state to matching links
         document.querySelectorAll(`a[data-spa="${route}"]`).forEach((link) => {
-            // Skip if this link is inside footer
-            if (link.closest('footer')) {
+            // Skip if this link is inside footer or has ignore-active attribute
+            if (link.closest('footer') || link.dataset.spaIgnoreActive === 'true') {
                 return;
             }
             
