@@ -22,7 +22,7 @@ class SiteSettingService
      */
     public function updateSambutan(array $data, Request $request): void
     {
-        $this->flushCacheTags(['site_settings']);
+        $this->clearModuleCache();
         $existingFoto = SiteSetting::getValue('kepsek_sambutan_foto');
 
         // Handle deletion
@@ -46,7 +46,7 @@ class SiteSettingService
      */
     public function uploadFotoKepsek(Request $request): ?string
     {
-        $this->flushCacheTags(['site_settings']);
+        $this->clearModuleCache();
         if ($request->hasFile('foto_kepsek')) {
             $existing = SiteSetting::getValue('foto_kepsek');
             $path = $this->fileService->replace($existing, $request, 'foto_kepsek', 'site');
@@ -61,7 +61,7 @@ class SiteSettingService
      */
     public function deleteFotoKepsek(): bool
     {
-        $this->flushCacheTags(['site_settings']);
+        $this->clearModuleCache();
         $existing = SiteSetting::getValue('foto_kepsek');
         if ($existing) {
             $this->fileService->delete($existing);

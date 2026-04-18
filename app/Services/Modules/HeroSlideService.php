@@ -25,7 +25,7 @@ class HeroSlideService
      */
     public function store(array $data, Request $request): HeroSlide
     {
-        $this->flushCacheTags(['hero_slides']);
+        $this->clearModuleCache();
         $data['display_order'] = HeroSlide::getMaxOrder() + 1;
         $data['is_active'] = true;
 
@@ -63,7 +63,7 @@ class HeroSlideService
      */
     public function update(HeroSlide $slide, array $data, Request $request): HeroSlide
     {
-        $this->flushCacheTags(['hero_slides']);
+        $this->clearModuleCache();
         if ($request->hasFile('image')) {
             // Delete old image
             $this->fileService->delete($slide->image_path);
@@ -102,7 +102,7 @@ class HeroSlideService
      */
     public function delete(HeroSlide $slide): bool
     {
-        $this->flushCacheTags(['hero_slides']);
+        $this->clearModuleCache();
         $this->fileService->delete($slide->image_path);
         return $slide->delete();
     }

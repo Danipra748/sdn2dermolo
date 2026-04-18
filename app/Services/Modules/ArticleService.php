@@ -24,7 +24,7 @@ class ArticleService
      */
     public function store(array $data, Request $request): Article
     {
-        $this->flushCacheTags(['articles']);
+        $this->clearModuleCache();
         $data['author_id'] = $request->user()->id;
         $data['slug'] = $this->uniqueSlug($data['slug'] ?? $data['title']);
 
@@ -44,7 +44,7 @@ class ArticleService
      */
     public function update(Article $article, array $data, Request $request): Article
     {
-        $this->flushCacheTags(['articles']);
+        $this->clearModuleCache();
         $data['slug'] = $this->uniqueSlug($data['slug'] ?? $data['title'], $article->id);
 
         if ($request->hasFile('featured_image')) {
@@ -68,7 +68,7 @@ class ArticleService
      */
     public function delete(Article $article): bool
     {
-        $this->flushCacheTags(['articles']);
+        $this->clearModuleCache();
         $this->fileService->delete($article->featured_image);
         return $article->delete();
     }

@@ -51,7 +51,7 @@ class PpdbService
      */
     public function updateSettings(array $data): PpdbSetting
     {
-        $this->flushCacheTags(['ppdb']);
+        $this->clearModuleCache();
         $settings = PpdbSetting::getInstance();
         $settings->update($data);
         return $settings;
@@ -62,7 +62,7 @@ class PpdbService
      */
     public function storeBanner(Request $request): PpdbBanner
     {
-        $this->flushCacheTags(['ppdb']);
+        $this->clearModuleCache();
         $data = $request->only(['title', 'order']);
         if ($request->hasFile('image')) {
             $data['image_path'] = $this->fileService->upload($request, 'image', 'ppdb/banners');
@@ -75,7 +75,7 @@ class PpdbService
      */
     public function updateBanner(Request $request, PpdbBanner $banner): PpdbBanner
     {
-        $this->flushCacheTags(['ppdb']);
+        $this->clearModuleCache();
         $data = $request->only(['title', 'order']);
         if ($request->hasFile('image')) {
             $data['image_path'] = $this->fileService->replace($banner->image_path, $request, 'image', 'ppdb/banners');
@@ -89,7 +89,7 @@ class PpdbService
      */
     public function deleteBanner(PpdbBanner $banner): bool
     {
-        $this->flushCacheTags(['ppdb']);
+        $this->clearModuleCache();
         $this->fileService->delete($banner->image_path);
         return $banner->delete();
     }

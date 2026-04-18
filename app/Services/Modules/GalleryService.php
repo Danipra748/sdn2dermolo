@@ -1,3 +1,7 @@
+<?php
+
+namespace App\Services\Modules;
+
 use App\Models\Gallery;
 use App\Services\Core\FileService;
 use Illuminate\Http\Request;
@@ -18,7 +22,7 @@ class GalleryService
      */
     public function store(array $data, Request $request): Gallery
     {
-        $this->flushCacheTags(['galleries']);
+        $this->clearModuleCache();
         if ($request->hasFile('foto')) {
             $data['foto'] = $this->fileService->upload($request, 'foto', 'gallery');
         }
@@ -30,7 +34,7 @@ class GalleryService
      */
     public function update(Gallery $gallery, array $data, Request $request): Gallery
     {
-        $this->flushCacheTags(['galleries']);
+        $this->clearModuleCache();
         if ($request->hasFile('foto')) {
             $data['foto'] = $this->fileService->replace($gallery->foto, $request, 'foto', 'gallery');
         }
@@ -43,7 +47,7 @@ class GalleryService
      */
     public function delete(Gallery $gallery): bool
     {
-        $this->flushCacheTags(['galleries']);
+        $this->clearModuleCache();
         $this->fileService->delete($gallery->foto);
         return $gallery->delete();
     }

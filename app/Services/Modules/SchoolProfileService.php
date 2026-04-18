@@ -25,7 +25,7 @@ class SchoolProfileService
      */
     public function updateProfile(Request $request): SchoolProfile
     {
-        $this->flushCacheTags(['school_profile']);
+        $this->clearModuleCache();
         $profile = SchoolProfile::getOrCreate();
         $validated = $request->validated();
 
@@ -71,7 +71,7 @@ class SchoolProfileService
      */
     public function deleteLogo(): bool
     {
-        $this->flushCacheTags(['school_profile']);
+        $this->clearModuleCache();
         $profile = SchoolProfile::getOrCreate();
         if ($profile->logo) {
             $this->fileService->delete($profile->logo);

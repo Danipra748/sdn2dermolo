@@ -1,3 +1,7 @@
+<?php
+
+namespace App\Services\Modules;
+
 use App\Models\Guru;
 use App\Services\Core\FileService;
 use Illuminate\Http\Request;
@@ -18,7 +22,7 @@ class GuruService
      */
     public function store(array $data, Request $request): Guru
     {
-        $this->flushCacheTags(['gurus']);
+        $this->clearModuleCache();
         if ($request->hasFile('photo')) {
             $data['photo'] = $this->fileService->upload($request, 'photo', 'guru');
         }
@@ -30,7 +34,7 @@ class GuruService
      */
     public function update(Guru $guru, array $data, Request $request): Guru
     {
-        $this->flushCacheTags(['gurus']);
+        $this->clearModuleCache();
         if ($request->boolean('remove_photo')) {
             $data = array_merge($data, $this->fileService->handleModelDeletion($guru, 'photo'));
         }
@@ -48,7 +52,7 @@ class GuruService
      */
     public function delete(Guru $guru): bool
     {
-        $this->flushCacheTags(['gurus']);
+        $this->clearModuleCache();
         $this->fileService->delete($guru->photo);
         return $guru->delete();
     }

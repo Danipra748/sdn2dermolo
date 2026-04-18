@@ -23,14 +23,11 @@ use Illuminate\Support\Facades\Cache;
 class SpaService
 {
     /**
-     * Get home page data.
+     * Get home page data with robust key-based caching.
      */
     public function getHomeData(): array
     {
-        $cache = Cache::getFacadeRoot();
-        $tags = ['hero_slides', 'gurus', 'articles', 'galleries', 'school_profile', 'site_settings'];
-        
-        $callback = function () {
+        return Cache::rememberForever('spa_home_data', function () {
             $heroSlides = Schema::hasTable('hero_slides') ? HeroSlide::getActiveOrdered() : null;
             $guru = $this->getGuruCollection();
             $kepsek = $this->findKepsek($guru);
@@ -57,13 +54,7 @@ class SpaService
                 'mapsOpen' => SchoolConfig::mapsOpen(),
                 'alamatLines' => SchoolConfig::addressLines(),
             ];
-        };
-
-        if (method_exists($cache->store(), 'tags')) {
-            return Cache::tags($tags)->rememberForever('spa_home_data', $callback);
-        }
-
-        return Cache::rememberForever('spa_home_data', $callback);
+        });
     }
 
     /**
@@ -71,19 +62,12 @@ class SpaService
      */
     public function getGuruCollection(): Collection
     {
-        $cache = Cache::getFacadeRoot();
-        $callback = function () {
+        return Cache::rememberForever('spa_guru_collection', function () {
             if (!Schema::hasTable('gurus')) {
                 return collect(SchoolData::guru())->map(fn ($item) => (object) $item);
             }
             return Guru::orderBy('no')->get();
-        };
-
-        if (method_exists($cache->store(), 'tags')) {
-            return Cache::tags(['gurus'])->rememberForever('spa_guru_collection', $callback);
-        }
-
-        return Cache::rememberForever('spa_guru_collection', $callback);
+        });
     }
 
     /**
@@ -102,8 +86,9 @@ class SpaService
      */
     public function getPublishedNews(?int $limit = null): Collection
     {
-        $cache = Cache::getFacadeRoot();
-        $callback = function () use ($limit) {
+        $cacheKey = 'spa_published_news_' . ($limit ?? 'all');
+
+        return Cache::rememberForever($cacheKey, function () use ($limit) {
             if (!Schema::hasTable('articles')) {
                 return collect();
             }
@@ -121,12 +106,6 @@ class SpaService
             }
 
             return $query->get();
-        };
-
-        if (method_exists($cache->store(), 'tags')) {
-            return Cache::tags(['articles', 'categories'])->rememberForever('spa_published_news_' . ($limit ?? 'all'), $callback);
-        }
-
-        return Cache::rememberForever('spa_published_news_' . ($limit ?? 'all'), $callback);
+        });
     }
 }
