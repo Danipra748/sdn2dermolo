@@ -303,17 +303,11 @@
             </div>
 
             {{-- Tombol Hamburger (Mobile) --}}
-            <div class="flex items-center gap-3 md:hidden">
-                <a href="{{ route('ppdb') }}" data-spa="/spa/ppdb" data-spa-title="PPDB - SD N 2 Dermolo" data-spa-ignore-active="true"
-                   class="inline-flex items-center justify-center rounded-full {{ request()->routeIs('ppdb*') ? 'bg-gradient-to-r from-blue-600 to-cyan-500' : 'bg-gradient-to-r from-amber-400 to-orange-500' }} px-4 py-2 text-xs font-bold text-white shadow-md">
-                    PPDB
-                </a>
-                <button id="mobile-menu-button" class="flex items-center justify-center rounded-md p-2 text-slate-600 hover:text-blue-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
-                </button>
-            </div>
+            <button id="mobile-menu-button" class="md:hidden flex items-center justify-center rounded-md p-2 text-slate-600 hover:text-blue-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
         </div>
 
         {{-- Menu Mobile --}}
@@ -332,6 +326,14 @@
             <a href="{{ route('prestasi.index') }}" data-spa="/spa/prestasi" data-spa-title="Prestasi - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('prestasi.*') ? 'text-blue-600' : '' }}">Prestasi</a>
             <a href="{{ route('gallery.index') }}" data-spa="/spa/gallery" data-spa-title="Galeri - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('gallery.*') ? 'text-blue-600' : '' }}">Galeri</a>
             <a href="{{ route('contact') }}" data-spa="/spa/contact" data-spa-title="Kontak - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('contact') ? 'text-blue-600' : '' }}">Kontak</a>
+
+            {{-- Mobile PPDB Prominent Button --}}
+            <div class="pt-2 pb-1 border-t border-slate-100 mt-2">
+                <a href="{{ route('ppdb') }}" data-spa="/spa/ppdb" data-spa-title="PPDB - SD N 2 Dermolo" data-spa-ignore-active="true"
+                   class="block w-full py-3.5 px-4 rounded-xl {{ request()->routeIs('ppdb*') ? 'bg-gradient-to-r from-blue-600 to-cyan-500' : 'bg-gradient-to-r from-amber-400 to-orange-500' }} text-white text-base font-bold text-center shadow-lg">
+                    PPDB
+                </a>
+            </div>
             
             {{-- Mobile Admin Actions --}}
             @auth
