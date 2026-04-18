@@ -12,18 +12,25 @@
     $svgIcon = $versionedAsset('favicon.svg');
     $pngIcon = $versionedAsset('logosdreal.png');
     $icoIcon = $versionedAsset('favicon.ico');
+    $dynamicFavicon = $versionedAsset('storage/school-profile/favicon-dynamic.png');
 
     $fallbackUrl = null;
     $fallbackType = 'image/png';
 
-    // Always use the new logo as primary favicon
-    if ($pngIcon) {
+    // Prioritize the dynamic favicon from admin settings
+    if ($dynamicFavicon) {
+        $fallbackUrl = $dynamicFavicon;
+        $fallbackType = 'image/png';
+    } elseif ($pngIcon) {
         $fallbackUrl = $pngIcon;
         $fallbackType = 'image/png';
     }
 @endphp
 
-@if ($icoIcon)
+@if ($dynamicFavicon)
+    <link rel="icon" type="image/png" href="{{ $dynamicFavicon }}">
+    <link rel="apple-touch-icon" href="{{ $dynamicFavicon }}">
+@elseif ($icoIcon)
     <link rel="icon" type="image/x-icon" href="{{ $icoIcon }}">
     <link rel="shortcut icon" href="{{ $icoIcon }}">
 @endif

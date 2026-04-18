@@ -22,6 +22,17 @@
 @section('content')
     <div class="article-page font-body bg-slate-50 pt-28 pb-16">
         <div class="max-w-4xl mx-auto px-4">
+            {{-- Tombol Kembali --}}
+            <div class="mb-6">
+                <a href="{{ route('news.index') }}" 
+                   class="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 font-semibold text-sm transition-all hover:bg-slate-50 hover:text-blue-600 hover:shadow-md">
+                    <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Kembali ke Berita
+                </a>
+            </div>
+
             <div class="article-card bg-white border border-slate-200 rounded-[1.5rem] p-8">
                 <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500">
                     <span class="px-3 py-1 rounded-full bg-sky-100 text-sky-700 font-semibold">

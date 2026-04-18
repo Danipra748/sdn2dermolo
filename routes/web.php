@@ -33,8 +33,9 @@ use App\Http\Controllers\SpaController;
 Route::get('/', [PageController::class, 'index'])->name('home');
 Route::get('/program', [PageController::class, 'programIndex'])->name('program.index');
 Route::get('/fasilitas', [PageController::class, 'fasilitasIndex'])->name('fasilitas.index');
-Route::get('/guru-pendidik', [PageController::class, 'guruIndex'])->name('guru.index');
+Route::get('/guru-pendidik', [GuruController::class, 'index'])->name('guru.index');
 Route::get('/tentang-kami', [AboutController::class, 'index'])->name('about');
+Route::get('/kontak', [PageController::class, 'contactIndex'])->name('contact');
 
 // SPA Routes - Dynamic content loading
 Route::prefix('spa')->name('spa.')->group(function () {
@@ -46,6 +47,7 @@ Route::prefix('spa')->name('spa.')->group(function () {
     Route::get('/about', [SpaController::class, 'getAboutContent'])->name('about');
     Route::get('/berita', [SpaController::class, 'getBeritaContent'])->name('berita');
     Route::get('/program', [SpaController::class, 'getProgramContent'])->name('program');
+    Route::get('/contact', [SpaController::class, 'getContactContent'])->name('contact');
 });
 
 Route::middleware('guest')->group(function () {

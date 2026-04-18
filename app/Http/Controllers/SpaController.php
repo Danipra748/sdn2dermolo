@@ -205,6 +205,22 @@ class SpaController extends Controller
         );
     }
 
+    public function getContactContent(Request $request): JsonResponse|RedirectResponse
+    {
+        $kontak = SchoolConfig::contact();
+        $alamatLines = SchoolConfig::addressLines();
+        $mapsEmbed = SchoolConfig::mapsEmbed();
+        $mapsOpen = SchoolConfig::mapsOpen();
+
+        return $this->respond(
+            $request,
+            'spa.partials.contact',
+            compact('kontak', 'alamatLines', 'mapsEmbed', 'mapsOpen'),
+            'Kontak - SD N 2 Dermolo',
+            route('contact')
+        );
+    }
+
     private function respond(
         Request $request,
         string $view,

@@ -120,4 +120,14 @@ class PageController extends Controller
 
         return view('guru.index', compact('guru', 'kepsek', 'guruLain'));
     }
+
+    public function contactIndex()
+    {
+        $kontak = SchoolConfig::contact();
+        $alamatLines = SchoolConfig::addressLines();
+        $mapsEmbed = SchoolConfig::mapsEmbed();
+        $mapsOpen = SchoolConfig::mapsOpen();
+
+        return view('contact', compact('kontak', 'alamatLines', 'mapsEmbed', 'mapsOpen'));
+    }
 }

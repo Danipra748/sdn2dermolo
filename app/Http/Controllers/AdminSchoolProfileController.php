@@ -56,38 +56,39 @@ class AdminSchoolProfileController extends Controller
                 'missions' => 'nullable|array',
                 'mission_items' => 'nullable|array',
 
-                // Logo - always nullable to allow re-upload
-                'logo' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
+                // Logo inputs
+                'logo_raw' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072',
+                'crop_x' => 'nullable|numeric',
+                'crop_y' => 'nullable|numeric',
+                'crop_w' => 'nullable|numeric',
+                'crop_h' => 'nullable|numeric',
             ]);
 
             // Handle logo upload - only process if file is present
-            if ($request->hasFile('logo')) {
-                $file = $request->file('logo');
+            if ($request->hasFile('logo_raw')) {
+                $file = $request->file('logo_raw');
 
                 if (!$file->isValid()) {
                     return redirect()->back()
                         ->with('error', 'File upload gagal. File tidak valid.');
                 }
 
-                // Delete old logo if exists (using base controller method)
+                // Delete old logo if exists
                 if ($profile->logo) {
                     $this->deletePhysicalFile($profile->logo, 'public');
                 }
 
-                // Ensure directory exists
-                $directory = storage_path('app/public/school-profile');
-                if (!is_dir($directory)) {
-                    mkdir($directory, 0775, true);
-                }
+                // Process and save logo
+                $cropData = [
+                    'x' => $request->input('crop_x'),
+                    'y' => $request->input('crop_y'),
+                    'w' => $request->input('crop_w'),
+                    'h' => $request->input('crop_h'),
+                ];
 
-                // Upload new logo
-                $path = $file->store('school-profile', 'public');
-                $validated['logo'] = $path;
-
-                // Set correct permissions
-                $fullPath = storage_path('app/public/' . $path);
-                if (file_exists($fullPath)) {
-                    chmod($fullPath, 0664);
+                $logoPath = $this->processLogo($file, $cropData);
+                if ($logoPath) {
+                    $validated['logo'] = $logoPath;
                 }
             }
 
@@ -113,9 +114,6 @@ class AdminSchoolProfileController extends Controller
         }
     }
 
-    /**
-     * Delete logo (set to null, don't delete row)
-     */
     public function deleteLogo()
     {
         $profile = SchoolProfile::getOrCreate();
@@ -129,5 +127,117 @@ class AdminSchoolProfileController extends Controller
         }
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Process logo: crop and convert to WebP and ICO
+     */
+    private function processLogo($file, $cropData): ?string
+    {
+        try {
+            $extension = $file->getClientOriginalExtension();
+            $path = $file->getRealPath();
+
+            // Load image based on extension
+            switch (strtolower($extension)) {
+                case 'jpeg':
+                case 'jpg':
+                    $src = imagecreatefromjpeg($path);
+                    break;
+                case 'png':
+                    $src = imagecreatefrompng($path);
+                    break;
+                case 'webp':
+                    $src = imagecreatefromwebp($path);
+                    break;
+                default:
+                    return null;
+            }
+
+            if (!$src) return null;
+
+            // Perform crop
+            $cropped = imagecreatetruecolor($cropData['w'], $cropData['h']);
+            
+            // Handle transparency for PNG/WebP
+            imagealphablending($cropped, false);
+            imagesavealpha($cropped, true);
+            $transparent = imagecolorallocatealpha($cropped, 255, 255, 255, 127);
+            imagefilledrectangle($cropped, 0, 0, $cropData['w'], $cropData['h'], $transparent);
+
+            imagecopyresampled(
+                $cropped, $src,
+                0, 0,
+                $cropData['x'], $cropData['y'],
+                $cropData['w'], $cropData['h'],
+                $cropData['w'], $cropData['h']
+            );
+
+            // Resize to standard logo size (512x512)
+            $finalSize = 512;
+            $finalLogo = imagecreatetruecolor($finalSize, $finalSize);
+            imagealphablending($finalLogo, false);
+            imagesavealpha($finalLogo, true);
+            imagecopyresampled(
+                $finalLogo, $cropped,
+                0, 0, 0, 0,
+                $finalSize, $finalSize,
+                $cropData['w'], $cropData['h']
+            );
+
+            // Ensure directory exists
+            $directory = 'school-profile';
+            if (!Storage::disk('public')->exists($directory)) {
+                Storage::disk('public')->makeDirectory($directory);
+            }
+
+            // Save as WebP
+            $filename = 'logo_' . time() . '.webp';
+            $fullPath = storage_path('app/public/' . $directory . '/' . $filename);
+            imagewebp($finalLogo, $fullPath, 90);
+
+            // Save as ICO (favicon replacement)
+            // For favicon, we resize to 48x48
+            $favSize = 48;
+            $favicon = imagecreatetruecolor($favSize, $favSize);
+            imagealphablending($favicon, false);
+            imagesavealpha($favicon, true);
+            imagecopyresampled(
+                $favicon, $finalLogo,
+                0, 0, 0, 0,
+                $favSize, $favSize,
+                $finalSize, $finalSize
+            );
+            
+            // Save as PNG in the school-profile directory
+            $favFilename = 'favicon_' . time() . '.png';
+            $favPath = storage_path('app/public/' . $directory . '/' . $favFilename);
+            imagepng($favicon, $favPath);
+
+            // Clean up
+            imagedestroy($src);
+            imagedestroy($cropped);
+            imagedestroy($finalLogo);
+            imagedestroy($favicon);
+
+            // Return the logo path, but we also need to store the favicon path.
+            // Since SchoolProfile only has one 'logo' column, let's store 
+            // the favicon path in a SiteSetting or update the model if needed.
+            // However, to keep it simple, we can derive the favicon from the logo 
+            // if we use a consistent naming convention, OR we just update 
+            // the favicon.png in a fixed location.
+            
+            // Let's use a fixed location in storage for favicon to make it easy for the blade:
+            $fixedFavPath = storage_path('app/public/school-profile/favicon-dynamic.png');
+            if (file_exists($favPath)) {
+                copy($favPath, $fixedFavPath);
+            }
+
+            return $directory . '/' . $filename;
+
+        } catch (\Exception $e) {
+            \Log::error('Logo processing error: ' . $e->getMessage());
+            return null;
+        }
     }
 }

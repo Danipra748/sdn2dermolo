@@ -20,6 +20,7 @@
             '/spa/program',
             '/spa/about',
             '/spa/home',
+            '/spa/contact',
         ],
     };
 
@@ -51,6 +52,10 @@
         '/program': {
             route: '/spa/program',
             title: 'Program - SD N 2 Dermolo',
+        },
+        '/kontak': {
+            route: '/spa/contact',
+            title: 'Kontak - SD N 2 Dermolo',
         },
     };
 
@@ -830,26 +835,64 @@
     }
 
     function updateActiveNav(route) {
-        // Target all SPA links EXCEPT footer (we'll handle footer separately)
-        document.querySelectorAll('a[data-spa]').forEach((link) => {
+        // Target all SPA links (Desktop & Mobile) EXCEPT footer
+        document.querySelectorAll('a[data-spa], #mobile-menu a[data-spa]').forEach((link) => {
             // Skip if this link is inside footer
             if (link.closest('footer')) {
                 return;
             }
-            link.classList.remove('bg-emerald-50', 'text-blue-600');
+            link.classList.remove('bg-emerald-50', 'text-blue-600', 'text-blue-600');
+            
+            // For mobile menu specifically
+            if (link.closest('#mobile-menu')) {
+                link.classList.remove('text-blue-600');
+                link.classList.add('text-slate-600');
+            }
+        });
+
+        // Reset dropdown parents (Profil button)
+        document.querySelectorAll('nav .group button').forEach(button => {
+            button.classList.remove('bg-emerald-50', 'text-blue-600');
         });
 
         if (! route) {
             return;
         }
 
-        // Add active state to matching non-footer links
+        // Add active state to matching links
         document.querySelectorAll(`a[data-spa="${route}"]`).forEach((link) => {
             // Skip if this link is inside footer
             if (link.closest('footer')) {
                 return;
             }
-            link.classList.add('bg-emerald-50', 'text-blue-600');
+            
+            link.classList.add('text-blue-600');
+            
+            // Desktop specific (non-dropdown items or specific design)
+            if (!link.closest('.absolute')) {
+                link.classList.add('bg-emerald-50');
+            }
+
+            // Dropdown parent handling
+            const dropdown = link.closest('.group');
+            if (dropdown) {
+                const button = dropdown.querySelector('button');
+                if (button) {
+                    button.classList.add('bg-emerald-50', 'text-blue-600');
+                }
+            }
+            
+            // Mobile menu active handling
+            if (link.closest('#mobile-menu')) {
+                link.classList.remove('text-slate-600');
+                link.classList.add('text-blue-600');
+                
+                // If it's inside a <details> in mobile menu, open it
+                const details = link.closest('details');
+                if (details) {
+                    details.open = true;
+                }
+            }
         });
 
         // Update footer navigation separately with footer-specific styling
@@ -1082,109 +1125,99 @@
         console.log('[SPA] Dynamic click handlers initialized');
     }
 
+    function handleDynamicKeydown(event) {
+        if (event.key !== 'Escape') {
+            return;
+        }
+
+        const openModal = document.querySelector('.is-open');
+        if (openModal) {
+            const modalId = openModal.id;
+            if (modalId === 'gallery-modal') closeGalleryModal();
+            else if (modalId === 'prestasi-modal') closePrestasiModal();
+            else if (modalId === 'facility-modal') closeFacilityModal();
+        }
+    }
+
     function handleDynamicClick(event) {
         const target = event.target;
         if (!(target instanceof Element)) {
             return;
         }
 
-        if (handleFacilityModalClick(target)) {
+        // Improved detection: use closest() to find the trigger element
+        const facilityCard = target.closest('[data-facility-card]');
+        if (facilityCard) {
+            if (handleFacilityModalClick(facilityCard, target)) return;
+        }
+
+        const prestasiCard = target.closest('[data-prestasi-card]');
+        if (prestasiCard) {
+            if (handlePrestasiModalClick(prestasiCard, target)) return;
+        }
+
+        const galleryCard = target.closest('[data-gallery-card]');
+        if (galleryCard) {
+            if (handleGalleryModalClick(galleryCard, target)) return;
+        }
+
+        const programCard = target.closest('[data-program-card]');
+        if (programCard) {
+            if (handleProgramCardClick(programCard, target)) return;
+        }
+
+        if (target.closest('[data-facility-close]')) {
+            closeFacilityModal();
             return;
         }
 
-        if (handlePrestasiModalClick(target)) {
+        if (target.closest('[data-prestasi-close]')) {
+            closePrestasiModal();
             return;
         }
 
-        if (handleGalleryModalClick(target)) {
-            return;
-        }
-
-        if (handleProgramCardClick(target)) {
+        if (target.closest('[data-gallery-close]')) {
+            closeGalleryModal();
             return;
         }
 
         handleGeneralInteractiveClick(event, target);
     }
 
-    function handleDynamicKeydown(event) {
-        if (event.key !== 'Escape') {
-            return;
-        }
-
-        if (isModalOpen('gallery-modal')) {
-            closeGalleryModal();
-            return;
-        }
-
-        if (isModalOpen('prestasi-modal')) {
-            closePrestasiModal();
-            return;
-        }
-
-        if (isModalOpen('facility-modal')) {
-            closeFacilityModal();
-        }
-    }
-
-    function handleFacilityModalClick(target) {
-        if (target.closest('[data-facility-close]')) {
-            closeFacilityModal();
-            return true;
-        }
-
-        const card = target.closest('[data-facility-card]');
-        if (!card || hasNestedInteractiveTarget(target, card, 'a[href], button, input, textarea, select')) {
+    function handleFacilityModalClick(card, originalTarget) {
+        if (hasNestedInteractiveTarget(originalTarget, card, 'a[href], button, input, textarea, select')) {
             return false;
         }
-
         openFacilityModal(card);
         return true;
     }
 
-    function handlePrestasiModalClick(target) {
-        if (target.closest('[data-prestasi-close]')) {
-            closePrestasiModal();
-            return true;
-        }
-
-        const card = target.closest('[data-prestasi-card]');
-        if (!card || hasNestedInteractiveTarget(target, card, 'a[href], button, input, textarea, select')) {
+    function handlePrestasiModalClick(card, originalTarget) {
+        if (hasNestedInteractiveTarget(originalTarget, card, 'a[href], button, input, textarea, select')) {
             return false;
         }
-
         openPrestasiModal(card);
         return true;
     }
 
-    function handleGalleryModalClick(target) {
-        if (target.closest('[data-gallery-close]')) {
-            closeGalleryModal();
-            return true;
-        }
-
-        const card = target.closest('[data-gallery-card]');
-        if (!card || hasNestedInteractiveTarget(target, card, 'a[href], button, input, textarea, select')) {
+    function handleGalleryModalClick(card, originalTarget) {
+        if (hasNestedInteractiveTarget(originalTarget, card, 'a[href], button, input, textarea, select')) {
             return false;
         }
-
         openGalleryModal(card);
         return true;
     }
 
-    function handleProgramCardClick(target) {
-        const card = target.closest('[data-program-card]');
-        if (!card || card.matches('a[href]') || hasNestedInteractiveTarget(target, card, 'a[href], button, input, textarea, select, [data-toggle]')) {
+    function handleProgramCardClick(card, originalTarget) {
+        if (card.matches('a[href]') || hasNestedInteractiveTarget(originalTarget, card, 'a[href], button, input, textarea, select, [data-toggle]')) {
             return false;
         }
-
         const link = card.querySelector('a[href]');
-        if (!link) {
-            return false;
+        if (link) {
+            window.location.href = link.href;
+            return true;
         }
-
-        window.location.href = link.href;
-        return true;
+        return false;
     }
 
     function handleGeneralInteractiveClick(event, target) {
@@ -1554,14 +1587,19 @@
 
         const startAutoplay = () => {
             stopAutoplay();
-            autoplayId = window.setInterval(() => {
-                goToSlide((currentSlide + 1) % slides.length);
-            }, interval);
+            if (slides.length > 1) {
+                autoplayId = window.setInterval(() => {
+                    goToSlide((currentSlide + 1) % slides.length);
+                }, interval);
+                console.log('[SPA] Hero Slideshow Autoplay started');
+            }
         };
 
         dots.forEach((dot, index) => {
-            const handleClick = () => {
+            const handleClick = (e) => {
+                e.stopPropagation();
                 goToSlide(index);
+                // Restart autoplay so the timer resets
                 startAutoplay();
             };
 
@@ -1571,8 +1609,14 @@
 
         updateDots(currentSlide);
 
-        const handleMouseEnter = () => stopAutoplay();
-        const handleMouseLeave = () => startAutoplay();
+        const handleMouseEnter = () => {
+            stopAutoplay();
+            console.log('[SPA] Hero Slideshow Autoplay paused (hover)');
+        };
+        const handleMouseLeave = () => {
+            startAutoplay();
+            console.log('[SPA] Hero Slideshow Autoplay resumed (leave)');
+        };
 
         heroSection.addEventListener('mouseenter', handleMouseEnter);
         heroSection.addEventListener('mouseleave', handleMouseLeave);
