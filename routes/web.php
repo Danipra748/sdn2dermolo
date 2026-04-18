@@ -21,6 +21,7 @@ use App\Http\Controllers\AdminSambutanController;
 use App\Http\Controllers\AdminArticleController;
 use App\Http\Controllers\AdminCategoryController;
 use App\Http\Controllers\AdminProgramPhotoController;
+use App\Http\Controllers\AdminPpdbController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\AdminContactMessageController;
@@ -32,9 +33,11 @@ use App\Http\Controllers\SpaController;
 
 Route::get('/', [PageController::class, 'index'])->name('home');
 Route::get('/program', [PageController::class, 'programIndex'])->name('program.index');
-Route::get('/fasilitas', [PageController::class, 'fasilitasIndex'])->name('fasilitas.index');
 Route::get('/guru-pendidik', [PageController::class, 'guruIndex'])->name('guru.index');
 Route::get('/tentang-kami', [AboutController::class, 'index'])->name('about');
+Route::get('/kontak', [PageController::class, 'contactIndex'])->name('contact');
+Route::get('/ppdb', [PageController::class, 'ppdbIndex'])->name('ppdb');
+Route::get('/ppdb/daftar', [PageController::class, 'ppdbRegister'])->name('ppdb.daftar');
 
 // SPA Routes - Dynamic content loading
 Route::prefix('spa')->name('spa.')->group(function () {
@@ -46,7 +49,11 @@ Route::prefix('spa')->name('spa.')->group(function () {
     Route::get('/about', [SpaController::class, 'getAboutContent'])->name('about');
     Route::get('/berita', [SpaController::class, 'getBeritaContent'])->name('berita');
     Route::get('/program', [SpaController::class, 'getProgramContent'])->name('program');
+    Route::get('/contact', [SpaController::class, 'getContactContent'])->name('contact');
+    Route::get('/ppdb', [SpaController::class, 'getPpdbContent'])->name('ppdb');
+    Route::get('/ppdb/daftar', [SpaController::class, 'getPpdbRegistrationContent'])->name('ppdb.registration');
 });
+
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -67,6 +74,9 @@ Route::prefix('program')->name('program.')->group(function () {
 
 // ── PRESTASI ──
 Route::get('/prestasi', [PrestasiController::class, 'index'])->name('prestasi.index');
+
+// ── FASILITAS ──
+Route::get('/fasilitas', [PageController::class, 'fasilitasIndex'])->name('public.fasilitas.index');
 
 // ── GALLERY ──
 Route::get('/galeri', [GalleryController::class, 'index'])->name('gallery.index');
@@ -189,4 +199,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         ->name('articles.ai-generate');
     Route::resource('articles', AdminArticleController::class)->except(['show']);
     Route::resource('categories', AdminCategoryController::class)->except(['show']);
+
+    // PPDB Management
+    Route::prefix('ppdb')->name('ppdb.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\AdminPpdbController::class, 'index'])->name('index');
+        Route::post('/settings', [\App\Http\Controllers\AdminPpdbController::class, 'updateSettings'])->name('settings.update');
+        Route::post('/banners', [\App\Http\Controllers\AdminPpdbController::class, 'storeBanner'])->name('banners.store');
+        Route::post('/banners/{banner}', [\App\Http\Controllers\AdminPpdbController::class, 'updateBanner'])->name('banners.update');
+        Route::patch('/banners/{banner}/toggle', [\App\Http\Controllers\AdminPpdbController::class, 'toggleBanner'])->name('banners.toggle');
+        Route::delete('/banners/{banner}', [\App\Http\Controllers\AdminPpdbController::class, 'destroyBanner'])->name('banners.destroy');
+    });
 });

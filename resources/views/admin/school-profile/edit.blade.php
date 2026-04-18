@@ -3,6 +3,14 @@
 @section('title', 'Profil Sekolah')
 @section('heading', 'Profil Sekolah')
 
+@push('styles')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    <style>
+        .cropper-container { max-height: 450px; }
+        #crop-image { max-width: 100%; display: block; }
+    </style>
+@endpush
+
 @section('content')
     @if (session('success'))
         <div class="mb-6 rounded-2xl bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800">
@@ -221,11 +229,18 @@
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Upload Logo Baru</label>
                     <input type="file" 
-                           name="logo" 
-                           accept=".jpg,.jpeg,.png,.svg" 
-                           onchange="previewLogo(event)"
+                           id="logo-input"
+                           name="logo_raw" 
+                           accept=".jpg,.jpeg,.png,.webp" 
                            class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                    <p class="mt-2 text-xs text-slate-500">Format: JPG, PNG, SVG. Maksimal 2MB. Kosongkan jika tidak ingin mengganti.</p>
+                    
+                    {{-- Hidden inputs for crop data --}}
+                    <input type="hidden" name="crop_x" id="crop_x">
+                    <input type="hidden" name="crop_y" id="crop_y">
+                    <input type="hidden" name="crop_w" id="crop_w">
+                    <input type="hidden" name="crop_h" id="crop_h">
+
+                    <p class="mt-2 text-xs text-slate-500">Format: JPG, PNG, WEBP. Rasio 1:1 direkomendasikan. Maksimal 2MB. Kosongkan jika tidak ingin mengganti.</p>
                     
                     @if ($profile->logo)
                         <div class="mt-4">
@@ -244,14 +259,15 @@
                 <div>
                     <div class="text-sm font-semibold text-slate-700 mb-2">Preview Logo Saat Ini</div>
                     @if ($profile->logo)
-                        <div id="logo-preview" class="rounded-2xl overflow-hidden border-2 border-slate-200 shadow-lg bg-white p-4">
+                        <div id="logo-preview-container" class="rounded-2xl overflow-hidden border-2 border-slate-200 shadow-lg bg-white p-4">
                             <img src="{{ asset('storage/' . $profile->logo) }}" 
+                                 id="logo-current-preview"
                                  alt="Logo Sekolah" 
                                  class="w-full h-auto max-h-48 object-contain mx-auto">
                         </div>
-                        <p class="mt-2 text-xs text-slate-500 text-center">Logo saat ini</p>
+                        <p class="mt-2 text-xs text-slate-500 text-center">Logo saat ini (dynamic)</p>
                     @else
-                        <div id="logo-preview" class="w-full h-48 rounded-2xl border-2 border-dashed border-slate-300 flex items-center justify-center text-sm text-slate-400 bg-slate-50">
+                        <div id="logo-preview-container" class="w-full h-48 rounded-2xl border-2 border-dashed border-slate-300 flex items-center justify-center text-sm text-slate-400 bg-slate-50">
                             <div class="text-center">
                                 <svg class="w-12 h-12 mx-auto mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -261,6 +277,29 @@
                             </div>
                         </div>
                     @endif
+                </div>
+            </div>
+        </div>
+
+        {{-- Cropping Modal --}}
+        <div id="crop-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+            <div class="bg-white rounded-3xl p-6 max-w-2xl w-full shadow-2xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-slate-900">Crop Logo Sekolah (1:1)</h3>
+                    <button type="button" onclick="closeCropModal()" class="text-slate-400 hover:text-slate-600 transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <div class="cropper-container mb-6 bg-slate-100 rounded-xl overflow-hidden flex items-center justify-center">
+                    <img id="crop-image" src="" alt="Image to crop">
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeCropModal()" class="flex-1 px-6 py-3 rounded-xl border border-slate-300 text-slate-700 font-semibold hover:bg-slate-50 transition">
+                        Batal
+                    </button>
+                    <button type="button" onclick="confirmCrop()" class="flex-1 px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-lg shadow-blue-600/30">
+                        Gunakan Hasil Crop
+                    </button>
                 </div>
             </div>
         </div>
@@ -282,8 +321,13 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 <script>
     let missionCount = {{ count($missions) }};
+    let cropper = null;
+    const logoInput = document.getElementById('logo-input');
+    const cropModal = document.getElementById('crop-modal');
+    const cropImage = document.getElementById('crop-image');
 
     function addMission() {
         missionCount++;
@@ -299,24 +343,75 @@
         container.appendChild(newMission);
     }
 
-    function previewLogo(event) {
-        const file = event.target.files[0];
-        if (file) {
+    logoInput.addEventListener('change', function(e) {
+        const files = e.target.files;
+        if (files && files.length > 0) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                const preview = document.getElementById('logo-preview');
-                
-                // Replace entire preview content with new image
-                preview.innerHTML = `
-                    <img src="${e.target.result}" 
-                         alt="Preview Logo Baru" 
-                         class="w-full h-auto max-h-48 object-contain mx-auto">
-                `;
-                preview.classList.remove('bg-slate-50', 'border-dashed');
-                preview.classList.add('bg-white', 'border-solid');
+                cropImage.src = e.target.result;
+                openCropModal();
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(files[0]);
         }
+    });
+
+    function openCropModal() {
+        cropModal.classList.remove('hidden');
+        cropModal.classList.add('flex');
+        
+        if (cropper) {
+            cropper.destroy();
+        }
+        
+        // Brief timeout to ensure image is loaded in DOM
+        setTimeout(() => {
+            cropper = new Cropper(cropImage, {
+                aspectRatio: 1,
+                viewMode: 2,
+                autoCropArea: 1,
+            });
+        }, 100);
+    }
+
+    function closeCropModal() {
+        cropModal.classList.add('hidden');
+        cropModal.classList.remove('flex');
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+        // Reset input if cancelled
+        logoInput.value = '';
+    }
+
+    function confirmCrop() {
+        if (!cropper) return;
+        
+        const data = cropper.getData();
+        document.getElementById('crop_x').value = Math.round(data.x);
+        document.getElementById('crop_y').value = Math.round(data.y);
+        document.getElementById('crop_w').value = Math.round(data.width);
+        document.getElementById('crop_h').value = Math.round(data.height);
+        
+        // Show preview in UI
+        const canvas = cropper.getCroppedCanvas({
+            width: 512,
+            height: 512
+        });
+        
+        const previewContainer = document.getElementById('logo-preview-container');
+        previewContainer.innerHTML = '';
+        const previewImg = document.createElement('img');
+        previewImg.src = canvas.toDataURL();
+        previewImg.className = 'w-full h-auto max-h-48 object-contain mx-auto';
+        previewContainer.appendChild(previewImg);
+        previewContainer.classList.remove('bg-slate-50', 'border-dashed');
+        previewContainer.classList.add('bg-white', 'border-solid');
+        
+        // Keep modal open or close it? Close it.
+        cropModal.classList.add('hidden');
+        cropModal.classList.remove('flex');
+        // DON'T destroy cropper yet if we need dataURL, but we use coordinates.
     }
 
     function deleteLogo() {

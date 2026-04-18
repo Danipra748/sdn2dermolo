@@ -2,84 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Article;
 use App\Models\Category;
 use App\Models\Fasilitas;
 use App\Models\Gallery;
-use App\Models\Guru;
-use App\Models\HomepageSection;
 use App\Models\Prestasi;
 use App\Models\Program;
 use App\Models\SchoolProfile;
+use App\Models\PpdbSetting;
+use App\Models\PpdbBanner;
 use App\Models\SiteSetting;
 use App\Support\SchoolConfig;
 use App\Support\SchoolData;
+use App\Services\Modules\SpaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 
 class SpaController extends Controller
 {
+    protected $spaService;
+
+    public function __construct(SpaService $spaService)
+    {
+        $this->spaService = $spaService;
+    }
+
     public function getHomeContent(Request $request): JsonResponse|RedirectResponse
     {
-        // Get hero slides from hero_slides table
-        $heroSlides = null;
-        if (Schema::hasTable('hero_slides')) {
-            $heroSlides = \App\Models\HeroSlide::getActiveOrdered();
-        }
-
-        $guru = $this->getGuruCollection();
-        $kepsek = $this->findKepsek($guru);
-
-        $defaultSambutan = implode("\n", [
-            'SD N 2 Dermolo adalah lembaga pendidikan dasar yang berkomitmen memberikan pendidikan berkualitas tinggi. Kami terus berinovasi menghadirkan metode pembelajaran yang efektif dan menyenangkan.',
-            'Melalui pendekatan holistik, kami mengembangkan tidak hanya aspek akademik, tetapi juga karakter, kreativitas, dan keterampilan sosial setiap siswa.',
-        ]);
-
-        $sambutanText = SiteSetting::getValue('kepsek_sambutan_text', $defaultSambutan);
-        $sambutanFoto = SiteSetting::getValue('kepsek_sambutan_foto');
-        $fotoKepsek = SiteSetting::getFotoKepsek();
-
-        $profile = SchoolProfile::getOrCreate();
-        $visi = $profile->vision;
-        $misi = is_array($profile->missions)
-            ? implode("\n", array_filter($profile->missions))
-            : ($profile->missions ?? '');
-
-        // Get latest news (3 posts)
-        $berita = $this->getPublishedNews(3);
-
-        // Get latest gallery (4 photos)
-        $galeri = Schema::hasTable('galleries')
-            ? Gallery::latest()->take(4)->get()
-            : collect();
-
-        // Get contact info from static config
-        $kontak = SchoolConfig::contact();
-        $alamatLines = SchoolConfig::addressLines();
-        $mapsEmbed = SchoolConfig::mapsEmbed();
-        $mapsOpen = SchoolConfig::mapsOpen();
+        $data = $this->spaService->getHomeData();
 
         return $this->respond(
             $request,
             'spa.partials.home',
-            compact(
-                'heroSlides',
-                'sambutanFoto',
-                'fotoKepsek',
-                'sambutanText',
-                'kepsek',
-                'visi',
-                'misi',
-                'berita',
-                'galeri',
-                'kontak',
-                'mapsEmbed',
-                'mapsOpen',
-                'alamatLines'
-            ),
+            $data,
             'Beranda - SD N 2 Dermolo',
             route('home')
         );
@@ -96,14 +52,14 @@ class SpaController extends Controller
             'spa.partials.sarana-prasarana',
             compact('fasilitas'),
             'Sarana & Prasarana - SD N 2 Dermolo',
-            route('fasilitas.index')
+            route('public.fasilitas.index')
         );
     }
 
     public function getDataGuruContent(Request $request): JsonResponse|RedirectResponse
     {
-        $guru = $this->getGuruCollection();
-        $kepsek = $this->findKepsek($guru);
+        $guru = $this->spaService->getGuruCollection();
+        $kepsek = $this->spaService->findKepsek($guru);
         $guruLain = $kepsek
             ? $guru->reject(fn ($item) => data_get($item, 'id') === data_get($kepsek, 'id'))->values()
             : $guru;
@@ -150,25 +106,25 @@ class SpaController extends Controller
     public function getAboutContent(Request $request): JsonResponse|RedirectResponse
     {
         $profile = SchoolProfile::getOrCreate();
+        $guru = $this->spaService->getGuruCollection();
+        $kepsek = $this->spaService->findKepsek($guru);
 
-        // Get kepala sekolah data
-        $sambutanText = SiteSetting::getValue('kepsek_sambutan_text', '');
-        $sambutanFoto = SiteSetting::getValue('kepsek_sambutan_foto');
-        $fotoKepsek = SiteSetting::getFotoKepsek();
-
-        $guru = $this->getGuruCollection();
-        $kepsek = $this->findKepsek($guru);
-
-        // Get contact info from static config
-        $kontak = SchoolConfig::contact();
-        $alamatLines = SchoolConfig::addressLines();
-        $mapsEmbed = SchoolConfig::mapsEmbed();
-        $mapsOpen = SchoolConfig::mapsOpen();
+        $data = [
+            'profile' => $profile,
+            'sambutanText' => SiteSetting::getValue('kepsek_sambutan_text', ''),
+            'sambutanFoto' => SiteSetting::getValue('kepsek_sambutan_foto'),
+            'fotoKepsek' => SiteSetting::getFotoKepsek(),
+            'kepsek' => $kepsek,
+            'mapsEmbed' => SchoolConfig::mapsEmbed(),
+            'mapsOpen' => SchoolConfig::mapsOpen(),
+            'alamatLines' => SchoolConfig::addressLines(),
+            'kontak' => SchoolConfig::contact(),
+        ];
 
         return $this->respond(
             $request,
             'spa.partials.about',
-            compact('profile', 'sambutanText', 'sambutanFoto', 'fotoKepsek', 'kepsek', 'mapsEmbed', 'mapsOpen', 'alamatLines'),
+            $data,
             'Tentang Kami - SD N 2 Dermolo',
             route('about')
         );
@@ -176,7 +132,7 @@ class SpaController extends Controller
 
     public function getBeritaContent(Request $request): JsonResponse|RedirectResponse
     {
-        $news = $this->getPublishedNews();
+        $news = $this->spaService->getPublishedNews();
         $categories = Schema::hasTable('categories')
             ? Category::orderBy('name')->get()
             : collect();
@@ -205,6 +161,55 @@ class SpaController extends Controller
         );
     }
 
+    public function getContactContent(Request $request): JsonResponse|RedirectResponse
+    {
+        $kontak = SchoolConfig::contact();
+        $alamatLines = SchoolConfig::addressLines();
+        $mapsEmbed = SchoolConfig::mapsEmbed();
+        $mapsOpen = SchoolConfig::mapsOpen();
+
+        return $this->respond(
+            $request,
+            'spa.partials.contact',
+            compact('kontak', 'alamatLines', 'mapsEmbed', 'mapsOpen'),
+            'Kontak - SD N 2 Dermolo',
+            route('contact')
+        );
+    }
+
+    public function getPpdbContent(Request $request): JsonResponse|RedirectResponse
+    {
+        $settings = PpdbSetting::getInstance();
+        $banners = PpdbBanner::active()->get();
+        $status = $settings->getStatus();
+
+        return $this->respond(
+            $request,
+            'spa.partials.ppdb',
+            compact('settings', 'banners', 'status'),
+            'PPDB - SD N 2 Dermolo',
+            route('ppdb')
+        );
+    }
+
+    public function getPpdbRegistrationContent(Request $request): JsonResponse|RedirectResponse
+    {
+        $settings = PpdbSetting::getInstance();
+        $status = $settings->getStatus();
+
+        if ($status === 'waiting' || $status === 'closed') {
+            return response()->json(['redirect' => route('ppdb')], 302);
+        }
+
+        return $this->respond(
+            $request,
+            'spa.partials.ppdb-registration',
+            compact('settings', 'status'),
+            'Pendaftaran PPDB - SD N 2 Dermolo',
+            route('ppdb.daftar')
+        );
+    }
+
     private function respond(
         Request $request,
         string $view,
@@ -229,49 +234,5 @@ class SpaController extends Controller
         return $request->ajax()
             || $request->expectsJson()
             || $request->header('X-Requested-With') === 'XMLHttpRequest';
-    }
-
-    private function getGuruCollection(): Collection
-    {
-        if (! Schema::hasTable('gurus')) {
-            return collect(SchoolData::guru())
-                ->map(fn (array $item) => (object) $item);
-        }
-
-        return Guru::orderBy('no')->get();
-    }
-
-    private function findKepsek(Collection $guru): mixed
-    {
-        return $guru->first(function ($item) {
-            $jabatan = strtolower((string) data_get($item, 'jabatan', ''));
-
-            return str_contains($jabatan, 'kepala') || str_contains($jabatan, 'kepsek');
-        }) ?? $guru->first();
-    }
-
-    private function getPublishedNews(?int $limit = null): Collection
-    {
-        if (! Schema::hasTable('articles')) {
-            return collect();
-        }
-
-        $query = Article::with('category')
-            ->published()
-            ->latest('published_at');
-
-        if (Schema::hasColumn('articles', 'type')) {
-            $hasBerita = (clone $query)->where('type', 'berita')->exists();
-
-            if ($hasBerita) {
-                $query->where('type', 'berita');
-            }
-        }
-
-        if ($limit !== null) {
-            $query->take($limit);
-        }
-
-        return $query->get();
     }
 }

@@ -256,11 +256,15 @@
             {{-- Logo --}}
             <a href="{{ route('home') }}" class="flex items-center gap-3.5">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white border border-slate-200 shadow-sm overflow-hidden">
-                    {{-- Pastikan file logosdreal.png ada di folder public/ --}}
-                    <img src="{{ asset('logosdreal.png') }}" alt="Logo SD N 2 Dermolo" class="w-full h-full object-contain p-1">
+                    @if ($schoolProfile->logo)
+                        <img src="{{ asset('storage/' . $schoolProfile->logo) }}" alt="Logo {{ $schoolProfile->school_name }}" class="w-full h-full object-contain p-1">
+                    @else
+                        {{-- Fallback logo --}}
+                        <img src="{{ asset('storage/school-profile/logo_default.png') }}" alt="Logo SD N 2 Dermolo" class="w-full h-full object-contain p-1">
+                    @endif
                 </div>
                 <div>
-                    <h1 class="text-base font-extrabold leading-tight text-slate-900">SD N 2 Dermolo</h1>
+                    <h1 class="text-base font-extrabold leading-tight text-slate-900">{{ $schoolProfile->school_name ?? 'SD N 2 Dermolo' }}</h1>
                     <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500">Unggul & Berkarakter</p>
                 </div>
             </a>
@@ -271,7 +275,7 @@
 
                 {{-- Dropdown Profil dengan Pure CSS --}}
                 <div class="relative group">
-                    <button class="inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ (request()->routeIs('fasilitas.*') || request()->routeIs('program.*')) ? 'bg-emerald-50 text-blue-600' : '' }}" type="button">
+                    <button class="inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ (request()->routeIs('public.fasilitas.*') || request()->routeIs('program.*')) ? 'bg-emerald-50 text-blue-600' : '' }}" type="button">
                         Profil
                         <svg class="h-3.5 w-3.5 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -280,16 +284,22 @@
                     {{-- Dropdown Menu --}}
                     <div class="absolute left-1/2 top-full mt-0 w-56 -translate-x-1/2 rounded-xl bg-white p-2 text-slate-900 shadow-[0_16px_40px_rgba(15,23,42,0.12)] border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-2 group-hover:translate-y-0">
                         <a href="{{ route('about') }}" data-spa="/spa/about" data-spa-title="Tentang Kami - SD N 2 Dermolo" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition {{ request()->routeIs('about') ? 'bg-blue-50 text-blue-600' : '' }}">Identitas Sekolah</a>
-                        <a href="{{ route('fasilitas.index') }}" data-spa="/spa/sarana-prasarana" data-spa-title="Sarana Prasarana - SD N 2 Dermolo" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition {{ request()->routeIs('fasilitas.*') ? 'bg-blue-50 text-blue-600' : '' }}">Sarana Prasarana</a>
+                        <a href="{{ route('public.fasilitas.index') }}" data-spa="/spa/sarana-prasarana" data-spa-title="Sarana Prasarana - SD N 2 Dermolo" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition {{ request()->routeIs('public.fasilitas.*') ? 'bg-blue-50 text-blue-600' : '' }}">Sarana Prasarana</a>
                         <a href="{{ route('program.index') }}" data-spa="/spa/program" data-spa-title="Program - SD N 2 Dermolo" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition {{ request()->routeIs('program.*') ? 'bg-blue-50 text-blue-600' : '' }}">Ekstrakurikuler</a>
                     </div>
                 </div>
 
                 <a href="{{ route('guru.index') }}" data-spa="/spa/data-guru" data-spa-title="Data Guru - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('guru.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Data Guru</a>
-                <a href="{{ route('news.index') }}" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('news.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Berita</a>
+                <a href="{{ route('news.index') }}" data-spa="/spa/berita" data-spa-title="Berita - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('news.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Berita</a>
                 <a href="{{ route('prestasi.index') }}" data-spa="/spa/prestasi" data-spa-title="Prestasi - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('prestasi.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Prestasi</a>
                 <a href="{{ route('gallery.index') }}" data-spa="/spa/gallery" data-spa-title="Galeri - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('gallery.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Galeri</a>
-                <a href="{{ route('home') }}#kontak" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600">Kontak</a>
+                <a href="{{ route('contact') }}" data-spa="/spa/contact" data-spa-title="Kontak - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('contact') ? 'bg-emerald-50 text-blue-600' : '' }}">Kontak</a>
+
+                {{-- Prominent PPDB Button --}}
+                <a href="{{ route('ppdb') }}" data-spa="/spa/ppdb" data-spa-title="PPDB - SD N 2 Dermolo" data-spa-ignore-active="true"
+                   class="ml-2 inline-flex items-center justify-center rounded-full {{ request()->routeIs('ppdb*') ? 'bg-gradient-to-r from-blue-600 to-cyan-500 shadow-blue-500/30 hover:shadow-blue-500/50' : 'bg-gradient-to-r from-amber-400 to-orange-500 shadow-amber-500/30 hover:shadow-amber-500/50' }} px-5 py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95">
+                    PPDB
+                </a>
             </div>
 
             {{-- Tombol Hamburger (Mobile) --}}
@@ -307,15 +317,23 @@
                 <summary class="cursor-pointer font-semibold text-slate-600">Profil</summary>
                 <div class="mt-2 space-y-1">
                     <a href="{{ route('about') }}" data-spa="/spa/about" data-spa-title="Tentang Kami - SD N 2 Dermolo" class="block rounded-lg px-3 py-1.5 text-sm font-medium text-slate-500">Identitas Sekolah</a>
-                    <a href="{{ route('fasilitas.index') }}" data-spa="/spa/sarana-prasarana" data-spa-title="Sarana & Prasarana - SD N 2 Dermolo" class="block rounded-lg px-3 py-1.5 text-sm font-medium text-slate-500">Sarana Prasarana</a>
+                    <a href="{{ route('public.fasilitas.index') }}" data-spa="/spa/sarana-prasarana" data-spa-title="Sarana & Prasarana - SD N 2 Dermolo" class="block rounded-lg px-3 py-1.5 text-sm font-medium text-slate-500">Sarana Prasarana</a>
                     <a href="{{ route('program.index') }}" data-spa="/spa/program" data-spa-title="Program - SD N 2 Dermolo" class="block rounded-lg px-3 py-1.5 text-sm font-medium text-slate-500">Ekstrakurikuler</a>
                 </div>
             </details>
             <a href="{{ route('guru.index') }}" data-spa="/spa/data-guru" data-spa-title="Data Guru - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('guru.*') ? 'text-blue-600' : '' }}">Data Guru</a>
-            <a href="{{ route('news.index') }}" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('news.*') ? 'text-blue-600' : '' }}">Berita</a>
+            <a href="{{ route('news.index') }}" data-spa="/spa/berita" data-spa-title="Berita - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('news.*') ? 'text-blue-600' : '' }}">Berita</a>
             <a href="{{ route('prestasi.index') }}" data-spa="/spa/prestasi" data-spa-title="Prestasi - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('prestasi.*') ? 'text-blue-600' : '' }}">Prestasi</a>
             <a href="{{ route('gallery.index') }}" data-spa="/spa/gallery" data-spa-title="Galeri - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('gallery.*') ? 'text-blue-600' : '' }}">Galeri</a>
-            <a href="{{ route('home') }}#kontak" class="block py-2 font-semibold text-slate-600">Kontak</a>
+            <a href="{{ route('contact') }}" data-spa="/spa/contact" data-spa-title="Kontak - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('contact') ? 'text-blue-600' : '' }}">Kontak</a>
+
+            {{-- Mobile PPDB Prominent Button --}}
+            <div class="pt-2 pb-1 border-t border-slate-100 mt-2">
+                <a href="{{ route('ppdb') }}" data-spa="/spa/ppdb" data-spa-title="PPDB - SD N 2 Dermolo" data-spa-ignore-active="true"
+                   class="block w-full py-3 px-4 rounded-xl {{ request()->routeIs('ppdb*') ? 'bg-gradient-to-r from-blue-600 to-cyan-500' : 'bg-gradient-to-r from-amber-400 to-orange-500' }} text-white text-sm font-semibold text-center shadow-md">
+                    PPDB
+                </a>
+            </div>
             
             {{-- Mobile Admin Actions --}}
             @auth
@@ -325,7 +343,7 @@
                         <x-heroicon-o-cog-6-tooth class="w-4 h-4 inline mr-2" />
                         Dashboard Admin
                     </a>
-                    <form action="{{ route('logout') }}" method="POST" data-confirm="Yakin ingin logout?">
+                    <form action="{{ route('logout') }}" method="POST" data-confirm="Yakin ingin logout?" data-spa-ignore="true">
                         @csrf
                         <button type="submit" class="block w-full py-2 px-4 rounded-xl border border-red-300 text-red-600 text-sm font-semibold text-center hover:bg-red-50 transition">
                             Logout
@@ -350,7 +368,11 @@
                 <div>
                     <div class="flex items-center mb-5">
                         <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-md mr-3 overflow-hidden">
-                            <img src="{{ asset('school-profile/logosdreal.png') }}" alt="Logo SD N 2 Dermolo" class="w-full h-full object-contain">
+                            @if ($schoolProfile->logo)
+                                <img src="{{ asset('storage/' . $schoolProfile->logo) }}" alt="Logo {{ $schoolProfile->school_name }}" class="w-full h-full object-contain p-1">
+                            @else
+                                <img src="{{ asset('storage/school-profile/logo_default.png') }}" alt="Logo SD N 2 Dermolo" class="w-full h-full object-contain p-1">
+                            @endif
                         </div>
                         <div>
                             <h3 class="font-bold text-lg">{{ $schoolProfile->school_name ?? 'SD N 2 Dermolo' }}</h3>
@@ -393,9 +415,10 @@
                         <li><a href="{{ route('guru.index') }}" data-spa="/spa/data-guru" data-spa-title="Tenaga Kependidikan - SD N 2 Dermolo" class="spa-nav-link inline-block">Tenaga Kependidikan</a></li>
                         <li><a href="{{ route('prestasi.index') }}" data-spa="/spa/prestasi" data-spa-title="Prestasi - SD N 2 Dermolo" class="spa-nav-link inline-block">Prestasi</a></li>
                         <li><a href="{{ route('gallery.index') }}" data-spa="/spa/gallery" data-spa-title="Galeri - SD N 2 Dermolo" class="spa-nav-link inline-block">Galeri</a></li>
-                        <li><a href="{{ route('news.index') }}" class="spa-nav-link inline-block">Berita</a></li>
-                        <li><a href="{{ route('fasilitas.index') }}" data-spa="/spa/sarana-prasarana" data-spa-title="Fasilitas - SD N 2 Dermolo" class="spa-nav-link inline-block">Fasilitas</a></li>
-                        <li><a href="{{ route('home') }}#kontak" data-spa="/spa/home" data-spa-title="Kontak - SD N 2 Dermolo" data-spa-hash="#kontak" class="spa-nav-link inline-block">Kontak</a></li>
+                        <li><a href="{{ route('ppdb') }}" data-spa="/spa/ppdb" data-spa-title="PPDB - SD N 2 Dermolo" class="spa-nav-link inline-block">PPDB Online</a></li>
+                        <li><a href="{{ route('news.index') }}" data-spa="/spa/berita" data-spa-title="Berita - SD N 2 Dermolo" class="spa-nav-link inline-block">Berita</a></li>
+                        <li><a href="{{ route('public.fasilitas.index') }}" data-spa="/spa/sarana-prasarana" data-spa-title="Fasilitas - SD N 2 Dermolo" class="spa-nav-link inline-block">Fasilitas</a></li>
+                        <li><a href="{{ route('contact') }}" data-spa="/spa/contact" data-spa-title="Kontak - SD N 2 Dermolo" class="spa-nav-link inline-block">Kontak</a></li>
                     </ul>
                 </div>
 

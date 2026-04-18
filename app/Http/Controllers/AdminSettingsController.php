@@ -3,11 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\SiteSetting;
+use App\Services\Modules\SiteSettingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Log;
 
 class AdminSettingsController extends Controller
 {
+    protected $siteSettingService;
+
+    public function __construct(SiteSettingService $siteSettingService)
+    {
+        $this->siteSettingService = $siteSettingService;
+    }
+
     /**
      * Redirect old logo page to school profile page.
      */
@@ -27,7 +36,6 @@ class AdminSettingsController extends Controller
         $fotoKepsek = null;
 
         if (Schema::hasTable('site_settings')) {
-            // Di sini variabel sambutan kepala sekolah diproses.
             $sambutanText = SiteSetting::getValue('kepsek_sambutan_text', '');
             $sambutanFoto = SiteSetting::getValue('kepsek_sambutan_foto');
             $fotoKepsek = SiteSetting::getFotoKepsek();
@@ -46,25 +54,23 @@ class AdminSettingsController extends Controller
     public function uploadFotoKepsek(Request $request)
     {
         $request->validate([
-            'foto_kepsek' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:3072'],
+            'foto_kepsek' => ['required', 'image', 'mimes:jpeg,jpg,png,webp|max:3072'],
         ]);
 
         try {
-            if ($request->hasFile('foto_kepsek')) {
-                $path = SiteSetting::uploadFotoKepsek($request->file('foto_kepsek'));
+            $path = $this->siteSettingService->uploadFotoKepsek($request);
 
-                if ($path) {
-                    return redirect()->route('admin.hidden-settings')
-                        ->with('success', 'Foto kepala sekolah berhasil diupload!');
-                }
+            if ($path) {
+                return redirect()->route('admin.hidden-settings')
+                    ->with('success', 'Foto kepala sekolah berhasil diupload!');
             }
 
             return redirect()->route('admin.hidden-settings')
                 ->with('error', 'Gagal mengupload foto kepala sekolah.');
         } catch (\Exception $e) {
-            \Log::error('Upload foto kepsek error: ' . $e->getMessage());
+            Log::error('Upload foto kepsek error: ' . $e->getMessage());
             return redirect()->route('admin.hidden-settings')
-                ->with('error', 'Terjadi error saat upload: ' . $e->getMessage());
+                ->with('error', 'Terjadi error saat upload.');
         }
     }
 
@@ -74,7 +80,7 @@ class AdminSettingsController extends Controller
     public function deleteFotoKepsek()
     {
         try {
-            $deleted = SiteSetting::deleteFotoKepsek();
+            $deleted = $this->siteSettingService->deleteFotoKepsek();
 
             if ($deleted) {
                 return redirect()->route('admin.hidden-settings')
@@ -84,9 +90,9 @@ class AdminSettingsController extends Controller
             return redirect()->route('admin.hidden-settings')
                 ->with('error', 'Gagal menghapus foto kepala sekolah.');
         } catch (\Exception $e) {
-            \Log::error('Delete foto kepsek error: ' . $e->getMessage());
+            Log::error('Delete foto kepsek error: ' . $e->getMessage());
             return redirect()->route('admin.hidden-settings')
-                ->with('error', 'Terjadi error saat menghapus: ' . $e->getMessage());
+                ->with('error', 'Terjadi error saat menghapus.');
         }
     }
 }

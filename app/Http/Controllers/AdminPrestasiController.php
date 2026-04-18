@@ -4,31 +4,32 @@ namespace App\Http\Controllers;
 
 use App\Models\Prestasi;
 use App\Models\SiteSetting;
+use App\Services\Modules\PrestasiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Storage;
 
 class AdminPrestasiController extends Controller
 {
+    protected $prestasiService;
+
+    public function __construct(PrestasiService $prestasiService)
+    {
+        $this->prestasiService = $prestasiService;
+    }
+
     public function index()
     {
-        if (! $this->hasRequiredTables()) {
+        if (!Schema::hasTable('prestasis')) {
             return redirect()->route('admin.dashboard')
-                ->with('status', 'Tabel prestasi/site_settings belum tersedia. Jalankan: php artisan migrate');
+                ->with('status', 'Tabel prestasi belum tersedia. Jalankan: php artisan migrate');
         }
 
         $prestasi = Prestasi::latest()->get();
-
         return view('admin.prestasi.index', compact('prestasi'));
     }
 
     public function create()
     {
-        if (! $this->hasRequiredTables()) {
-            return redirect()->route('admin.dashboard')
-                ->with('status', 'Tabel prestasi/site_settings belum tersedia. Jalankan: php artisan migrate');
-        }
-
         return view('admin.prestasi.form', [
             'prestasi' => new Prestasi(),
             'action' => route('admin.prestasi-sekolah.store'),
@@ -39,32 +40,15 @@ class AdminPrestasiController extends Controller
 
     public function store(Request $request)
     {
-        if (! $this->hasRequiredTables()) {
-            return redirect()->route('admin.dashboard')
-                ->with('status', 'Tabel prestasi/site_settings belum tersedia. Jalankan: php artisan migrate');
-        }
-
         $data = $this->validatePrestasi($request);
-
-        if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('prestasi', 'public');
-        }
-
-        Prestasi::create($data);
+        $this->prestasiService->store($data, $request);
 
         return redirect()->route('admin.prestasi-sekolah.index')
             ->with('status', 'Data prestasi berhasil ditambahkan.');
     }
 
-    public function edit(string $prestasiSekolah)
+    public function edit(Prestasi $prestasi)
     {
-        if (! $this->hasRequiredTables()) {
-            return redirect()->route('admin.dashboard')
-                ->with('status', 'Tabel prestasi/site_settings belum tersedia. Jalankan: php artisan migrate');
-        }
-
-        $prestasi = Prestasi::findOrFail($prestasiSekolah);
-
         return view('admin.prestasi.form', [
             'prestasi' => $prestasi,
             'action' => route('admin.prestasi-sekolah.update', $prestasi),
@@ -73,63 +57,26 @@ class AdminPrestasiController extends Controller
         ]);
     }
 
-    public function update(Request $request, string $prestasiSekolah)
+    public function update(Request $request, Prestasi $prestasi)
     {
-        if (! $this->hasRequiredTables()) {
-            return redirect()->route('admin.dashboard')
-                ->with('status', 'Tabel prestasi/site_settings belum tersedia. Jalankan: php artisan migrate');
-        }
-
-        $prestasi = Prestasi::findOrFail($prestasiSekolah);
         $data = $this->validatePrestasi($request);
-
-        if ($request->hasFile('foto')) {
-            if ($prestasi->foto) {
-                Storage::disk('public')->delete($prestasi->foto);
-            }
-
-            $data['foto'] = $request->file('foto')->store('prestasi', 'public');
-        }
-
-        $prestasi->update($data);
+        $this->prestasiService->update($prestasi, $data, $request);
 
         return redirect()->route('admin.prestasi-sekolah.index')
             ->with('status', 'Data prestasi berhasil diperbarui.');
     }
 
-    public function destroy(string $prestasiSekolah)
+    public function destroy(Prestasi $prestasi)
     {
-        if (! $this->hasRequiredTables()) {
-            return redirect()->route('admin.dashboard')
-                ->with('status', 'Tabel prestasi/site_settings belum tersedia. Jalankan: php artisan migrate');
-        }
-
-        $prestasi = Prestasi::findOrFail($prestasiSekolah);
-
-        if ($prestasi->foto) {
-            Storage::disk('public')->delete($prestasi->foto);
-        }
-
-        $prestasi->delete();
-
+        $this->prestasiService->delete($prestasi);
         return redirect()->route('admin.prestasi-sekolah.index')
             ->with('status', 'Data prestasi berhasil dihapus.');
     }
 
     public function editRingkasan()
     {
-        if (! $this->hasRequiredTables()) {
-            return redirect()->route('admin.dashboard')
-                ->with('status', 'Tabel prestasi/site_settings belum tersedia. Jalankan: php artisan migrate');
-        }
-
         $saved = SiteSetting::getValue('prestasi_ringkasan');
-        $items = [];
-
-        if ($saved) {
-            $decoded = json_decode($saved, true);
-            $items = is_array($decoded) ? $decoded : [];
-        }
+        $items = $saved ? (json_decode($saved, true) ?: []) : [];
 
         return view('admin.prestasi.ringkasan', [
             'ringkasanText' => implode("\n", $items),
@@ -138,22 +85,11 @@ class AdminPrestasiController extends Controller
 
     public function updateRingkasan(Request $request)
     {
-        if (! $this->hasRequiredTables()) {
-            return redirect()->route('admin.dashboard')
-                ->with('status', 'Tabel prestasi/site_settings belum tersedia. Jalankan: php artisan migrate');
-        }
-
         $validated = $request->validate([
             'ringkasan' => ['nullable', 'string'],
         ]);
 
-        $lines = collect(preg_split('/\r\n|\r|\n/', $validated['ringkasan'] ?? ''))
-            ->map(fn ($line) => trim($line))
-            ->filter()
-            ->values()
-            ->all();
-
-        SiteSetting::setValue('prestasi_ringkasan', $lines);
+        $this->prestasiService->updateSummary($validated['ringkasan'] ?? '');
 
         return redirect()->route('admin.prestasi-sekolah.index')
             ->with('status', 'Ringkasan prestasi berhasil diperbarui.');
@@ -166,10 +102,5 @@ class AdminPrestasiController extends Controller
             'deskripsi' => ['nullable', 'string'],
             'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
-    }
-
-    private function hasRequiredTables(): bool
-    {
-        return Schema::hasTable('prestasis') && Schema::hasTable('site_settings');
     }
 }

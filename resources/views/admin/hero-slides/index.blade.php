@@ -2,6 +2,14 @@
 
 @section('title', 'Pengelolaan Hero Slides')
 
+@push('styles')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    <style>
+        .cropper-container { max-height: 500px; }
+        #crop-image { max-width: 100%; display: block; }
+    </style>
+@endpush
+
 @section('content')
 <div class="space-y-6">
     {{-- Header --}}
@@ -34,14 +42,30 @@
     {{-- Add New Slide Form --}}
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <h2 class="text-lg font-bold text-slate-900 mb-4">Tambah Slide Baru</h2>
-        <form action="{{ route('admin.hero-slides.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+        <form action="{{ route('admin.hero-slides.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4" id="create-slide-form">
             @csrf
 
-            <div>
-                <label class="block text-sm font-medium text-slate-700 mb-2">Gambar Slide (Wajib)</label>
-                <input type="file" name="image" accept="image/jpeg,image/jpg,image/png,image/webp" required
-                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <p class="text-xs text-slate-500 mt-1">Format: JPG, PNG, WebP. Maksimal 3MB.</p>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Gambar Slide (Wajib)</label>
+                    <input type="file" name="image" id="create-image-input" accept="image/jpeg,image/jpg,image/png,image/webp" required
+                        class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    
+                    {{-- Hidden inputs for crop data --}}
+                    <input type="hidden" name="crop_x" id="create_crop_x">
+                    <input type="hidden" name="crop_y" id="create_crop_y">
+                    <input type="hidden" name="crop_w" id="create_crop_w">
+                    <input type="hidden" name="crop_h" id="create_crop_h">
+
+                    <p class="text-xs text-slate-500 mt-1">Format: JPG, PNG, WebP. Maksimal 3MB. Rasio 16:9 direkomendasikan.</p>
+                </div>
+
+                <div id="create-preview-container" class="hidden">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Preview Crop</label>
+                    <div class="w-full aspect-video rounded-lg overflow-hidden border border-slate-200 bg-slate-50">
+                        <img id="create-preview-img" class="w-full h-full object-cover">
+                    </div>
+                </div>
             </div>
 
             <div class="grid md:grid-cols-2 gap-4">
@@ -77,7 +101,7 @@
         </form>
     </div>
 
-    {{-- Slides List with Drag & Drop --}}
+    {{-- Slides List --}}
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-bold text-slate-900">Daftar Slide ({{ $slides->count() }})</h2>
@@ -140,9 +164,7 @@
 
                         {{-- Action Buttons --}}
                         <div class="flex items-center gap-2 mt-3">
-                            {{-- Move Up --}}
-                            @if(!$loop->first)
-                            <form action="{{ route('admin.hero-slides.move-up', $slide) }}" method="POST" class="inline">
+                            <form action="{{ route('admin.hero-slides.move-up', $slide) }}" method="POST" class="inline {{ $loop->first ? 'hidden' : '' }}">
                                 @csrf
                                 <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-300 rounded text-xs font-medium text-slate-700 hover:bg-slate-50 transition">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,11 +173,8 @@
                                     Atas
                                 </button>
                             </form>
-                            @endif
 
-                            {{-- Move Down --}}
-                            @if(!$loop->last)
-                            <form action="{{ route('admin.hero-slides.move-down', $slide) }}" method="POST" class="inline">
+                            <form action="{{ route('admin.hero-slides.move-down', $slide) }}" method="POST" class="inline {{ $loop->last ? 'hidden' : '' }}">
                                 @csrf
                                 <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-300 rounded text-xs font-medium text-slate-700 hover:bg-slate-50 transition">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -164,9 +183,7 @@
                                     Bawah
                                 </button>
                             </form>
-                            @endif
 
-                            {{-- Toggle Active --}}
                             <form action="{{ route('admin.hero-slides.toggle-active', $slide) }}" method="POST" class="inline">
                                 @csrf
                                 <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-300 rounded text-xs font-medium {{ $slide->is_active ? 'text-amber-700 hover:bg-amber-50' : 'text-green-700 hover:bg-green-50' }} transition">
@@ -184,7 +201,6 @@
                                 </button>
                             </form>
 
-                            {{-- Edit --}}
                             <button type="button" onclick="openEditModal({{ $slide->id }})" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700 transition">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -192,7 +208,6 @@
                                 Edit
                             </button>
 
-                            {{-- Delete --}}
                             <form action="{{ route('admin.hero-slides.destroy', $slide) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus slide ini?')">
                                 @csrf
                                 @method('DELETE')
@@ -208,18 +223,25 @@
                 </div>
             </div>
 
-            {{-- Edit Modal Data --}}
+            {{-- Edit Modal --}}
             <div id="edit-modal-{{ $slide->id }}" class="hidden fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
                 <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6">
                     <h3 class="text-lg font-bold text-slate-900 mb-4">Edit Slide</h3>
-                    <form action="{{ route('admin.hero-slides.update', $slide) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                    <form action="{{ route('admin.hero-slides.update', $slide) }}" method="POST" enctype="multipart/form-data" class="space-y-4 edit-form">
                         @csrf
                         @method('PUT')
 
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-2">Gambar Baru (Opsional)</label>
-                            <input type="file" name="image" accept="image/jpeg,image/jpg,image/png,image/webp"
-                                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <input type="file" name="image" accept="image/jpeg,image/jpg,image/png,image/webp" data-slide-id="{{ $slide->id }}"
+                                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 edit-image-input">
+                            
+                            {{-- Hidden inputs for crop data --}}
+                            <input type="hidden" name="crop_x" id="edit_crop_x_{{ $slide->id }}">
+                            <input type="hidden" name="crop_y" id="edit_crop_y_{{ $slide->id }}">
+                            <input type="hidden" name="crop_w" id="edit_crop_w_{{ $slide->id }}">
+                            <input type="hidden" name="crop_h" id="edit_crop_h_{{ $slide->id }}">
+
                             <p class="text-xs text-slate-500 mt-1">Kosongkan jika tidak ingin mengubah gambar.</p>
                         </div>
 
@@ -271,8 +293,123 @@
     </div>
 </div>
 
+{{-- Global Cropping Modal --}}
+<div id="crop-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl p-6 max-w-4xl w-full shadow-2xl">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-slate-900">Crop Gambar Hero (16:9)</h3>
+            <button type="button" onclick="closeCropModal()" class="text-slate-400 hover:text-slate-600 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="cropper-container mb-6 bg-slate-100 rounded-xl overflow-hidden flex items-center justify-center">
+            <img id="crop-image" src="" alt="Image to crop">
+        </div>
+        <div class="flex gap-3">
+            <button type="button" onclick="closeCropModal()" class="flex-1 px-6 py-3 rounded-xl border border-slate-300 text-slate-700 font-semibold hover:bg-slate-50 transition">
+                Batal
+            </button>
+            <button type="button" id="confirm-crop-btn" class="flex-1 px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-lg shadow-blue-600/30">
+                Gunakan Hasil Crop
+            </button>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 <script>
+let cropper = null;
+let currentActiveInput = null;
+let currentActiveType = null; // 'create' or slideId
+const cropModal = document.getElementById('crop-modal');
+const cropImage = document.getElementById('crop-image');
+
+// Handle image selection for Create Form
+document.getElementById('create-image-input').addEventListener('change', function(e) {
+    handleImageSelect(this, 'create');
+});
+
+// Handle image selection for Edit Forms
+document.querySelectorAll('.edit-image-input').forEach(input => {
+    input.addEventListener('change', function(e) {
+        handleImageSelect(this, this.dataset.slideId);
+    });
+});
+
+function handleImageSelect(input, type) {
+    const files = input.files;
+    if (files && files.length > 0) {
+        currentActiveInput = input;
+        currentActiveType = type;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            cropImage.src = e.target.result;
+            openCropModal();
+        };
+        reader.readAsDataURL(files[0]);
+    }
+}
+
+function openCropModal() {
+    cropModal.classList.remove('hidden');
+    cropModal.classList.add('flex');
+    
+    if (cropper) {
+        cropper.destroy();
+    }
+    
+    setTimeout(() => {
+        cropper = new Cropper(cropImage, {
+            aspectRatio: 16 / 9,
+            viewMode: 2,
+            autoCropArea: 1,
+        });
+    }, 100);
+}
+
+function closeCropModal() {
+    cropModal.classList.add('hidden');
+    cropModal.classList.remove('flex');
+    if (cropper) {
+        cropper.destroy();
+        cropper = null;
+    }
+    // Only reset input if we aren't confirming
+    if (!document.getElementById('confirm-crop-btn').dataset.confirming) {
+        if (currentActiveInput) currentActiveInput.value = '';
+    }
+    delete document.getElementById('confirm-crop-btn').dataset.confirming;
+}
+
+document.getElementById('confirm-crop-btn').addEventListener('click', function() {
+    if (!cropper) return;
+    
+    this.dataset.confirming = 'true';
+    const data = cropper.getData();
+    
+    if (currentActiveType === 'create') {
+        document.getElementById('create_crop_x').value = Math.round(data.x);
+        document.getElementById('create_crop_y').value = Math.round(data.y);
+        document.getElementById('create_crop_w').value = Math.round(data.width);
+        document.getElementById('create_crop_h').value = Math.round(data.height);
+        
+        // Show preview
+        const canvas = cropper.getCroppedCanvas({ width: 640, height: 360 });
+        const previewContainer = document.getElementById('create-preview-container');
+        const previewImg = document.getElementById('create-preview-img');
+        previewImg.src = canvas.toDataURL();
+        previewContainer.classList.remove('hidden');
+    } else {
+        document.getElementById('edit_crop_x_' + currentActiveType).value = Math.round(data.x);
+        document.getElementById('edit_crop_y_' + currentActiveType).value = Math.round(data.y);
+        document.getElementById('edit_crop_w_' + currentActiveType).value = Math.round(data.width);
+        document.getElementById('edit_crop_h_' + currentActiveType).value = Math.round(data.height);
+    }
+    
+    closeCropModal();
+});
+
 // Drag and Drop functionality for slide ordering
 document.addEventListener('DOMContentLoaded', function() {
     const container = document.getElementById('slides-sortable');
@@ -338,7 +475,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Show success notification
                 showNotification('Urutan slide berhasil diperbarui.', 'success');
             }
         })
@@ -375,13 +511,6 @@ function closeEditModal(slideId) {
         modal.classList.add('hidden');
     }
 }
-
-// Close modal when clicking outside
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('fixed')) {
-        e.target.classList.add('hidden');
-    }
-});
 </script>
 @endpush
 @endsection

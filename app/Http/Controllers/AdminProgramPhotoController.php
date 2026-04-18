@@ -4,12 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Program;
 use App\Models\ProgramPhoto;
+use App\Services\Modules\ProgramService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Storage;
 
 class AdminProgramPhotoController extends Controller
 {
+    protected $programService;
+
+    public function __construct(ProgramService $programService)
+    {
+        $this->programService = $programService;
+    }
+
     public function index(Program $programSekolah)
     {
         if (!Schema::hasTable('program_photos')) {
@@ -18,7 +25,6 @@ class AdminProgramPhotoController extends Controller
         }
 
         $photos = $programSekolah->photos()->get();
-
         return view('admin.program.photos.index', compact('programSekolah', 'photos'));
     }
 
@@ -39,10 +45,7 @@ class AdminProgramPhotoController extends Controller
             'caption' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $data['photo'] = $request->file('photo')->store('program/photos', 'public');
-        $data['program_id'] = $programSekolah->id;
-
-        ProgramPhoto::create($data);
+        $this->programService->storePhoto($programSekolah, $data, $request);
 
         return redirect()->route('admin.program-sekolah.photos.index', $programSekolah)
             ->with('status', 'Dokumentasi program berhasil ditambahkan.');
@@ -74,20 +77,7 @@ class AdminProgramPhotoController extends Controller
             'remove_photo' => ['nullable', 'boolean'],
         ]);
 
-        if ($request->boolean('remove_photo') && $photo->photo) {
-            Storage::disk('public')->delete($photo->photo);
-            $photo->photo = null;
-        }
-
-        if ($request->hasFile('photo')) {
-            if ($photo->photo) {
-                Storage::disk('public')->delete($photo->photo);
-            }
-            $photo->photo = $request->file('photo')->store('program/photos', 'public');
-        }
-
-        $photo->caption = $data['caption'] ?? null;
-        $photo->save();
+        $this->programService->updatePhoto($photo, $data, $request);
 
         return redirect()->route('admin.program-sekolah.photos.index', $programSekolah)
             ->with('status', 'Dokumentasi program berhasil diperbarui.');
@@ -99,11 +89,7 @@ class AdminProgramPhotoController extends Controller
             abort(404);
         }
 
-        if ($photo->photo) {
-            Storage::disk('public')->delete($photo->photo);
-        }
-
-        $photo->delete();
+        $this->programService->deletePhoto($photo);
 
         return redirect()->route('admin.program-sekolah.photos.index', $programSekolah)
             ->with('status', 'Dokumentasi program berhasil dihapus.');

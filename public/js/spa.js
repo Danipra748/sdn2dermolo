@@ -20,6 +20,9 @@
             '/spa/program',
             '/spa/about',
             '/spa/home',
+            '/spa/contact',
+            '/spa/ppdb',
+            '/spa/ppdb/daftar',
         ],
     };
 
@@ -51,6 +54,18 @@
         '/program': {
             route: '/spa/program',
             title: 'Program - SD N 2 Dermolo',
+        },
+        '/kontak': {
+            route: '/spa/contact',
+            title: 'Kontak - SD N 2 Dermolo',
+        },
+        '/ppdb': {
+            route: '/spa/ppdb',
+            title: 'PPDB Online - SD N 2 Dermolo',
+        },
+        '/ppdb/daftar': {
+            route: '/spa/ppdb/daftar',
+            title: 'Pendaftaran PPDB - SD N 2 Dermolo',
         },
     };
 
@@ -268,10 +283,9 @@
         }
 
         isLoading = true;
-        
+
         // Show loading bar indicator
         showLoadingBar();
-        scheduleLoading(contentArea, route);
 
         try {
             const data = await fetchContent(route);
@@ -285,12 +299,13 @@
                 animate: true,
             });
         } catch (error) {
-            currentRoute = previousRoute;
-            updateActiveNav(previousRoute);
-            showError(error instanceof Error ? error.message : 'Unknown error');
-            console.error('SPA load failed:', error);
+            console.error('[SPA] Critical load failure, falling back to standard navigation:', error);
+            
+            // If it's a timeout or network error, fallback to standard browser navigation
+            // This prevents the user from being "stuck" in a loading state
+            const targetUrl = routeMap[window.location.pathname] ? window.location.pathname : route;
+            window.location.href = targetUrl;
         } finally {
-            hideLoading(contentArea);
             hideLoadingBar();
             isLoading = false;
         }
@@ -306,7 +321,15 @@
         // Get CSRF token from meta tag
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
+        // Add timeout controller (15 seconds)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+            console.warn('[SPA] Request timed out for:', route);
+            controller.abort();
+        }, 15000);
+
         return fetch(cacheBustUrl, {
+            signal: controller.signal,
             headers: {
                 Accept: 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
@@ -315,6 +338,7 @@
             // Add cache control for no-cache routes
             cache: isNoCache ? 'no-store' : 'default',
         }).then(async (response) => {
+            clearTimeout(timeoutId);
             if (! response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
@@ -328,7 +352,10 @@
             console.log('[SPA] Content fetched successfully for:', route);
             return data;
         }).catch(error => {
-            console.error('[SPA] Fetch error for', route, ':', error);
+            clearTimeout(timeoutId);
+            if (error.name === 'AbortError') {
+                throw new Error('Request timeout');
+            }
             throw error;
         });
     }
@@ -484,38 +511,6 @@
         }
     }
 
-    function scheduleLoading(contentArea, route) {
-        window.clearTimeout(loadingTimer);
-        loadingTimer = window.setTimeout(() => showLoading(contentArea, route), config.loadingDelay);
-    }
-
-    function showLoading(contentArea, route) {
-        if (! contentArea) {
-            return;
-        }
-
-        const minHeight = Math.min(Math.max(contentArea.offsetHeight, 480), 1400);
-
-        contentArea.dataset.loadingState = 'true';
-        contentArea.setAttribute('aria-busy', 'true');
-        contentArea.style.minHeight = `${minHeight}px`;
-        contentArea.style.opacity = '1';
-        contentArea.innerHTML = getLoadingTemplate(route);
-    }
-
-    function hideLoading(contentArea) {
-        window.clearTimeout(loadingTimer);
-        loadingTimer = null;
-
-        if (! contentArea) {
-            return;
-        }
-
-        contentArea.removeAttribute('aria-busy');
-        contentArea.removeAttribute('data-loading-state');
-        contentArea.style.minHeight = '';
-    }
-
     function showLoadingBar() {
         // Create loading bar if it doesn't exist
         if (!loadingBar) {
@@ -567,152 +562,6 @@
                 loadingBar.style.width = '0%';
             }
         }, 300);
-    }
-
-    function getLoadingTemplate(route) {
-        if (route === '/spa/data-guru') {
-            return buildGuruLoadingTemplate();
-        }
-
-        if (route === '/spa/prestasi') {
-            return buildPrestasiLoadingTemplate();
-        }
-
-        if (route === '/spa/gallery') {
-            return buildGalleryLoadingTemplate();
-        }
-
-        return buildGenericLoadingTemplate();
-    }
-
-    function buildLoadingShell(content) {
-        return `
-            <div class="relative bg-slate-50">
-                <div class="pointer-events-none absolute right-6 top-6 z-10 hidden items-center gap-2 rounded-full bg-white px-4 py-2 shadow-sm ring-1 ring-slate-200 md:inline-flex">
-                    <span class="inline-flex h-2.5 w-2.5 animate-ping rounded-full bg-blue-500"></span>
-                    <span class="-ml-2 inline-flex h-2.5 w-2.5 rounded-full bg-blue-500"></span>
-                    <span class="sr-only">Memuat konten</span>
-                </div>
-                ${content}
-            </div>
-        `;
-    }
-
-    function buildHeroLoadingTemplate() {
-        return `
-            <section class="hero-fullscreen relative overflow-hidden text-white" style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0ea5e9 100%);">
-                <div class="hero-content mx-auto max-w-6xl px-6 py-16 text-center">
-                    <div class="mx-auto h-10 w-40 animate-pulse rounded-full bg-white/15"></div>
-                    <div class="mx-auto mt-6 h-7 w-3/4 max-w-2xl animate-pulse rounded-full bg-white/25"></div>
-                    <div class="mx-auto mt-4 h-5 w-2/3 max-w-xl animate-pulse rounded-full bg-white/20"></div>
-                    <div class="mx-auto mt-3 h-4 w-full max-w-2xl animate-pulse rounded-full bg-white/10"></div>
-                    <div class="mx-auto mt-3 h-4 w-5/6 max-w-xl animate-pulse rounded-full bg-white/10"></div>
-                </div>
-            </section>
-        `;
-    }
-
-    function buildGuruLoadingTemplate() {
-        const cards = Array.from({ length: 6 }, () => `
-            <div class="rounded-3xl border border-slate-200 bg-white p-7 text-center shadow-sm">
-                <div class="mx-auto h-20 w-20 animate-pulse rounded-full bg-slate-200"></div>
-                <div class="mx-auto mt-5 h-5 w-3/4 animate-pulse rounded-full bg-slate-200"></div>
-                <div class="mx-auto mt-3 h-4 w-1/2 animate-pulse rounded-full bg-slate-100"></div>
-            </div>
-        `).join('');
-
-        return buildLoadingShell(`
-            ${buildHeroLoadingTemplate()}
-            <section class="bg-slate-50 px-4 py-12">
-                <div class="mx-auto max-w-6xl">
-                    <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-                        <div class="flex flex-col gap-5 md:flex-row md:items-center">
-                            <div class="h-20 w-20 animate-pulse rounded-full bg-slate-200"></div>
-                            <div class="flex-1">
-                                <div class="h-4 w-28 animate-pulse rounded-full bg-slate-100"></div>
-                                <div class="mt-3 h-8 w-2/3 max-w-sm animate-pulse rounded-full bg-slate-200"></div>
-                                <div class="mt-3 h-4 w-1/2 max-w-xs animate-pulse rounded-full bg-slate-100"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        ${cards}
-                    </div>
-                </div>
-            </section>
-        `);
-    }
-
-    function buildPrestasiLoadingTemplate() {
-        const cards = Array.from({ length: 8 }, () => `
-            <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                <div class="aspect-[4/3] animate-pulse bg-slate-200"></div>
-                <div class="p-5">
-                    <div class="h-5 w-4/5 animate-pulse rounded-full bg-slate-200"></div>
-                    <div class="mt-3 h-6 w-24 animate-pulse rounded-full bg-slate-100"></div>
-                    <div class="mt-4 h-4 w-full animate-pulse rounded-full bg-slate-100"></div>
-                    <div class="mt-2 h-4 w-3/4 animate-pulse rounded-full bg-slate-100"></div>
-                </div>
-            </div>
-        `).join('');
-
-        return buildLoadingShell(`
-            ${buildHeroLoadingTemplate()}
-            <section class="bg-slate-50 px-4 py-16">
-                <div class="mx-auto max-w-7xl">
-                    <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
-                        ${cards}
-                    </div>
-                </div>
-            </section>
-        `);
-    }
-
-    function buildGalleryLoadingTemplate() {
-        const cards = Array.from({ length: 8 }, () => `
-            <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                <div class="aspect-[4/3] animate-pulse bg-slate-200"></div>
-                <div class="p-5">
-                    <div class="h-5 w-4/5 animate-pulse rounded-full bg-slate-200"></div>
-                    <div class="mt-3 h-6 w-24 animate-pulse rounded-full bg-slate-100"></div>
-                    <div class="mt-4 h-4 w-full animate-pulse rounded-full bg-slate-100"></div>
-                    <div class="mt-2 h-4 w-3/4 animate-pulse rounded-full bg-slate-100"></div>
-                </div>
-            </div>
-        `).join('');
-
-        return buildLoadingShell(`
-            ${buildHeroLoadingTemplate()}
-            <section class="bg-slate-50 px-4 py-16">
-                <div class="mx-auto max-w-7xl">
-                    <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
-                        ${cards}
-                    </div>
-                </div>
-            </section>
-        `);
-    }
-
-    function buildGenericLoadingTemplate() {
-        const cards = Array.from({ length: 4 }, () => `
-            <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div class="h-52 animate-pulse rounded-2xl bg-slate-200"></div>
-                <div class="mt-5 h-5 w-2/3 animate-pulse rounded-full bg-slate-200"></div>
-                <div class="mt-3 h-4 w-full animate-pulse rounded-full bg-slate-100"></div>
-                <div class="mt-2 h-4 w-5/6 animate-pulse rounded-full bg-slate-100"></div>
-            </div>
-        `).join('');
-
-        return buildLoadingShell(`
-            ${buildHeroLoadingTemplate()}
-            <section class="bg-slate-50 px-4 py-12">
-                <div class="mx-auto max-w-6xl">
-                    <div class="grid gap-6 md:grid-cols-2">
-                        ${cards}
-                    </div>
-                </div>
-            </section>
-        `);
     }
 
     function seedCurrentRouteCache(route, title, url) {
@@ -830,26 +679,84 @@
     }
 
     function updateActiveNav(route) {
-        // Target all SPA links EXCEPT footer (we'll handle footer separately)
-        document.querySelectorAll('a[data-spa]').forEach((link) => {
-            // Skip if this link is inside footer
-            if (link.closest('footer')) {
+        // Reset PPDB buttons to default amber gradient
+        document.querySelectorAll('a[data-spa="/spa/ppdb"], a[data-spa="/spa/ppdb/daftar"]').forEach((link) => {
+            link.classList.remove('from-blue-600', 'to-cyan-500', 'shadow-blue-500/30', 'hover:shadow-blue-500/50');
+            link.classList.add('from-amber-400', 'to-orange-500');
+            if (link.classList.contains('shadow-lg')) {
+                link.classList.add('shadow-amber-500/30', 'hover:shadow-amber-500/50');
+            }
+        });
+
+        // Target all SPA links (Desktop & Mobile) EXCEPT footer and explicitly ignored buttons
+        document.querySelectorAll('a[data-spa], #mobile-menu a[data-spa]').forEach((link) => {
+            // Skip if this link is inside footer or has ignore-active attribute
+            if (link.closest('footer') || link.dataset.spaIgnoreActive === 'true') {
                 return;
             }
-            link.classList.remove('bg-emerald-50', 'text-blue-600');
+            link.classList.remove('bg-emerald-50', 'text-blue-600', 'text-blue-600');
+            
+            // For mobile menu specifically
+            if (link.closest('#mobile-menu')) {
+                link.classList.remove('text-blue-600');
+                link.classList.add('text-slate-600');
+            }
+        });
+
+        // Reset dropdown parents (Profil button)
+        document.querySelectorAll('nav .group button').forEach(button => {
+            button.classList.remove('bg-emerald-50', 'text-blue-600');
         });
 
         if (! route) {
             return;
         }
 
-        // Add active state to matching non-footer links
+        // Handle active state for PPDB buttons
+        if (route.startsWith('/spa/ppdb')) {
+            document.querySelectorAll('a[data-spa="/spa/ppdb"], a[data-spa="/spa/ppdb/daftar"]').forEach((link) => {
+                link.classList.remove('from-amber-400', 'to-orange-500', 'shadow-amber-500/30', 'hover:shadow-amber-500/50');
+                link.classList.add('from-blue-600', 'to-cyan-500');
+                if (link.classList.contains('shadow-lg')) {
+                    link.classList.add('shadow-blue-500/30', 'hover:shadow-blue-500/50');
+                }
+            });
+        }
+
+        // Add active state to matching links
         document.querySelectorAll(`a[data-spa="${route}"]`).forEach((link) => {
-            // Skip if this link is inside footer
-            if (link.closest('footer')) {
+            // Skip if this link is inside footer or has ignore-active attribute
+            if (link.closest('footer') || link.dataset.spaIgnoreActive === 'true') {
                 return;
             }
-            link.classList.add('bg-emerald-50', 'text-blue-600');
+            
+            link.classList.add('text-blue-600');
+            
+            // Desktop specific (non-dropdown items or specific design)
+            if (!link.closest('.absolute')) {
+                link.classList.add('bg-emerald-50');
+            }
+
+            // Dropdown parent handling
+            const dropdown = link.closest('.group');
+            if (dropdown) {
+                const button = dropdown.querySelector('button');
+                if (button) {
+                    button.classList.add('bg-emerald-50', 'text-blue-600');
+                }
+            }
+            
+            // Mobile menu active handling
+            if (link.closest('#mobile-menu')) {
+                link.classList.remove('text-slate-600');
+                link.classList.add('text-blue-600');
+                
+                // If it's inside a <details> in mobile menu, open it
+                const details = link.closest('details');
+                if (details) {
+                    details.open = true;
+                }
+            }
         });
 
         // Update footer navigation separately with footer-specific styling
@@ -1082,109 +989,99 @@
         console.log('[SPA] Dynamic click handlers initialized');
     }
 
+    function handleDynamicKeydown(event) {
+        if (event.key !== 'Escape') {
+            return;
+        }
+
+        const openModal = document.querySelector('.is-open');
+        if (openModal) {
+            const modalId = openModal.id;
+            if (modalId === 'gallery-modal') closeGalleryModal();
+            else if (modalId === 'prestasi-modal') closePrestasiModal();
+            else if (modalId === 'facility-modal') closeFacilityModal();
+        }
+    }
+
     function handleDynamicClick(event) {
         const target = event.target;
         if (!(target instanceof Element)) {
             return;
         }
 
-        if (handleFacilityModalClick(target)) {
+        // Improved detection: use closest() to find the trigger element
+        const facilityCard = target.closest('[data-facility-card]');
+        if (facilityCard) {
+            if (handleFacilityModalClick(facilityCard, target)) return;
+        }
+
+        const prestasiCard = target.closest('[data-prestasi-card]');
+        if (prestasiCard) {
+            if (handlePrestasiModalClick(prestasiCard, target)) return;
+        }
+
+        const galleryCard = target.closest('[data-gallery-card]');
+        if (galleryCard) {
+            if (handleGalleryModalClick(galleryCard, target)) return;
+        }
+
+        const programCard = target.closest('[data-program-card]');
+        if (programCard) {
+            if (handleProgramCardClick(programCard, target)) return;
+        }
+
+        if (target.closest('[data-facility-close]')) {
+            closeFacilityModal();
             return;
         }
 
-        if (handlePrestasiModalClick(target)) {
+        if (target.closest('[data-prestasi-close]')) {
+            closePrestasiModal();
             return;
         }
 
-        if (handleGalleryModalClick(target)) {
-            return;
-        }
-
-        if (handleProgramCardClick(target)) {
+        if (target.closest('[data-gallery-close]')) {
+            closeGalleryModal();
             return;
         }
 
         handleGeneralInteractiveClick(event, target);
     }
 
-    function handleDynamicKeydown(event) {
-        if (event.key !== 'Escape') {
-            return;
-        }
-
-        if (isModalOpen('gallery-modal')) {
-            closeGalleryModal();
-            return;
-        }
-
-        if (isModalOpen('prestasi-modal')) {
-            closePrestasiModal();
-            return;
-        }
-
-        if (isModalOpen('facility-modal')) {
-            closeFacilityModal();
-        }
-    }
-
-    function handleFacilityModalClick(target) {
-        if (target.closest('[data-facility-close]')) {
-            closeFacilityModal();
-            return true;
-        }
-
-        const card = target.closest('[data-facility-card]');
-        if (!card || hasNestedInteractiveTarget(target, card, 'a[href], button, input, textarea, select')) {
+    function handleFacilityModalClick(card, originalTarget) {
+        if (hasNestedInteractiveTarget(originalTarget, card, 'a[href], button, input, textarea, select')) {
             return false;
         }
-
         openFacilityModal(card);
         return true;
     }
 
-    function handlePrestasiModalClick(target) {
-        if (target.closest('[data-prestasi-close]')) {
-            closePrestasiModal();
-            return true;
-        }
-
-        const card = target.closest('[data-prestasi-card]');
-        if (!card || hasNestedInteractiveTarget(target, card, 'a[href], button, input, textarea, select')) {
+    function handlePrestasiModalClick(card, originalTarget) {
+        if (hasNestedInteractiveTarget(originalTarget, card, 'a[href], button, input, textarea, select')) {
             return false;
         }
-
         openPrestasiModal(card);
         return true;
     }
 
-    function handleGalleryModalClick(target) {
-        if (target.closest('[data-gallery-close]')) {
-            closeGalleryModal();
-            return true;
-        }
-
-        const card = target.closest('[data-gallery-card]');
-        if (!card || hasNestedInteractiveTarget(target, card, 'a[href], button, input, textarea, select')) {
+    function handleGalleryModalClick(card, originalTarget) {
+        if (hasNestedInteractiveTarget(originalTarget, card, 'a[href], button, input, textarea, select')) {
             return false;
         }
-
         openGalleryModal(card);
         return true;
     }
 
-    function handleProgramCardClick(target) {
-        const card = target.closest('[data-program-card]');
-        if (!card || card.matches('a[href]') || hasNestedInteractiveTarget(target, card, 'a[href], button, input, textarea, select, [data-toggle]')) {
+    function handleProgramCardClick(card, originalTarget) {
+        if (card.matches('a[href]') || hasNestedInteractiveTarget(originalTarget, card, 'a[href], button, input, textarea, select, [data-toggle]')) {
             return false;
         }
-
         const link = card.querySelector('a[href]');
-        if (!link) {
-            return false;
+        if (link) {
+            window.location.href = link.href;
+            return true;
         }
-
-        window.location.href = link.href;
-        return true;
+        return false;
     }
 
     function handleGeneralInteractiveClick(event, target) {
@@ -1525,7 +1422,10 @@
         };
 
         const goToSlide = (index) => {
-            if (index === currentSlide) {
+            // Lightweight infinite loop logic
+            const targetIndex = (index + slides.length) % slides.length;
+
+            if (targetIndex === currentSlide) {
                 return;
             }
 
@@ -1533,18 +1433,16 @@
             slides[currentSlide].style.zIndex = '1';
             slides[currentSlide].setAttribute('aria-hidden', 'true');
 
-            currentSlide = index;
+            slides[targetIndex].style.opacity = '1';
+            slides[targetIndex].style.zIndex = '10';
+            slides[targetIndex].setAttribute('aria-hidden', 'false');
 
-            slides[currentSlide].style.opacity = '1';
-            slides[currentSlide].style.zIndex = '10';
-            slides[currentSlide].setAttribute('aria-hidden', 'false');
-            
+            currentSlide = targetIndex;
+
             // Update hero text with animation
             updateHeroText(currentSlide);
-            
             updateDots(currentSlide);
         };
-
         const stopAutoplay = () => {
             if (autoplayId !== null) {
                 window.clearInterval(autoplayId);
@@ -1554,14 +1452,19 @@
 
         const startAutoplay = () => {
             stopAutoplay();
-            autoplayId = window.setInterval(() => {
-                goToSlide((currentSlide + 1) % slides.length);
-            }, interval);
+            if (slides.length > 1) {
+                autoplayId = window.setInterval(() => {
+                    goToSlide(currentSlide + 1);
+                }, interval);
+                console.log('[SPA] Hero Slideshow: Infinite loop active');
+            }
         };
 
         dots.forEach((dot, index) => {
-            const handleClick = () => {
+            const handleClick = (e) => {
+                e.stopPropagation();
                 goToSlide(index);
+                // Restart autoplay so the timer resets
                 startAutoplay();
             };
 
@@ -1571,8 +1474,14 @@
 
         updateDots(currentSlide);
 
-        const handleMouseEnter = () => stopAutoplay();
-        const handleMouseLeave = () => startAutoplay();
+        const handleMouseEnter = () => {
+            stopAutoplay();
+            console.log('[SPA] Hero Slideshow Autoplay paused (hover)');
+        };
+        const handleMouseLeave = () => {
+            startAutoplay();
+            console.log('[SPA] Hero Slideshow Autoplay resumed (leave)');
+        };
 
         heroSection.addEventListener('mouseenter', handleMouseEnter);
         heroSection.addEventListener('mouseleave', handleMouseLeave);
@@ -1930,6 +1839,131 @@
             console.log('[SPA] Updated hero slide text to slide', slideIndex + 1);
         } catch (error) {
             console.error('[SPA] Error updating hero slide text:', error);
+        }
+    }
+
+    function setupPpdbFeatures() {
+        const countdownEl = document.getElementById('ppdb-countdown');
+        const mainContainer = document.getElementById('ppdb-main-container');
+        const regContainer = document.getElementById('ppdb-reg-container');
+        const adminForm = document.getElementById('ppdb-settings-form');
+
+        if (!countdownEl && !mainContainer && !regContainer && !adminForm) {
+            return;
+        }
+
+        // State monitoring loop
+        const timer = setInterval(() => {
+            const now = new Date().getTime();
+
+            // 1. Landing Page Logic
+            if (mainContainer && window.location.pathname === '/ppdb') {
+                const start = new Date(mainContainer.dataset.ppdbStart).getTime();
+                const end = new Date(mainContainer.dataset.ppdbEnd).getTime();
+                
+                // Countdown logic (only if waiting)
+                if (countdownEl && now < start) {
+                    const distance = start - now;
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    
+                    countdownEl.innerHTML = `
+                        <div class="ppdb-cd-box">
+                            <div class="ppdb-cd-num">${days}</div>
+                            <div class="ppdb-cd-lbl">Hari</div>
+                        </div>
+                        <div class="ppdb-cd-box">
+                            <div class="ppdb-cd-num">${hours}</div>
+                            <div class="ppdb-cd-lbl">Jam</div>
+                        </div>
+                        <div class="ppdb-cd-box">
+                            <div class="ppdb-cd-num">${minutes}</div>
+                            <div class="ppdb-cd-lbl">Menit</div>
+                        </div>
+                        <div class="ppdb-cd-box">
+                            <div class="ppdb-cd-num">${seconds}</div>
+                            <div class="ppdb-cd-lbl">Detik</div>
+                        </div>
+                    `;
+                }
+
+                // Auto-refresh landing page if state transitions
+                const currentState = mainContainer.dataset.ppdbState;
+                let newState = 'closed';
+                if (now < start) newState = 'waiting';
+                else if (now >= start && now <= end) newState = 'open';
+
+                if (currentState && currentState !== newState) {
+                    console.log(`[SPA] PPDB state changed from ${currentState} to ${newState}. Refreshing...`);
+                    // Ensure we are still on the PPDB page before reloading
+                    if (window.location.pathname === '/ppdb') {
+                        loadContent('/spa/ppdb', 'PPDB Online - SD N 2 Dermolo', true);
+                    }
+                }
+            }
+
+            // 2. Registration Page Protection
+            if (regContainer && window.location.pathname === '/ppdb/daftar') {
+                const end = new Date(regContainer.dataset.ppdbEnd).getTime();
+                if (now > end) {
+                    const modal = document.getElementById('ppdb-closed-modal');
+                    const iframeWrapper = document.getElementById('iframe-wrapper');
+                    if (modal && modal.classList.contains('hidden')) {
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
+                        if (iframeWrapper) iframeWrapper.innerHTML = '<div class="p-20 text-center text-slate-400">Pendaftaran telah ditutup.</div>';
+                    }
+                }
+            }
+
+            // 3. Admin Dashboard Realtime Status
+            const adminStatus = document.getElementById('ppdb-admin-status');
+            if (adminStatus && adminForm) {
+                const start = new Date(adminForm.dataset.ppdbStart).getTime();
+                const end = new Date(adminForm.dataset.ppdbEnd).getTime();
+                
+                let badgeHtml = '';
+                if (!start || !end) {
+                    badgeHtml = '<span class="flex h-3 w-3 rounded-full bg-slate-500"></span><span class="text-slate-700 font-bold">Belum Dikonfigurasi</span>';
+                } else if (now < start) {
+                    badgeHtml = '<span class="flex h-3 w-3 rounded-full bg-amber-500"></span><span class="text-amber-700 font-bold">Belum Dimulai</span>';
+                } else if (now > end) {
+                    badgeHtml = '<span class="flex h-3 w-3 rounded-full bg-slate-500"></span><span class="text-slate-700 font-bold">Ditutup</span>';
+                } else if (end - now <= (24 * 60 * 60 * 1000)) { // 24 hours
+                    badgeHtml = '<span class="flex h-3 w-3 rounded-full bg-red-500 animate-pulse"></span><span class="text-red-700 font-bold">Hampir Selesai</span>';
+                } else {
+                    badgeHtml = '<span class="flex h-3 w-3 rounded-full bg-green-500 animate-pulse"></span><span class="text-green-700 font-bold">Sedang Berlangsung</span>';
+                }
+                
+                if (adminStatus.innerHTML !== badgeHtml) {
+                    adminStatus.innerHTML = badgeHtml;
+                }
+            }
+        }, 1000);
+        
+        cleanup.push(() => clearInterval(timer));
+
+        // PPDB Carousel (same as before)
+        const banners = document.querySelectorAll('.ppdb-banner');
+        const dots = document.querySelectorAll('.ppdb-dot');
+        if (banners.length > 1) {
+            let current = 0;
+            const bannerTimer = setInterval(() => {
+                const activeBanners = document.querySelectorAll('.ppdb-banner');
+                if (activeBanners.length === 0) {
+                    clearInterval(bannerTimer);
+                    return;
+                }
+                
+                banners[current].classList.replace('opacity-100', 'opacity-0');
+                if (dots[current]) dots[current].classList.remove('bg-white', 'scale-125');
+                current = (current + 1) % banners.length;
+                banners[current].classList.replace('opacity-0', 'opacity-100');
+                if (dots[current]) dots[current].classList.add('bg-white', 'scale-125');
+            }, 5000);
+            cleanup.push(() => clearInterval(bannerTimer));
         }
     }
 

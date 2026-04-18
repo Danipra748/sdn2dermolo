@@ -3,15 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gallery;
+use App\Services\Modules\GalleryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Storage;
 
 class AdminGalleryController extends Controller
 {
+    protected $galleryService;
+
+    public function __construct(GalleryService $galleryService)
+    {
+        $this->galleryService = $galleryService;
+    }
+
     public function index()
     {
-        if (!$this->hasRequiredTables()) {
+        if (!Schema::hasTable('galleries')) {
             return redirect()->route('admin.dashboard')
                 ->with('status', 'Tabel galeri belum tersedia. Jalankan: php artisan migrate');
         }
@@ -23,11 +30,6 @@ class AdminGalleryController extends Controller
 
     public function create()
     {
-        if (!$this->hasRequiredTables()) {
-            return redirect()->route('admin.dashboard')
-                ->with('status', 'Tabel galeri belum tersedia. Jalankan: php artisan migrate');
-        }
-
         return view('admin.gallery.form', [
             'gallery' => new Gallery(),
             'action' => route('admin.gallery.store'),
@@ -38,32 +40,15 @@ class AdminGalleryController extends Controller
 
     public function store(Request $request)
     {
-        if (!$this->hasRequiredTables()) {
-            return redirect()->route('admin.dashboard')
-                ->with('status', 'Tabel galeri belum tersedia. Jalankan: php artisan migrate');
-        }
-
         $data = $this->validateGallery($request);
-
-        if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('gallery', 'public');
-        }
-
-        Gallery::create($data);
+        $this->galleryService->store($data, $request);
 
         return redirect()->route('admin.gallery.index')
             ->with('status', 'Foto galeri berhasil ditambahkan.');
     }
 
-    public function edit(string $id)
+    public function edit(Gallery $gallery)
     {
-        if (!$this->hasRequiredTables()) {
-            return redirect()->route('admin.dashboard')
-                ->with('status', 'Tabel galeri belum tersedia. Jalankan: php artisan migrate');
-        }
-
-        $gallery = Gallery::findOrFail($id);
-
         return view('admin.gallery.form', [
             'gallery' => $gallery,
             'action' => route('admin.gallery.update', $gallery),
@@ -72,44 +57,18 @@ class AdminGalleryController extends Controller
         ]);
     }
 
-    public function update(Request $request, string $id)
+    public function update(Request $request, Gallery $gallery)
     {
-        if (!$this->hasRequiredTables()) {
-            return redirect()->route('admin.dashboard')
-                ->with('status', 'Tabel galeri belum tersedia. Jalankan: php artisan migrate');
-        }
-
-        $gallery = Gallery::findOrFail($id);
         $data = $this->validateGallery($request);
-
-        if ($request->hasFile('foto')) {
-            if ($gallery->foto) {
-                Storage::disk('public')->delete($gallery->foto);
-            }
-
-            $data['foto'] = $request->file('foto')->store('gallery', 'public');
-        }
-
-        $gallery->update($data);
+        $this->galleryService->update($gallery, $data, $request);
 
         return redirect()->route('admin.gallery.index')
             ->with('status', 'Foto galeri berhasil diperbarui.');
     }
 
-    public function destroy(string $id)
+    public function destroy(Gallery $gallery)
     {
-        if (!$this->hasRequiredTables()) {
-            return redirect()->route('admin.dashboard')
-                ->with('status', 'Tabel galeri belum tersedia. Jalankan: php artisan migrate');
-        }
-
-        $gallery = Gallery::findOrFail($id);
-
-        if ($gallery->foto) {
-            Storage::disk('public')->delete($gallery->foto);
-        }
-
-        $gallery->delete();
+        $this->galleryService->delete($gallery);
 
         return redirect()->route('admin.gallery.index')
             ->with('status', 'Foto galeri berhasil dihapus.');
@@ -120,12 +79,7 @@ class AdminGalleryController extends Controller
         return $request->validate([
             'judul' => ['required', 'string', 'max:255'],
             'deskripsi' => ['nullable', 'string'],
-            'foto' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
-    }
-
-    private function hasRequiredTables(): bool
-    {
-        return Schema::hasTable('galleries');
     }
 }
