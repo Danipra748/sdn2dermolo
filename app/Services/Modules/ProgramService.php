@@ -6,10 +6,11 @@ use App\Models\Program;
 use App\Models\ProgramPhoto;
 use App\Services\Core\FileService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
+use App\Traits\CacheableService;
 
 class ProgramService
 {
+    use CacheableService;
     protected $fileService;
 
     public function __construct(FileService $fileService)
@@ -22,7 +23,7 @@ class ProgramService
      */
     public function store(array $validated, Request $request): Program
     {
-        Cache::tags(['programs'])->flush();
+        $this->flushCacheTags(['programs']);
         if ($request->hasFile('foto')) {
             $validated['foto'] = $this->fileService->upload($request, 'foto', 'program');
         }
@@ -41,7 +42,7 @@ class ProgramService
      */
     public function update(Program $program, array $validated, Request $request): Program
     {
-        Cache::tags(['programs'])->flush();
+        $this->flushCacheTags(['programs']);
         // Handle file replacements
         $validated = array_merge($validated, $this->fileService->handleModelUpload($program, 'foto', $request, 'foto', 'program'));
         $validated = array_merge($validated, $this->fileService->handleModelUpload($program, 'card_bg_image', $request, 'card_bg_image', 'program/card'));
@@ -67,7 +68,7 @@ class ProgramService
      */
     public function delete(Program $program): bool
     {
-        Cache::tags(['programs'])->flush();
+        $this->flushCacheTags(['programs']);
         $this->fileService->delete($program->foto);
         $this->fileService->delete($program->card_bg_image);
         $this->fileService->delete($program->logo);
@@ -79,7 +80,7 @@ class ProgramService
      */
     public function storePhoto(Program $program, array $data, Request $request): ProgramPhoto
     {
-        Cache::tags(['programs'])->flush();
+        $this->flushCacheTags(['programs']);
         $data['program_id'] = $program->id;
         if ($request->hasFile('photo')) {
             $data['photo'] = $this->fileService->upload($request, 'photo', 'program/photos');
@@ -92,7 +93,7 @@ class ProgramService
      */
     public function updatePhoto(ProgramPhoto $photo, array $data, Request $request): ProgramPhoto
     {
-        Cache::tags(['programs'])->flush();
+        $this->flushCacheTags(['programs']);
         if ($request->boolean('remove_photo')) {
             $data = array_merge($data, $this->fileService->handleModelDeletion($photo, 'photo'));
         }
@@ -108,7 +109,7 @@ class ProgramService
      */
     public function deletePhoto(ProgramPhoto $photo): bool
     {
-        Cache::tags(['programs'])->flush();
+        $this->flushCacheTags(['programs']);
         $this->fileService->delete($photo->photo);
         return $photo->delete();
     }

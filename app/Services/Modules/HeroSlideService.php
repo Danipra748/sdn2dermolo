@@ -6,10 +6,11 @@ use App\Models\HeroSlide;
 use App\Services\Core\FileService;
 use App\Services\Core\ImageProcessorService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
+use App\Traits\CacheableService;
 
 class HeroSlideService
 {
+    use CacheableService;
     protected $fileService;
     protected $imageProcessor;
 
@@ -24,7 +25,7 @@ class HeroSlideService
      */
     public function store(array $data, Request $request): HeroSlide
     {
-        Cache::tags(['hero_slides'])->flush();
+        $this->flushCacheTags(['hero_slides']);
         $data['display_order'] = HeroSlide::getMaxOrder() + 1;
         $data['is_active'] = true;
 
@@ -62,7 +63,7 @@ class HeroSlideService
      */
     public function update(HeroSlide $slide, array $data, Request $request): HeroSlide
     {
-        Cache::tags(['hero_slides'])->flush();
+        $this->flushCacheTags(['hero_slides']);
         if ($request->hasFile('image')) {
             // Delete old image
             $this->fileService->delete($slide->image_path);
@@ -101,7 +102,7 @@ class HeroSlideService
      */
     public function delete(HeroSlide $slide): bool
     {
-        Cache::tags(['hero_slides'])->flush();
+        $this->flushCacheTags(['hero_slides']);
         $this->fileService->delete($slide->image_path);
         return $slide->delete();
     }

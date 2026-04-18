@@ -7,10 +7,11 @@ use App\Services\Core\FileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
+use App\Traits\CacheableService;
 
 class ArticleService
 {
+    use CacheableService;
     protected $fileService;
 
     public function __construct(FileService $fileService)
@@ -23,7 +24,7 @@ class ArticleService
      */
     public function store(array $data, Request $request): Article
     {
-        Cache::tags(['articles'])->flush();
+        $this->flushCacheTags(['articles']);
         $data['author_id'] = $request->user()->id;
         $data['slug'] = $this->uniqueSlug($data['slug'] ?? $data['title']);
 
@@ -43,7 +44,7 @@ class ArticleService
      */
     public function update(Article $article, array $data, Request $request): Article
     {
-        Cache::tags(['articles'])->flush();
+        $this->flushCacheTags(['articles']);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?? $data['title'], $article->id);
 
         if ($request->hasFile('featured_image')) {
@@ -67,7 +68,7 @@ class ArticleService
      */
     public function delete(Article $article): bool
     {
-        Cache::tags(['articles'])->flush();
+        $this->flushCacheTags(['articles']);
         $this->fileService->delete($article->featured_image);
         return $article->delete();
     }

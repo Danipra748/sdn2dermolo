@@ -1,10 +1,11 @@
 use App\Models\Gallery;
 use App\Services\Core\FileService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
+use App\Traits\CacheableService;
 
 class GalleryService
 {
+    use CacheableService;
     protected $fileService;
 
     public function __construct(FileService $fileService)
@@ -17,7 +18,7 @@ class GalleryService
      */
     public function store(array $data, Request $request): Gallery
     {
-        Cache::tags(['galleries'])->flush();
+        $this->flushCacheTags(['galleries']);
         if ($request->hasFile('foto')) {
             $data['foto'] = $this->fileService->upload($request, 'foto', 'gallery');
         }
@@ -29,7 +30,7 @@ class GalleryService
      */
     public function update(Gallery $gallery, array $data, Request $request): Gallery
     {
-        Cache::tags(['galleries'])->flush();
+        $this->flushCacheTags(['galleries']);
         if ($request->hasFile('foto')) {
             $data['foto'] = $this->fileService->replace($gallery->foto, $request, 'foto', 'gallery');
         }
@@ -42,7 +43,7 @@ class GalleryService
      */
     public function delete(Gallery $gallery): bool
     {
-        Cache::tags(['galleries'])->flush();
+        $this->flushCacheTags(['galleries']);
         $this->fileService->delete($gallery->foto);
         return $gallery->delete();
     }

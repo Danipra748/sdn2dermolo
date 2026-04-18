@@ -29,7 +29,7 @@ class FasilitasService
      */
     public function store(array $validated, Request $request): Fasilitas
     {
-        Cache::tags(['fasilitas'])->flush();
+        $this->flushCacheTags(['fasilitas']);
         if ($request->hasFile('foto')) {
             $validated['foto'] = $this->fileService->upload($request, 'foto', 'fasilitas');
         }
@@ -41,7 +41,7 @@ class FasilitasService
      */
     public function update(Fasilitas $fasilitas, array $validated, Request $request): Fasilitas
     {
-        Cache::tags(['fasilitas'])->flush();
+        $this->flushCacheTags(['fasilitas']);
         if ($request->boolean('remove_foto')) {
             $validated = array_merge($validated, $this->fileService->handleModelDeletion($fasilitas, 'foto'));
         }
@@ -51,10 +51,12 @@ class FasilitasService
         use App\Models\Fasilitas;
         use App\Services\Core\FileService;
         use Illuminate\Http\Request;
-        use Illuminate\Support\Facades\Cache;
+        use App\Traits\CacheableService;
 
         class FasilitasService
         {
+            use CacheableService;
+
             protected $fileService;
         ...
             /**
