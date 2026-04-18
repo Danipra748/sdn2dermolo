@@ -90,45 +90,24 @@
 </style>
 
 {{-- ═══════════════════════════════════════════
-     HERO SECTION WITH INFINITE LOOP
+     HERO SECTION
 ══════════════════════════════════════════════ --}}
-<section class="relative overflow-hidden text-white" style="padding-top:80px; min-height: 480px;">
-    {{-- Primary Background Color (Canonical Blue) --}}
-    <div class="absolute inset-0 z-0" style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0ea5e9 100%);"></div>
-    
-    {{-- Background Slideshow (Faint Texture Only) --}}
-    <div class="absolute inset-0 z-0 opacity-15">
-        @if($banners->count() > 0)
-            @foreach($banners as $index => $banner)
-                <div class="ppdb-hero-bg absolute inset-0 transition-opacity duration-[3000ms] ease-in-out {{ $index === 0 ? 'opacity-100' : 'opacity-0' }}"
-                     data-index="{{ $index }}">
-                    <img src="{{ asset('storage/' . $banner->image_path) }}" 
-                         class="w-full h-full object-cover" 
-                         alt="Background {{ $index }}"
-                         loading="{{ $index === 0 ? 'eager' : 'lazy' }}">
-                </div>
-            @endforeach
-        @endif
-    </div>
-
-    {{-- Darken Overlay for better text contrast --}}
-    <div class="absolute inset-0 z-0 bg-black/10"></div>
-
-    <div class="mx-auto max-w-[1200px] px-5 sm:px-8 py-16 md:py-24 text-center relative z-10 h-full flex flex-col justify-center items-center">
-        <div class="reveal inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold tracking-wide text-white backdrop-blur-md shadow-2xl">
+<section class="relative overflow-hidden text-white"
+         style="padding-top: 80px; background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0ea5e9 100%);">
+    <div class="mx-auto max-w-[1200px] px-6 py-12 md:py-16 text-center relative z-10">
+        <div class="reveal inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold tracking-wide text-white backdrop-blur-md">
             <x-heroicon-o-sparkles class="h-4 w-4 text-amber-400 flex-shrink-0" />
             PPDB ONLINE SDN 2 DERMOLO
         </div>
-        <h1 class="reveal reveal-delay-1 mt-8 font-display text-[clamp(2.4rem,6vw,4.5rem)] font-black leading-[1.05] tracking-tight text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+        <h1 class="reveal reveal-delay-1 mt-6 font-display text-[clamp(2rem,6vw,4.5rem)] font-black leading-[1.1] tracking-tight text-white">
             Penerimaan Peserta <br class="hidden sm:block"> Didik Baru
         </h1>
-        <p class="reveal reveal-delay-2 mt-6 text-center max-w-[700px] mx-auto text-[clamp(1.05rem,2vw,1.25rem)] leading-[1.8] text-white/95 px-2 drop-shadow-md font-medium">
+        <p class="reveal reveal-delay-2 mt-5 text-center max-w-[680px] mx-auto text-[clamp(.95rem,1.8vw,1.15rem)] leading-[1.75] text-white/90 px-2">
             Selamat datang di layanan pendaftaran mandiri calon siswa baru. Mari bergabung bersama keluarga besar SD N 2 Dermolo.
         </p>
     </div>
-    
-    <div class="absolute -top-24 -right-24 w-96 h-96 bg-white/5 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
-    <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-sky-400/10 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
+    <div class="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+    <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-sky-400/20 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
 </section>
 
 {{-- ═══════════════════════════════════════════
@@ -628,7 +607,8 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
         @foreach($banners as $index => $banner)
-            <div class="reveal reveal-delay-{{ ($index % 3) + 1 }} group">
+            <div class="reveal reveal-delay-{{ ($index % 3) + 1 }} group cursor-pointer" 
+                 onclick="openPosterModal('{{ asset('storage/' . $banner->image_path) }}', '{{ $banner->title ?? 'Poster PPDB' }}')">
                 <div class="relative rounded-[2.5rem] overflow-hidden shadow-2xl border-[12px] border-white bg-slate-50 transition-all duration-500 hover:scale-[1.02] hover:shadow-blue-200/50">
                     <img src="{{ asset('storage/' . $banner->image_path) }}" 
                          class="w-full h-auto object-cover" 
@@ -649,13 +629,116 @@
                     </div>
                 </div>
             </div>
-        @endforeach
-    </div>
-    </div>
-    </section>
-    @endif
+            @endforeach
+            </div>
+            </div>
+            </section>
+            @endif
 
-    <script>
+            {{-- ═══════════════════════════════════════════
+            PREMIUM POSTER LIGHTBOX (Zoom & Download Support)
+            ══════════════════════════════════════════════ --}}
+            <div id="poster-modal" 
+            class="fixed inset-0 z-[999] hidden flex-col bg-slate-950/98 backdrop-blur-xl transition-opacity duration-300 overflow-hidden"
+            onclick="closePosterModal()">
+
+            {{-- Floating Toolbar --}}
+            <div class="fixed top-0 left-0 right-0 z-[1002] p-4 flex justify-between items-center bg-gradient-to-b from-black/60 to-transparent pointer-events-none">
+                {{-- Left: Caption --}}
+                <div id="modal-caption-container" class="hidden md:flex px-6 py-2.5 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white shadow-2xl pointer-events-auto">
+                    <span id="modal-caption" class="font-bold text-sm tracking-wide"></span>
+                </div>
+
+                {{-- Right: Tools --}}
+                <div class="flex gap-2 pointer-events-auto">
+                    {{-- Zoom Out --}}
+                    <button onclick="event.stopPropagation(); zoomPoster(-0.2)" class="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all border border-white/10" title="Perkecil">
+                        <x-heroicon-o-magnifying-glass-minus class="w-6 h-6" />
+                    </button>
+                    {{-- Reset --}}
+                    <button onclick="event.stopPropagation(); resetPosterZoom()" class="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all border border-white/10" title="Reset Ukuran">
+                        <x-heroicon-o-arrows-pointing-in class="w-6 h-6" />
+                    </button>
+                    {{-- Zoom In --}}
+                    <button onclick="event.stopPropagation(); zoomPoster(0.2)" class="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all border border-white/10" title="Perbesar">
+                        <x-heroicon-o-magnifying-glass-plus class="w-6 h-6" />
+                    </button>
+                    {{-- Download --}}
+                    <a id="modal-download" href="" download class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-all shadow-xl" title="Unduh Poster" onclick="event.stopPropagation()">
+                        <x-heroicon-o-arrow-down-tray class="w-6 h-6" />
+                    </a>
+                    {{-- Close --}}
+                    <button onclick="closePosterModal()" class="w-12 h-12 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-all shadow-xl" title="Tutup">
+                        <x-heroicon-o-x-mark class="w-6 h-6" />
+                    </button>
+                </div>
+            </div>
+
+            {{-- Scrollable Content Area --}}
+            <div id="poster-modal-scroll" class="w-full h-full overflow-auto flex items-start justify-center cursor-zoom-out p-4 md:p-20">
+                <div id="poster-modal-content" class="relative transition-transform duration-300 ease-out origin-top opacity-0 scale-95 pointer-events-none">
+                    <img id="modal-image" src="" alt="Detail Poster" 
+                         class="max-w-[90vw] md:max-w-4xl h-auto rounded-xl shadow-[0_0_100px_rgba(0,0,0,0.8)] border-4 border-white/5 pointer-events-auto"
+                         onclick="event.stopPropagation()">
+                </div>
+            </div>
+            </div>
+
+            <script>
+/* ── Poster Modal ────────────────────────────── */
+let currentPosterZoom = 1.0;
+
+window.openPosterModal = function(src, title) {
+    const modal = document.getElementById('poster-modal');
+    const content = document.getElementById('poster-modal-content');
+    const img = document.getElementById('modal-image');
+    const caption = document.getElementById('modal-caption');
+    const downloadBtn = document.getElementById('modal-download');
+    const scrollArea = document.getElementById('poster-modal-scroll');
+
+    img.src = src;
+    downloadBtn.href = src;
+    caption.textContent = title || 'Poster PPDB';
+    
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    scrollArea.scrollTop = 0;
+    resetPosterZoom();
+    
+    // Delay to trigger animation
+    setTimeout(() => {
+        content.classList.remove('opacity-0', 'scale-95');
+        content.classList.add('opacity-100', 'scale-100');
+    }, 10);
+    
+    document.body.style.overflow = 'hidden'; 
+};
+
+window.closePosterModal = function() {
+    const modal = document.getElementById('poster-modal');
+    const content = document.getElementById('poster-modal-content');
+
+    content.classList.remove('opacity-100', 'scale-100');
+    content.classList.add('opacity-0', 'scale-95');
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = ''; 
+    }, 300);
+};
+
+window.zoomPoster = function(delta) {
+    const content = document.getElementById('poster-modal-content');
+    currentPosterZoom = Math.max(0.5, Math.min(3.0, currentPosterZoom + delta));
+    content.style.transform = `scale(${currentPosterZoom})`;
+};
+
+window.resetPosterZoom = function() {
+    const content = document.getElementById('poster-modal-content');
+    currentPosterZoom = 1.0;
+    content.style.transform = `scale(1)`;
+};
 
 /* ── Countdown Timer ─────────────────────────── */
 (function(){
@@ -758,19 +841,5 @@ window.ppdbPopBalloon = function(el, color){
     }
     dots.forEach((d,i)=>d.addEventListener('click',()=>go(i)));
     const timer = setInterval(()=>go((cur+1)%banners.length), 4500);
-})();
-
-/* ── Hero Background Loop ────────────────────── */
-(function(){
-    const bgs = document.querySelectorAll('.ppdb-hero-bg');
-    if(bgs.length <= 1) return;
-    let cur = 0;
-    setInterval(() => {
-        if(!bgs[cur]) return;
-        bgs[cur].classList.replace('opacity-100', 'opacity-0');
-        cur = (cur + 1) % bgs.length;
-        if(!bgs[cur]) return;
-        bgs[cur].classList.replace('opacity-0', 'opacity-100');
-    }, 7000);
 })();
 </script>
