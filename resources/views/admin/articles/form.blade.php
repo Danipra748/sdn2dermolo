@@ -1,288 +1,150 @@
 @extends('admin.layout')
 
-@section('title', $article->exists ? 'Edit Artikel' : 'Tambah Artikel')
-@section('heading', $article->exists ? 'Edit Artikel' : 'Tambah Artikel')
+@php
+    $isEdit = isset($article);
+    $title = $isEdit ? 'Edit Artikel' : 'Tulis Artikel Baru';
+    $icon = $isEdit 
+        ? '<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>'
+        : '<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>';
+@endphp
+
+@section('title', $title)
+@section('heading', $title)
 
 @push('styles')
-    <link rel="stylesheet" href="https://unpkg.com/trix@2.0.8/dist/trix.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
-        trix-editor {
-            min-height: 320px;
-            background: white;
-            border-radius: 1rem;
+        .select2-container .select2-selection--single {
+            height: 42px !important;
+            border-radius: 0.75rem !important;
+            border: 1px solid #e2e8f0 !important;
+            padding: 0.5rem 1rem !important;
+            font-size: 0.875rem !important;
         }
-        trix-editor:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(15,23,42,0.2);
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px !important;
+            right: 8px !important;
         }
     </style>
 @endpush
 
 @section('content')
-    @if ($errors->any())
-        <div class="mb-6 rounded-2xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-800">
-            <ul class="list-disc pl-4">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <form action="{{ $action }}" method="POST" enctype="multipart/form-data" class="grid lg:grid-cols-3 gap-6">
+    <form action="{{ $isEdit ? route('admin.articles.update', $article) : route('admin.articles.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
-        @if ($method !== 'POST')
-            @method($method)
+        @if($isEdit)
+            @method('PUT')
         @endif
 
-        <div class="lg:col-span-2 space-y-5">
-            <div class="glass rounded-3xl p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h2 class="text-lg font-semibold text-slate-900">Konten Artikel</h2>
-                        <p class="text-sm text-slate-500">Isi artikel yang akan tampil di halaman publik.</p>
-                    </div>
-                    <button type="button" id="ai-open"
-                        class="px-4 py-2 rounded-2xl bg-slate-900 text-white text-xs hover:opacity-90 transition">
-                        Generate with AI
-                    </button>
+        <div class="grid lg:grid-cols-3 gap-8">
+            {{-- Main Content Column --}}
+            <div class="lg:col-span-2 space-y-6">
+                <div class="glass-card p-6">
+                    <x-admin.form-group label="Judul Artikel" name="title" required>
+                        <input type="text" name="title" id="title" value="{{ old('title', $article->title ?? '') }}" class="w-full form-input" required>
+                    </x-admin.form-group>
                 </div>
 
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-sm font-semibold text-slate-700">Judul</label>
-                        <input type="text" name="title" id="title"
-                            value="{{ old('title', $article->title) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:ring-2 focus:ring-slate-300"
-                            placeholder="Judul artikel">
-                    </div>
+                <div class="glass-card p-6">
+                    <x-admin.form-group label="Konten Artikel" name="content" help="Gunakan sintaks Markdown untuk format teks.">
+                        <textarea name="content" id="content" rows="15" class="w-full form-input">{{ old('content', $article->content ?? '') }}</textarea>
+                    </x-admin.form-group>
+                </div>
 
-                    <div>
-                        <label class="text-sm font-semibold text-slate-700">Slug (URL)</label>
-                        <input type="text" name="slug" id="slug"
-                            value="{{ old('slug', $article->slug) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:ring-2 focus:ring-slate-300"
-                            placeholder="contoh: berita-sekolah">
-                    </div>
-
-                    <div>
-                        <label class="text-sm font-semibold text-slate-700">Subtitle</label>
-                        <input type="text" name="subtitle" id="subtitle"
-                            value="{{ old('subtitle', $article->subtitle) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:ring-2 focus:ring-slate-300"
-                            placeholder="Ringkasan singkat di bawah judul">
-                    </div>
-
-                    <div>
-                        <label class="text-sm font-semibold text-slate-700">Ringkasan</label>
-                        <textarea name="summary" id="summary" rows="3"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:ring-2 focus:ring-slate-300"
-                            placeholder="Gunakan untuk meta description dan preview.">{{ old('summary', $article->summary) }}</textarea>
-                    </div>
-
-                    <div>
-                        <label class="text-sm font-semibold text-slate-700">Konten</label>
-                        <input id="content" type="hidden" name="content" value="{{ old('content', $article->content) }}">
-                        <trix-editor input="content"></trix-editor>
-                    </div>
+                <div class="glass-card p-6">
+                    <x-admin.form-group label="Ringkasan (Opsional)" name="summary" help="Ringkasan singkat artikel. Jika kosong, akan dibuat otomatis dari konten.">
+                        <textarea name="summary" id="summary" rows="3" class="w-full form-input">{{ old('summary', $article->summary ?? '') }}</textarea>
+                    </x-admin.form-group>
                 </div>
             </div>
 
-            <div class="glass rounded-3xl p-6">
-                <h2 class="text-lg font-semibold text-slate-900">SEO & Metadata</h2>
-                <div class="space-y-4 mt-4">
-                    <div>
-                        <label class="text-sm font-semibold text-slate-700">Meta Title</label>
-                        <input type="text" name="meta_title"
-                            value="{{ old('meta_title', $article->meta_title) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:ring-2 focus:ring-slate-300"
-                            placeholder="Judul untuk SEO (opsional)">
+            {{-- Sidebar Column --}}
+            <div class="space-y-6">
+                <div class="glass-card p-6">
+                    <h3 class="font-bold text-slate-900 mb-4">Publikasi</h3>
+                    <div class="space-y-4">
+                        <x-admin.form-group label="Status" name="status">
+                            <select name="status" id="status" class="w-full form-input">
+                                <option value="published" @selected(old('status', $article->status ?? 'published') == 'published')>Published</option>
+                                <option value="draft" @selected(old('status', $article->status ?? 'published') == 'draft')>Draft</option>
+                            </select>
+                        </x-admin.form-group>
+
+                        <x-admin.form-group label="Tanggal Publikasi (Opsional)" name="published_at">
+                            <input type="datetime-local" name="published_at" id="published_at" value="{{ old('published_at', ($article->published_at ?? now())->format('Y-m-d\TH:i')) }}" class="w-full form-input">
+                        </x-admin.form-group>
                     </div>
-                    <div>
-                        <label class="text-sm font-semibold text-slate-700">Meta Description</label>
-                        <textarea name="meta_description" rows="3"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:ring-2 focus:ring-slate-300"
-                            placeholder="Deskripsi untuk mesin pencari">{{ old('meta_description', $article->meta_description) }}</textarea>
+                </div>
+
+                <div class="glass-card p-6">
+                    <h3 class="font-bold text-slate-900 mb-4">Pengaturan</h3>
+                    <div class="space-y-4">
+                        <x-admin.form-group label="Kategori" name="category_id">
+                            <select name="category_id" id="category_id" class="w-full form-input select2">
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" @selected(old('category_id', $article->category_id ?? '') == $category->id)>{{ $category->name }}</option>
+                                @endforeach
+                            </select>
+                        </x-admin.form-group>
+
+                        <x-admin.form-group label="Tipe Konten" name="type">
+                            <select name="type" id="type" class="w-full form-input">
+                                <option value="berita" @selected(old('type', $article->type ?? 'berita') == 'berita')>Berita</option>
+                                <option value="artikel" @selected(old('type', $article->type ?? 'berita') == 'artikel')>Artikel</option>
+                                <option value="pengumuman" @selected(old('type', $article->type ?? 'berita') == 'pengumuman')>Pengumuman</option>
+                            </select>
+                        </x-admin.form-group>
                     </div>
+                </div>
+
+                <div class="glass-card p-6">
+                    <h3 class="font-bold text-slate-900 mb-4">Gambar Unggulan</h3>
+                    <div class="w-full aspect-video rounded-xl bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden">
+                        <img id="image-preview" src="{{ $isEdit && $article->featured_image ? asset('storage/' . $article->featured_image) : '' }}" class="{{ $isEdit && $article->featured_image ? '' : 'hidden' }} w-full h-full object-cover">
+                        <label for="featured_image" id="image-placeholder" class="{{ $isEdit && $article->featured_image ? 'hidden' : '' }} text-center text-slate-400 cursor-pointer">
+                            <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+                            <span class="text-xs font-semibold">Klik untuk memilih gambar</span>
+                        </label>
+                    </div>
+                    <input type="file" name="featured_image" id="featured_image" class="hidden" accept="image/*">
                 </div>
             </div>
         </div>
 
-        <div class="space-y-5">
-            <div class="glass rounded-3xl p-6">
-                <h2 class="text-lg font-semibold text-slate-900">Pengaturan</h2>
-                <div class="space-y-4 mt-4">
-                    <div>
-                        <label class="text-sm font-semibold text-slate-700">Kategori</label>
-                        <select name="category_id" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:ring-2 focus:ring-slate-300">
-                            <option value="">Tanpa kategori</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->id }}" @selected(old('category_id', $article->category_id) == $category->id)>
-                                    {{ $category->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-sm font-semibold text-slate-700">Tipe Konten</label>
-                        <select name="type" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:ring-2 focus:ring-slate-300">
-                            <option value="berita" @selected(old('type', $article->type) === 'berita')>Berita</option>
-                            <option value="artikel" @selected(old('type', $article->type) === 'artikel')>Artikel</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="text-sm font-semibold text-slate-700">Status</label>
-                        <select name="status" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:ring-2 focus:ring-slate-300">
-                            <option value="draft" @selected(old('status', $article->status) === 'draft')>Draft</option>
-                            <option value="published" @selected(old('status', $article->status) === 'published')>Published</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="text-sm font-semibold text-slate-700">Tanggal Publish (opsional)</label>
-                        <input type="datetime-local" name="published_at"
-                            value="{{ old('published_at', optional($article->published_at)->format('Y-m-d\TH:i')) }}"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:ring-2 focus:ring-slate-300">
-                    </div>
-                </div>
-            </div>
-
-            <div class="glass rounded-3xl p-6">
-                <h2 class="text-lg font-semibold text-slate-900">Featured Image</h2>
-                <div class="space-y-4 mt-4">
-                    @if ($article->featured_image)
-                        <img src="{{ asset('storage/' . $article->featured_image) }}" alt="Featured"
-                            class="w-full h-40 object-cover rounded-2xl border border-slate-200">
-                    @endif
-                    <input type="file" name="featured_image"
-                        class="drop-zone-enabled"
-                        id="featured-image-input"
-                        accept=".jpg,.jpeg,.png,.webp">
-                </div>
-            </div>
-
+        {{-- Sticky Footer on Mobile --}}
+        <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/80 border-t border-slate-200 backdrop-blur-sm lg:hidden z-10">
             <div class="flex items-center gap-3">
-                <a href="{{ route('admin.articles.index') }}"
-                    class="px-4 py-2 rounded-2xl bg-white border border-slate-200 text-sm text-slate-700 hover:bg-slate-50 transition">
-                    Kembali
-                </a>
-                <button type="submit"
-                    class="px-4 py-2 rounded-2xl bg-slate-900 text-white text-sm hover:opacity-90 transition">
-                    Simpan Artikel
-                </button>
+                <x-admin.button href="{{ route('admin.articles.index') }}" variant="secondary" size="md" class="w-full">Batal</x-admin.button>
+                <x-admin.button type="submit" variant="primary" size="md" class="w-full">{{ $isEdit ? 'Simpan Perubahan' : 'Terbitkan' }}</x-admin.button>
             </div>
+        </div>
+        
+        {{-- Desktop Actions --}}
+        <div class="hidden lg:flex items-center gap-3 mt-8">
+            <x-admin.button href="{{ route('admin.articles.index') }}" variant="secondary">Batal</x-admin.button>
+            <x-admin.button type="submit" variant="primary">{{ $isEdit ? 'Simpan Perubahan' : 'Terbitkan' }}</x-admin.button>
         </div>
     </form>
-
-    {{-- Modal AI --}}
-    <div id="ai-modal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-3xl w-full max-w-lg p-6">
-            <h3 class="text-lg font-semibold text-slate-900">Generate Draft Artikel</h3>
-            <p class="text-sm text-slate-500 mt-1">Masukkan topik atau kata kunci untuk memulai draft.</p>
-            <textarea id="ai-topic" rows="3"
-                class="mt-4 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:ring-2 focus:ring-slate-300"
-                placeholder="Contoh: Kegiatan lomba sains kelas 5 minggu ini"></textarea>
-            <div class="mt-5 flex items-center justify-end gap-3">
-                <button type="button" id="ai-close"
-                    class="px-4 py-2 rounded-2xl bg-white border border-slate-200 text-sm text-slate-700 hover:bg-slate-50 transition">
-                    Batal
-                </button>
-                <button type="button" id="ai-generate"
-                    class="px-4 py-2 rounded-2xl bg-slate-900 text-white text-sm hover:opacity-90 transition">
-                    Generate
-                </button>
-            </div>
-            <p id="ai-error" class="text-sm text-red-600 mt-4 hidden"></p>
-        </div>
-    </div>
 @endsection
 
 @push('scripts')
-    <script src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>
-    <script>
-        const slugInput = document.getElementById('slug');
-        const titleInput = document.getElementById('title');
-        const aiModal = document.getElementById('ai-modal');
-        const aiOpen = document.getElementById('ai-open');
-        const aiClose = document.getElementById('ai-close');
-        const aiGenerate = document.getElementById('ai-generate');
-        const aiTopic = document.getElementById('ai-topic');
-        const aiError = document.getElementById('ai-error');
-        const contentInput = document.getElementById('content');
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.select2').select2();
+    });
 
-        function slugify(text) {
-            return text.toLowerCase()
-                .replace(/[^\w\s-]/g, '')
-                .trim()
-                .replace(/\s+/g, '-')
-                .replace(/-+/g, '-');
+    document.getElementById('featured_image').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('image-preview').src = e.target.result;
+                document.getElementById('image-preview').classList.remove('hidden');
+                document.getElementById('image-placeholder').classList.add('hidden');
+            }
+            reader.readAsDataURL(file);
         }
-
-        titleInput?.addEventListener('input', () => {
-            if (!slugInput.value) {
-                slugInput.value = slugify(titleInput.value);
-            }
-        });
-
-        aiOpen?.addEventListener('click', () => {
-            aiModal.classList.remove('hidden');
-            aiModal.classList.add('flex');
-            aiError.classList.add('hidden');
-        });
-        aiClose?.addEventListener('click', () => {
-            aiModal.classList.add('hidden');
-            aiModal.classList.remove('flex');
-        });
-
-        aiGenerate?.addEventListener('click', async () => {
-            aiError.classList.add('hidden');
-            const topic = aiTopic.value.trim();
-            if (!topic) {
-                aiError.textContent = 'Topik tidak boleh kosong.';
-                aiError.classList.remove('hidden');
-                return;
-            }
-
-            aiGenerate.disabled = true;
-            aiGenerate.textContent = 'Memproses...';
-
-            try {
-                const res = await fetch("{{ route('admin.articles.ai-generate') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': "{{ csrf_token() }}",
-                    },
-                    body: JSON.stringify({ topic })
-                });
-
-                const data = await res.json();
-                if (!res.ok) {
-                    throw new Error(data.message || 'Gagal menghasilkan draft.');
-                }
-
-                if (data.title) document.getElementById('title').value = data.title;
-                if (data.subtitle) document.getElementById('subtitle').value = data.subtitle;
-                if (data.summary) document.getElementById('summary').value = data.summary;
-                if (data.content_html) {
-                    contentInput.value = data.content_html;
-                    const trix = document.querySelector('trix-editor');
-                    if (trix) {
-                        trix.editor.loadHTML(data.content_html);
-                    }
-                }
-
-                aiModal.classList.add('hidden');
-                aiModal.classList.remove('flex');
-            } catch (err) {
-                aiError.textContent = err.message;
-                aiError.classList.remove('hidden');
-            } finally {
-                aiGenerate.disabled = false;
-                aiGenerate.textContent = 'Generate';
-            }
-        });
-    </script>
+    });
+</script>
 @endpush
-

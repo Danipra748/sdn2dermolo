@@ -1,154 +1,66 @@
 @extends('admin.layout')
 
+@php
+    $isEdit = isset($fasilitas);
+    $title = $isEdit ? 'Edit Fasilitas' : 'Tambah Fasilitas';
+@endphp
+
 @section('title', $title)
 @section('heading', $title)
 
 @section('content')
-    <div class="max-w-2xl mx-auto">
-        <div class="glass rounded-3xl p-6">
-            <form action="{{ $action }}" method="POST" enctype="multipart/form-data" class="space-y-6">
-                @csrf
-                @if ($method !== 'POST')
-                    @method($method)
-                @endif
-
-                {{-- Nama Fasilitas --}}
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">
-                        Nama Fasilitas <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" 
-                           name="nama" 
-                           value="{{ old('nama', $fasilitas->nama) }}"
-                           placeholder="Contoh: Ruang Kelas, Perpustakaan, Musholla"
-                           required
-                           class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
-                    @error('nama')
-                        <p class="text-xs text-red-600 mt-2">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- Deskripsi --}}
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">
-                        Deskripsi <span class="text-slate-400 font-normal">(Opsional)</span>
-                    </label>
-                    <textarea name="deskripsi" 
-                              rows="4"
-                              placeholder="Deskripsi singkat tentang fasilitas ini (tidak wajib diisi)"
-                              class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">{{ old('deskripsi', $fasilitas->deskripsi) }}</textarea>
-                    <p class="text-xs text-slate-500 mt-2">
-                        ℹ️ Deskripsi akan tampil sebagai subtitle di halaman publik. Bisa dikosongkan.
-                    </p>
-                    @error('deskripsi')
-                        <p class="text-xs text-red-600 mt-2">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- Upload Gambar Fasilitas --}}
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">
-                        Foto Fasilitas
-                    </label>
+    <x-admin.page-header 
+        :title="$title"
+        subtitle="Kelola detail aset dan sarana prasarana sekolah."
+        icon='<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1M2.25 15l4.5-2m0 0V3l4.5-1.636M12.75 21V10.75m0 0L21.25 7.5M12.75 10.75V3l4.5-1.636"/></svg>'>
+    </x-admin.page-header>
+    
+    <div class="max-w-4xl mx-auto">
+        <form action="{{ $isEdit ? route('admin.fasilitas.update', $fasilitas) : route('admin.fasilitas.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+            @csrf
+            @if($isEdit) @method('PUT') @endif
+    
+            <div class="glass-card p-6">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <x-admin.form-group label="Nama Fasilitas" name="nama" required>
+                        <input type="text" name="nama" value="{{ old('nama', $fasilitas->nama ?? '') }}" class="form-input" required>
+                    </x-admin.form-group>
                     
-                    {{-- Preview gambar saat ini --}}
-                    @if ($fasilitas->foto)
-                        <div class="mb-4">
-                            <p class="text-xs text-slate-500 mb-2">Foto saat ini:</p>
-                            <div class="relative inline-block">
-                                <img id="current-image-preview" 
-                                     src="{{ asset('storage/' . $fasilitas->foto) }}" 
-                                     alt="Foto {{ $fasilitas->nama }}"
-                                     class="w-full max-w-md h-48 object-cover rounded-xl border border-slate-200">
-                                <label class="absolute top-2 right-2 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500 text-white text-xs font-semibold cursor-pointer hover:bg-red-600 transition shadow-lg">
-                                    <input type="checkbox" name="remove_foto" value="1" id="remove-foto"
-                                           class="hidden"
-                                           onchange="toggleRemoveFoto()">
-                                    <span id="remove-foto-label">Hapus foto</span>
-                                </label>
-                            </div>
-                        </div>
-                    @endif
-
-                    {{-- Upload input with drop zone --}}
-                    <div class="relative">
-                        <input type="file"
-                               name="foto"
-                               id="foto-fasilitas"
-                               accept=".jpg,.jpeg,.png,.webp"
-                               class="drop-zone-enabled">
-
-                        @error('foto')
-                            <p class="text-xs text-red-600 mt-2">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    {{-- Preview gambar baru yang akan diupload --}}
-                    <div id="new-image-preview" class="mt-4 hidden">
-                        <p class="text-xs text-slate-500 mb-2">Preview foto baru:</p>
-                        <img id="preview-img" 
-                             src="" 
-                             alt="Preview"
-                             class="w-full max-w-md h-48 object-cover rounded-xl border-2 border-blue-500 shadow-lg">
-                    </div>
+                    <x-admin.form-group label="Warna Tema" name="warna">
+                        <select name="warna" class="form-input">
+                            @foreach (['blue', 'green', 'yellow', 'pink', 'purple', 'orange'] as $color)
+                                <option value="{{ $color }}" @selected(old('warna', $fasilitas->warna ?? 'blue') == $color)>
+                                    {{ ucfirst($color) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </x-admin.form-group>
                 </div>
+    
+                <x-admin.form-group label="Deskripsi Singkat" name="deskripsi" class="mt-6">
+                    <textarea name="deskripsi" rows="3" class="form-input">{{ old('deskripsi', $fasilitas->deskripsi ?? '') }}</textarea>
+                </x-admin.form-group>
+            </div>
+    
+            <div class="glass-card p-6">
+                <h3 class="font-bold text-slate-900 mb-4">Gambar</h3>
+                <x-admin.form-group label="Foto Utama" name="foto" help="Gambar utama yang mewakili fasilitas. Rasio 16:9 disarankan.">
+                    <input type="file" name="foto" class="file-input">
+                </x-admin.form-group>
+    
+                @if ($isEdit && $fasilitas->foto)
+                    <div class="mt-2">
+                        <label class="inline-flex items-center gap-2 text-xs">
+                            <input type="checkbox" name="remove_foto" value="1" class="rounded"> Hapus foto saat ini
+                        </label>
+                    </div>
+                @endif
+            </div>
 
-                {{-- Action Buttons --}}
-                <div class="flex gap-3 pt-4 border-t border-slate-200">
-                    <button type="submit"
-                            class="flex-1 px-6 py-3 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:opacity-90 transition shadow-lg">
-                        {{ $method === 'PUT' ? 'Update' : 'Simpan' }}
-                    </button>
-                    <a href="{{ route('admin.fasilitas.index') }}"
-                       class="px-6 py-3 rounded-xl border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition">
-                        Batal
-                    </a>
-                </div>
-            </form>
-        </div>
+            <div class="lg:flex items-center gap-3 mt-8">
+                <x-admin.button href="{{ route('admin.fasilitas.index') }}" variant="secondary">Batal</x-admin.button>
+                <x-admin.button type="submit" variant="primary">{{ $isEdit ? 'Simpan Perubahan' : 'Buat Fasilitas' }}</x-admin.button>
+            </div>
+        </form>
     </div>
 @endsection
-
-@push('scripts')
-<script>
-    // Preview image sebelum upload
-    function previewImage(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        // Validasi ukuran (2MB)
-        if (file.size > 2 * 1024 * 1024) {
-            alert('Ukuran file terlalu besar! Maksimal 2MB.');
-            event.target.value = '';
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const preview = document.getElementById('new-image-preview');
-            const previewImg = document.getElementById('preview-img');
-            
-            previewImg.src = e.target.result;
-            preview.classList.remove('hidden');
-            
-            console.log('Image preview loaded:', file.name, Math.round(file.size / 1024) + 'KB');
-        };
-        reader.readAsDataURL(file);
-    }
-
-    // Toggle remove foto
-    function toggleRemoveFoto() {
-        const checkbox = document.getElementById('remove-foto');
-        const label = document.getElementById('remove-foto-label');
-        const currentPreview = document.getElementById('current-image-preview');
-        
-        if (checkbox.checked) {
-            label.textContent = '✓ Akan dihapus';
-            currentPreview.style.opacity = '0.4';
-        } else {
-            label.textContent = 'Hapus foto';
-            currentPreview.style.opacity = '1';
-        }
-    }
-</script>
-@endpush

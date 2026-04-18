@@ -1,63 +1,65 @@
 @extends('admin.layout')
 
+@php
+    $isEdit = isset($prestasi);
+    $title = $isEdit ? 'Edit Prestasi' : 'Tambah Prestasi';
+@endphp
+
 @section('title', $title)
 @section('heading', $title)
 
 @section('content')
-    <div class="glass rounded-3xl p-6 max-w-3xl">
-        <form action="{{ $action }}" method="POST" enctype="multipart/form-data" class="space-y-5">
+    <x-admin.page-header 
+        :title="$title"
+        subtitle="Masukkan data pencapaian dan prestasi siswa atau sekolah."
+        icon='<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>'>
+    </x-admin.page-header>
+    
+    <div class="max-w-4xl mx-auto">
+        <form action="{{ $isEdit ? route('admin.prestasi-sekolah.update', $prestasi) : route('admin.prestasi-sekolah.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
-            @if ($method !== 'POST')
-                @method($method)
-            @endif
+            @if($isEdit) @method('PUT') @endif
+    
+            <div class="glass-card p-6 space-y-6">
+                <x-admin.form-group label="Judul Prestasi" name="title" required>
+                    <input type="text" name="title" value="{{ old('title', $prestasi->title ?? '') }}" class="form-input" required>
+                </x-admin.form-group>
+                
+                <x-admin.form-group label="Nama Peserta/Tim" name="participant" required>
+                    <input type="text" name="participant" value="{{ old('participant', $prestasi->participant ?? '') }}" class="form-input" required>
+                </x-admin.form-group>
 
-            <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Judul Prestasi</label>
-                <input type="text" name="judul" value="{{ old('judul', $prestasi->judul) }}"
-                       class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300">
-                @error('judul')
-                    <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
-                @enderror
+                <div class="grid md:grid-cols-2 gap-6">
+                    <x-admin.form-group label="Tipe Prestasi" name="type" required>
+                        <select name="type" class="form-input">
+                            <option value="Akademik" @selected(old('type', $prestasi->type ?? '') == 'Akademik')>Akademik</option>
+                            <option value="Non-Akademik" @selected(old('type', $prestasi->type ?? '') == 'Non-Akademik')>Non-Akademik</option>
+                        </select>
+                    </x-admin.form-group>
+                    <x-admin.form-group label="Tingkat" name="level" required>
+                        <select name="level" class="form-input">
+                            @foreach(['Sekolah', 'Kecamatan', 'Kabupaten', 'Provinsi', 'Nasional', 'Internasional'] as $level)
+                                <option value="{{ $level }}" @selected(old('level', $prestasi->level ?? '') == $level)>{{ $level }}</option>
+                            @endforeach
+                        </select>
+                    </x-admin.form-group>
+                </div>
+
+                 <x-admin.form-group label="Tanggal Diraih" name="date" required>
+                    <input type="date" name="date" value="{{ old('date', $prestasi->date ?? now()->format('Y-m-d')) }}" class="form-input">
+                </x-admin.form-group>
+            </div>
+    
+            <div class="glass-card p-6">
+                <h3 class="font-bold text-slate-900 mb-4">Dokumentasi</h3>
+                <x-admin.form-group label="Foto Piagam/Piala" name="foto">
+                    <input type="file" name="foto" class="file-input">
+                </x-admin.form-group>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">
-                    Deskripsi <span class="text-slate-400 font-normal">(Opsional)</span>
-                </label>
-                <textarea name="deskripsi" rows="4"
-                          placeholder="Ceritakan detail prestasi secara lengkap (tidak wajib diisi)"
-                          class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300">{{ old('deskripsi', $prestasi->deskripsi) }}</textarea>
-                <p class="text-xs text-slate-500 mt-1">
-                    ℹ️ Isi deskripsi untuk memberikan detail lebih lengkap tentang prestasi. Bisa dikosongkan jika hanya ingin menampilkan judul dan foto.
-                </p>
-                @error('deskripsi')
-                    <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Foto Dokumentasi</label>
-                <input type="file" name="foto" accept=".jpg,.jpeg,.png,.webp"
-                       class="drop-zone-enabled"
-                       id="foto-prestasi">
-                @error('foto')
-                    <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
-                @enderror
-                @if ($prestasi->foto)
-                    <img src="{{ asset('storage/' . $prestasi->foto) }}" alt="{{ $prestasi->judul }}"
-                         class="mt-3 h-24 w-24 rounded-xl object-cover border border-slate-200">
-                @endif
-            </div>
-
-            <div class="flex gap-3 pt-2">
-                <button type="submit"
-                        class="px-4 py-2 rounded-2xl bg-slate-900 text-white text-sm hover:opacity-90 transition">
-                    Simpan
-                </button>
-                <a href="{{ route('admin.prestasi-sekolah.index') }}"
-                   class="px-4 py-2 rounded-2xl border border-slate-300 text-sm text-slate-700 hover:bg-slate-50 transition">
-                    Kembali
-                </a>
+            <div class="lg:flex items-center gap-3 mt-8">
+                <x-admin.button href="{{ route('admin.prestasi-sekolah.index') }}" variant="secondary">Batal</x-admin.button>
+                <x-admin.button type="submit" variant="primary">{{ $isEdit ? 'Simpan Perubahan' : 'Tambah Prestasi' }}</x-admin.button>
             </div>
         </form>
     </div>
