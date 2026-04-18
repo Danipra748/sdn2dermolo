@@ -92,14 +92,15 @@
 {{-- ═══════════════════════════════════════════
      HERO SECTION WITH INFINITE LOOP
 ══════════════════════════════════════════════ --}}
-<section class="relative overflow-hidden text-white"
-         style="padding-top:80px; min-height: 480px; background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0ea5e9 100%);">
+<section class="relative overflow-hidden text-white" style="padding-top:80px; min-height: 480px;">
+    {{-- Primary Background Color (Canonical Blue) --}}
+    <div class="absolute inset-0 z-0" style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0ea5e9 100%);"></div>
     
-    {{-- Background Slideshow --}}
-    <div class="absolute inset-0 z-0">
+    {{-- Background Slideshow (Faint Texture Only) --}}
+    <div class="absolute inset-0 z-0 opacity-15">
         @if($banners->count() > 0)
             @foreach($banners as $index => $banner)
-                <div class="ppdb-hero-bg absolute inset-0 transition-opacity duration-[2000ms] ease-in-out {{ $index === 0 ? 'opacity-100' : 'opacity-0' }}"
+                <div class="ppdb-hero-bg absolute inset-0 transition-opacity duration-[3000ms] ease-in-out {{ $index === 0 ? 'opacity-100' : 'opacity-0' }}"
                      data-index="{{ $index }}">
                     <img src="{{ asset('storage/' . $banner->image_path) }}" 
                          class="w-full h-full object-cover" 
@@ -107,12 +108,11 @@
                          loading="{{ $index === 0 ? 'eager' : 'lazy' }}">
                 </div>
             @endforeach
-            {{-- Persistent Blue Overlay (Stable & No Flickering) --}}
-            <div class="absolute inset-0 bg-gradient-to-br from-[#1e3a8a]/95 via-[#1e40af]/90 to-[#0ea5e9]/85 backdrop-blur-[1px]"></div>
-        @else
-            <div class="absolute inset-0 bg-gradient-to-br from-[#1e3a8a] via-[#1e40af] to-[#0ea5e9]"></div>
         @endif
     </div>
+
+    {{-- Darken Overlay for better text contrast --}}
+    <div class="absolute inset-0 z-0 bg-black/10"></div>
 
     <div class="mx-auto max-w-[1200px] px-5 sm:px-8 py-16 md:py-24 text-center relative z-10 h-full flex flex-col justify-center items-center">
         <div class="reveal inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold tracking-wide text-white backdrop-blur-md shadow-2xl">
@@ -766,9 +766,11 @@ window.ppdbPopBalloon = function(el, color){
     if(bgs.length <= 1) return;
     let cur = 0;
     setInterval(() => {
+        if(!bgs[cur]) return;
         bgs[cur].classList.replace('opacity-100', 'opacity-0');
         cur = (cur + 1) % bgs.length;
+        if(!bgs[cur]) return;
         bgs[cur].classList.replace('opacity-0', 'opacity-100');
-    }, 6000);
+    }, 7000);
 })();
 </script>
