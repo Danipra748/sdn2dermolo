@@ -81,13 +81,13 @@ class AdminProgramController extends Controller
 
     private function validateProgram(Request $request, ?int $ignoreId = null): array
     {
-        $slugRule = ['required', 'in:pramuka,seni-ukir,drumband', 'unique:programs,slug'];
+        $uniqueRule = 'unique:programs,slug';
         if ($ignoreId) {
-            $slugRule[] = $ignoreId;
+            $uniqueRule .= ',' . $ignoreId;
         }
 
         return $request->validate([
-            'slug' => $slugRule,
+            'slug' => ['required', 'in:pramuka,seni-ukir,drumband', $uniqueRule],
             'title' => ['required', 'string', 'max:255'],
             'desc' => ['nullable', 'string'],
             'emoji' => ['nullable', 'string', 'max:20'],
