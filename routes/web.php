@@ -205,6 +205,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::get('/', [\App\Http\Controllers\AdminPpdbController::class, 'index'])->name('index');
         Route::post('/settings', [\App\Http\Controllers\AdminPpdbController::class, 'updateSettings'])->name('settings.update');
         Route::post('/banners', [\App\Http\Controllers\AdminPpdbController::class, 'storeBanner'])->name('banners.store');
+        Route::post('/banners/{banner}', [\App\Http\Controllers\AdminPpdbController::class, 'updateBanner'])->name('banners.update');
         Route::patch('/banners/{banner}/toggle', [\App\Http\Controllers\AdminPpdbController::class, 'toggleBanner'])->name('banners.toggle');
         Route::delete('/banners/{banner}', [\App\Http\Controllers\AdminPpdbController::class, 'destroyBanner'])->name('banners.destroy');
     });

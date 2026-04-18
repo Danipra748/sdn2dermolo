@@ -29,6 +29,12 @@ class AdminPpdbController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'form_url' => 'required|url',
+        ], [
+            'start_date.required' => 'Tanggal mulai pendaftaran wajib diisi.',
+            'end_date.required' => 'Tanggal selesai pendaftaran wajib diisi.',
+            'end_date.after' => 'Tanggal selesai harus setelah tanggal mulai.',
+            'form_url.required' => 'Link Google Form wajib diisi.',
+            'form_url.url' => 'Format Link Google Form tidak valid (harus diawali http:// atau https://).',
         ]);
 
         $settings = PpdbSetting::getInstance();
@@ -60,6 +66,36 @@ class AdminPpdbController extends Controller
         }
 
         return redirect()->back()->with('success', 'Banner PPDB berhasil ditambahkan.');
+    }
+
+    /**
+     * Update an existing banner.
+     */
+    public function updateBanner(Request $request, PpdbBanner $banner)
+    {
+        $validated = $request->validate([
+            'title' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'order' => 'integer',
+        ]);
+
+        $data = [
+            'title' => $validated['title'],
+            'order' => $validated['order'] ?? 0,
+        ];
+
+        if ($request->hasFile('image')) {
+            // Delete old image
+            if ($banner->image_path) {
+                Storage::disk('public')->delete($banner->image_path);
+            }
+            // Store new image
+            $data['image_path'] = $request->file('image')->store('ppdb/banners', 'public');
+        }
+
+        $banner->update($data);
+
+        return redirect()->back()->with('success', 'Banner PPDB berhasil diperbarui.');
     }
 
     /**

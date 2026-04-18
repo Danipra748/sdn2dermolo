@@ -1402,7 +1402,10 @@
         };
 
         const goToSlide = (index) => {
-            if (index === currentSlide) {
+            // Lightweight infinite loop logic
+            const targetIndex = (index + slides.length) % slides.length;
+
+            if (targetIndex === currentSlide) {
                 return;
             }
 
@@ -1410,18 +1413,16 @@
             slides[currentSlide].style.zIndex = '1';
             slides[currentSlide].setAttribute('aria-hidden', 'true');
 
-            currentSlide = index;
+            slides[targetIndex].style.opacity = '1';
+            slides[targetIndex].style.zIndex = '10';
+            slides[targetIndex].setAttribute('aria-hidden', 'false');
 
-            slides[currentSlide].style.opacity = '1';
-            slides[currentSlide].style.zIndex = '10';
-            slides[currentSlide].setAttribute('aria-hidden', 'false');
-            
+            currentSlide = targetIndex;
+
             // Update hero text with animation
             updateHeroText(currentSlide);
-            
             updateDots(currentSlide);
         };
-
         const stopAutoplay = () => {
             if (autoplayId !== null) {
                 window.clearInterval(autoplayId);
@@ -1433,9 +1434,9 @@
             stopAutoplay();
             if (slides.length > 1) {
                 autoplayId = window.setInterval(() => {
-                    goToSlide((currentSlide + 1) % slides.length);
+                    goToSlide(currentSlide + 1);
                 }, interval);
-                console.log('[SPA] Hero Slideshow Autoplay started');
+                console.log('[SPA] Hero Slideshow: Infinite loop active');
             }
         };
 

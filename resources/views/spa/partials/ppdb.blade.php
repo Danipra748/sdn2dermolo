@@ -90,24 +90,44 @@
 </style>
 
 {{-- ═══════════════════════════════════════════
-     HERO SECTION
+     HERO SECTION WITH INFINITE LOOP
 ══════════════════════════════════════════════ --}}
 <section class="relative overflow-hidden text-white"
-         style="padding-top:80px;background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 50%,#0ea5e9 100%)">
-    <div class="mx-auto max-w-[1200px] px-5 sm:px-8 py-12 md:py-20 text-center relative z-10">
-        <div class="reveal inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold tracking-wide text-white backdrop-blur-md">
+         style="padding-top:80px; min-height: 480px;">
+    
+    {{-- Background Slideshow --}}
+    <div class="absolute inset-0 z-0">
+        @if($banners->count() > 0)
+            @foreach($banners as $index => $banner)
+                <div class="ppdb-hero-bg absolute inset-0 transition-opacity duration-[2000ms] ease-in-out {{ $index === 0 ? 'opacity-100' : 'opacity-0' }}"
+                     data-index="{{ $index }}">
+                    <img src="{{ asset('storage/' . $banner->image_path) }}" 
+                         class="w-full h-full object-cover" 
+                         alt="Background {{ $index }}"
+                         loading="{{ $index === 0 ? 'eager' : 'lazy' }}">
+                    <div class="absolute inset-0 bg-blue-950/70 backdrop-blur-[1px]"></div>
+                </div>
+            @endforeach
+        @else
+            <div class="absolute inset-0 bg-gradient-to-br from-[#1e3a8a] via-[#1e40af] to-[#0ea5e9]"></div>
+        @endif
+    </div>
+
+    <div class="mx-auto max-w-[1200px] px-5 sm:px-8 py-16 md:py-24 text-center relative z-10 h-full flex flex-col justify-center items-center">
+        <div class="reveal inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold tracking-wide text-white backdrop-blur-md shadow-2xl">
             <x-heroicon-o-sparkles class="h-4 w-4 text-amber-400 flex-shrink-0" />
             PPDB ONLINE SDN 2 DERMOLO
         </div>
-        <h1 class="reveal reveal-delay-1 mt-6 font-display text-[clamp(2rem,6vw,4.5rem)] font-black leading-[1.1] tracking-tight text-white">
+        <h1 class="reveal reveal-delay-1 mt-8 font-display text-[clamp(2.4rem,6vw,4.5rem)] font-black leading-[1.05] tracking-tight text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
             Penerimaan Peserta <br class="hidden sm:block"> Didik Baru
         </h1>
-        <p class="reveal reveal-delay-2 mt-5 text-center max-w-[680px] mx-auto text-[clamp(.95rem,1.8vw,1.15rem)] leading-[1.75] text-white/90 px-2">
+        <p class="reveal reveal-delay-2 mt-6 text-center max-w-[700px] mx-auto text-[clamp(1.05rem,2vw,1.25rem)] leading-[1.8] text-white/95 px-2 drop-shadow-md font-medium">
             Selamat datang di layanan pendaftaran mandiri calon siswa baru. Mari bergabung bersama keluarga besar SD N 2 Dermolo.
         </p>
     </div>
-    <div class="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
-    <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-sky-400/20 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+    
+    <div class="absolute -top-24 -right-24 w-96 h-96 bg-white/5 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
+    <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-sky-400/10 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
 </section>
 
 {{-- ═══════════════════════════════════════════
@@ -343,7 +363,22 @@
         <div class="ppdb-open-grid items-center">
 
             {{-- ── Left: CTA ───────────── --}}
-            <div class="reveal">
+            <div class="reveal relative">
+                
+                {{-- Floating mascot character for Open State (Always visible) --}}
+                <div class="absolute -top-32 -left-12 w-40 h-40 opacity-20 pointer-events-none hidden md:block animate-float-kid">
+                    <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="100" cy="100" r="80" fill="#3b82f6" fill-opacity="0.1" />
+                        <rect x="70" y="120" width="60" height="50" rx="25" fill="#3b82f6" />
+                        <circle cx="100" cy="85" r="35" fill="#FFD2A8" />
+                        <path d="M70 85C70 65 83 50 100 45C117 50 130 65 130 85H70Z" fill="#1E3A8A" />
+                        <g class="ppdb-kid-eyes">
+                            <circle cx="90" cy="85" r="3" fill="#000" />
+                            <circle cx="110" cy="85" r="3" fill="#000" />
+                        </g>
+                        <path d="M92 100 Q100 106 108 100" stroke="#c47a4a" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    </svg>
+                </div>
 
                 @if($status === 'closing_soon')
                     <div class="mb-6 sm:mb-8 p-4 sm:p-5 bg-red-50 border-l-4 border-red-500 rounded-xl flex items-start sm:items-center gap-3 text-red-700 shadow-sm animate-pulse">
@@ -576,20 +611,79 @@
     @endif
 
     </div>
-</section>
+    </section>
 
+    {{-- ═══════════════════════════════════════════
+    BANNER & POSTER SECTION
+    ══════════════════════════════════════════════ --}}
+    @if($banners->count() > 0)
+    <section class="py-20 px-6 bg-white border-t border-slate-100">
+    <div class="max-w-[1200px] mx-auto">
+    <div class="text-center mb-16 reveal">
+        <span class="px-4 py-1.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-black tracking-[0.2em] uppercase">Informasi Visual</span>
+        <h2 class="text-3xl md:text-4xl font-black text-slate-900 mt-4 tracking-tight">Poster & Pengumuman</h2>
+        <p class="text-slate-500 mt-4 max-w-2xl mx-auto">Informasi lengkap mengenai alur, persyaratan, dan jadwal PPDB SDN 2 Dermolo dalam bentuk poster resmi.</p>
+    </div>
 
-<script>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+        @foreach($banners as $index => $banner)
+            <div class="reveal reveal-delay-{{ ($index % 3) + 1 }} group">
+                <div class="relative rounded-[2.5rem] overflow-hidden shadow-2xl border-[12px] border-white bg-slate-50 transition-all duration-500 hover:scale-[1.02] hover:shadow-blue-200/50">
+                    <img src="{{ asset('storage/' . $banner->image_path) }}" 
+                         class="w-full h-auto object-cover" 
+                         alt="{{ $banner->title ?? 'Poster PPDB' }}"
+                         loading="lazy">
+
+                    @if($banner->title)
+                        <div class="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 via-black/20 to-transparent text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <h3 class="font-bold text-xl">{{ $banner->title }}</h3>
+                        </div>
+                    @endif
+
+                    {{-- Zoom Icon Overlay --}}
+                    <div class="absolute inset-0 bg-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <div class="w-16 h-16 rounded-full bg-white text-blue-600 flex items-center justify-center shadow-xl transform scale-50 group-hover:scale-100 transition-transform duration-500">
+                            <x-heroicon-o-magnifying-glass-plus class="w-8 h-8" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+    </div>
+    </section>
+    @endif
+
+    <script>
+
 /* ── Countdown Timer ─────────────────────────── */
 (function(){
     const el = document.getElementById('ppdb-countdown');
     if(!el) return;
-    const until = new Date(el.dataset.until);
+    const untilStr = el.dataset.until;
+    if(!untilStr) return;
+    const until = new Date(untilStr).getTime();
     const ids = { d:'cd-d', h:'cd-h', m:'cd-m', s:'cd-s' };
     function pad(n){ return String(n).padStart(2,'0'); }
     function tick(){
-        const diff = until - Date.now();
-        if(diff <= 0){ clearInterval(timer); return; }
+        const now = Date.now();
+        const diff = until - now;
+        if(diff <= 0){
+            for(const k in ids) {
+                const e = document.getElementById(ids[k]);
+                if(e) e.textContent = '00';
+            }
+            // Auto refresh when countdown ends to update page state
+            clearInterval(timer);
+            setTimeout(() => {
+                if (window.loadSPAContent) {
+                    window.loadSPAContent('/spa/ppdb', 'PPDB Online - SD N 2 Dermolo', true);
+                } else {
+                    window.location.reload();
+                }
+            }, 1000);
+            return;
+        }
         const d = Math.floor(diff/86400000),
               h = Math.floor((diff%86400000)/3600000),
               m = Math.floor((diff%3600000)/60000),
@@ -605,7 +699,7 @@
 })();
 
 /* ── Balloon Pop ─────────────────────────────── */
-function ppdbPopBalloon(el, color){
+window.ppdbPopBalloon = function(el, color){
     const layer = document.getElementById('ppdb-confetti-layer');
     if(!layer || el.dataset.popped) return;
     el.dataset.popped = '1';
@@ -639,7 +733,7 @@ function ppdbPopBalloon(el, color){
     txt.style.cssText = '--cx:0px;--cy:-32px;animation:confetti-burst .65s ease-out forwards';
     layer.appendChild(txt);
     setTimeout(()=>txt.remove(), 700);
-}
+};
 
 /* ── Banner Carousel ─────────────────────────── */
 (function(){
@@ -648,13 +742,32 @@ function ppdbPopBalloon(el, color){
     if(banners.length <= 1) return;
     let cur = 0;
     function go(idx){
+        if(!banners[cur] || !banners[idx]) return;
         banners[cur].classList.replace('opacity-100','opacity-0');
-        dots[cur].classList.remove('bg-white','w-8'); dots[cur].classList.add('w-2.5');
+        if(dots[cur]) {
+            dots[cur].classList.remove('bg-white','w-8'); 
+            dots[cur].classList.add('w-2.5');
+        }
         cur = idx;
         banners[cur].classList.replace('opacity-0','opacity-100');
-        dots[cur].classList.remove('w-2.5'); dots[cur].classList.add('bg-white','w-8');
+        if(dots[cur]) {
+            dots[cur].classList.remove('w-2.5'); 
+            dots[cur].classList.add('bg-white','w-8');
+        }
     }
     dots.forEach((d,i)=>d.addEventListener('click',()=>go(i)));
-    setInterval(()=>go((cur+1)%banners.length), 4500);
+    const timer = setInterval(()=>go((cur+1)%banners.length), 4500);
+})();
+
+/* ── Hero Background Loop ────────────────────── */
+(function(){
+    const bgs = document.querySelectorAll('.ppdb-hero-bg');
+    if(bgs.length <= 1) return;
+    let cur = 0;
+    setInterval(() => {
+        bgs[cur].classList.replace('opacity-100', 'opacity-0');
+        cur = (cur + 1) % bgs.length;
+        bgs[cur].classList.replace('opacity-0', 'opacity-100');
+    }, 6000);
 })();
 </script>
