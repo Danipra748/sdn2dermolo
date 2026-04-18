@@ -241,6 +241,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::prefix('ppdb')->name('ppdb.')->group(function () {
         Route::get('/', [AdminPpdbController::class, 'index'])->name('index');
         Route::post('/settings', [AdminPpdbController::class, 'updateSettings'])->name('settings.update');
+        Route::put('/settings', [AdminPpdbController::class, 'updateSettings'])->name('settings.update');
         Route::get('/banners/create', [AdminPpdbController::class, 'createBanner'])->name('banners.create');
         Route::post('/banners', [AdminPpdbController::class, 'storeBanner'])->name('banners.store');
         Route::get('/banners/{banner}/edit', [AdminPpdbController::class, 'editBanner'])->name('banners.edit');
