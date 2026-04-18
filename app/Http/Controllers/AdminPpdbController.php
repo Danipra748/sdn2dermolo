@@ -2,26 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PpdbBanner;
 use App\Models\PpdbSetting;
+use App\Models\PpdbBanner;
+use App\Services\Modules\PpdbService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class AdminPpdbController extends Controller
 {
+    protected $ppdbService;
+
+    public function __construct(PpdbService $ppdbService)
+    {
+        $this->ppdbService = $ppdbService;
+    }
+
     /**
-     * Display PPDB settings and banners.
+     * Display PPDB management page.
      */
     public function index()
     {
         $settings = PpdbSetting::getInstance();
+        $status = $this->ppdbService->getStatus();
         $banners = PpdbBanner::orderBy('order')->get();
 
-        return view('admin.ppdb.index', compact('settings', 'banners'));
+        return view('admin.ppdb.index', compact('settings', 'status', 'banners'));
     }
 
     /**
-     * Update PPDB settings.
+     * Update PPDB schedule and link.
      */
     public function updateSettings(Request $request)
     {
@@ -37,8 +45,7 @@ class AdminPpdbController extends Controller
             'form_url.url' => 'Format Link Google Form tidak valid (harus diawali http:// atau https://).',
         ]);
 
-        $settings = PpdbSetting::getInstance();
-        $settings->update($validated);
+        $this->ppdbService->updateSettings($validated);
 
         return redirect()->back()->with('success', 'Pengaturan PPDB berhasil diperbarui.');
     }
@@ -48,22 +55,13 @@ class AdminPpdbController extends Controller
      */
     public function storeBanner(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'title' => 'nullable|string|max:255',
             'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
             'order' => 'integer',
         ]);
 
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('ppdb/banners', 'public');
-            
-            PpdbBanner::create([
-                'title' => $validated['title'],
-                'image_path' => $path,
-                'order' => $validated['order'] ?? 0,
-                'is_active' => true,
-            ]);
-        }
+        $this->ppdbService->storeBanner($request);
 
         return redirect()->back()->with('success', 'Banner PPDB berhasil ditambahkan.');
     }
@@ -73,27 +71,13 @@ class AdminPpdbController extends Controller
      */
     public function updateBanner(Request $request, PpdbBanner $banner)
     {
-        $validated = $request->validate([
+        $request->validate([
             'title' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'order' => 'integer',
         ]);
 
-        $data = [
-            'title' => $validated['title'],
-            'order' => $validated['order'] ?? 0,
-        ];
-
-        if ($request->hasFile('image')) {
-            // Delete old image
-            if ($banner->image_path) {
-                Storage::disk('public')->delete($banner->image_path);
-            }
-            // Store new image
-            $data['image_path'] = $request->file('image')->store('ppdb/banners', 'public');
-        }
-
-        $banner->update($data);
+        $this->ppdbService->updateBanner($request, $banner);
 
         return redirect()->back()->with('success', 'Banner PPDB berhasil diperbarui.');
     }
@@ -104,7 +88,11 @@ class AdminPpdbController extends Controller
     public function toggleBanner(PpdbBanner $banner)
     {
         $banner->update(['is_active' => !$banner->is_active]);
-        return response()->json(['success' => true, 'is_active' => $banner->is_active]);
+
+        return response()->json([
+            'success' => true,
+            'is_active' => $banner->is_active
+        ]);
     }
 
     /**
@@ -112,11 +100,7 @@ class AdminPpdbController extends Controller
      */
     public function destroyBanner(PpdbBanner $banner)
     {
-        if ($banner->image_path) {
-            Storage::disk('public')->delete($banner->image_path);
-        }
-        
-        $banner->delete();
+        $this->ppdbService->deleteBanner($banner);
 
         return redirect()->back()->with('success', 'Banner PPDB berhasil dihapus.');
     }

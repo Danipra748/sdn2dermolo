@@ -3,11 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\HeroSlide;
+use App\Services\Modules\HeroSlideService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class AdminHeroSlideController extends Controller
 {
+    protected $heroSlideService;
+
+    public function __construct(HeroSlideService $heroSlideService)
+    {
+        $this->heroSlideService = $heroSlideService;
+    }
+
     /**
      * Display hero slides management page
      */
@@ -30,29 +38,11 @@ class AdminHeroSlideController extends Controller
         ]);
 
         try {
-            $maxOrder = HeroSlide::getMaxOrder();
-
-            // Upload image first to get the path
-            $imagePath = $request->file('image')->store('hero-slides', 'public');
-
-            // Create slide with image path
-            HeroSlide::create([
-                'image_path' => $imagePath,
-                'title' => $validated['title'] ?? null,
-                'subtitle' => $validated['subtitle'] ?? null,
-                'description' => $validated['description'] ?? null,
-                'display_order' => $maxOrder + 1,
-                'is_active' => true,
-            ]);
-
+            $this->heroSlideService->store($validated, $request);
             return back()->with('success', 'Slide baru berhasil ditambahkan.');
         } catch (\Exception $e) {
-            \Log::error('Hero slide upload failed: ' . $e->getMessage(), [
-                'file' => $request->file('image')->getClientOriginalName(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            return back()->with('error', 'Gagal mengunggah slide. Silakan coba lagi.');
+            Log::error('Hero slide upload failed: ' . $e->getMessage());
+            return back()->with('error', 'Gagal mengunggah slide.');
         }
     }
 
@@ -69,20 +59,13 @@ class AdminHeroSlideController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        // Upload new image if provided
-        if ($request->hasFile('image')) {
-            $heroSlide->uploadImage($request->file('image'));
+        try {
+            $this->heroSlideService->update($heroSlide, $validated, $request);
+            return back()->with('success', 'Slide berhasil diperbarui.');
+        } catch (\Exception $e) {
+            Log::error('Hero slide update failed: ' . $e->getMessage());
+            return back()->with('error', 'Gagal memperbarui slide.');
         }
-
-        // Update other fields
-        $heroSlide->update([
-            'title' => $validated['title'] ?? null,
-            'subtitle' => $validated['subtitle'] ?? null,
-            'description' => $validated['description'] ?? null,
-            'is_active' => $request->boolean('is_active', true),
-        ]);
-
-        return back()->with('success', 'Slide berhasil diperbarui.');
     }
 
     /**
@@ -90,7 +73,7 @@ class AdminHeroSlideController extends Controller
      */
     public function destroy(HeroSlide $heroSlide)
     {
-        $heroSlide->deleteWithImage();
+        $this->heroSlideService->delete($heroSlide);
         return back()->with('success', 'Slide berhasil dihapus.');
     }
 

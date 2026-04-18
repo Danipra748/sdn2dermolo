@@ -3,15 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Guru;
+use App\Services\Modules\GuruService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class GuruController extends Controller
 {
+    protected $guruService;
+
+    public function __construct(GuruService $guruService)
+    {
+        $this->guruService = $guruService;
+    }
+
     public function index()
     {
         $guru = Guru::orderBy('no')->get();
-
         return view('admin.guru.index', compact('guru'));
     }
 
@@ -28,10 +34,7 @@ class GuruController extends Controller
     public function store(Request $request)
     {
         $data = $this->validateGuru($request);
-        if ($request->hasFile('photo')) {
-            $data['photo'] = $request->file('photo')->store('guru', 'public');
-        }
-        Guru::create($data);
+        $this->guruService->store($data, $request);
 
         return redirect()->route('admin.guru.index')->with('status', 'Data guru berhasil ditambahkan.');
     }
@@ -49,29 +52,14 @@ class GuruController extends Controller
     public function update(Request $request, Guru $guru)
     {
         $data = $this->validateGuru($request);
-        if ($request->boolean('remove_photo') && $guru->photo) {
-            Storage::disk('public')->delete($guru->photo);
-            $data['photo'] = null;
-        }
-
-        if ($request->hasFile('photo')) {
-            if ($guru->photo) {
-                Storage::disk('public')->delete($guru->photo);
-            }
-            $data['photo'] = $request->file('photo')->store('guru', 'public');
-        }
-        $guru->update($data);
+        $this->guruService->update($guru, $data, $request);
 
         return redirect()->route('admin.guru.index')->with('status', 'Data guru berhasil diperbarui.');
     }
 
     public function destroy(Guru $guru)
     {
-        if ($guru->photo) {
-            Storage::disk('public')->delete($guru->photo);
-        }
-        $guru->delete();
-
+        $this->guruService->delete($guru);
         return redirect()->route('admin.guru.index')->with('status', 'Data guru berhasil dihapus.');
     }
 

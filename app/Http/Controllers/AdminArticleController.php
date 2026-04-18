@@ -4,14 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Article;
 use App\Models\Category;
+use App\Services\Modules\ArticleService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class AdminArticleController extends Controller
 {
+    protected $articleService;
+
+    public function __construct(ArticleService $articleService)
+    {
+        $this->articleService = $articleService;
+    }
+
     public function index(Request $request)
     {
         if (!Schema::hasTable('articles')) {
@@ -41,11 +46,6 @@ class AdminArticleController extends Controller
 
     public function create()
     {
-        if (!Schema::hasTable('articles')) {
-            return redirect()->route('admin.dashboard')
-                ->with('status', 'Tabel artikel belum tersedia. Jalankan migrasi terlebih dahulu.');
-        }
-
         $article = new Article(['status' => 'draft', 'type' => 'artikel']);
         $categories = Schema::hasTable('categories') ? Category::orderBy('name')->get() : collect();
 
@@ -59,29 +59,8 @@ class AdminArticleController extends Controller
 
     public function store(Request $request)
     {
-        if (!Schema::hasTable('articles')) {
-            return redirect()->route('admin.dashboard')
-                ->with('status', 'Tabel artikel belum tersedia. Jalankan migrasi terlebih dahulu.');
-        }
-
         $data = $this->validateArticle($request);
-        $data['author_id'] = $request->user()->id;
-
-        if (empty($data['slug'])) {
-            $data['slug'] = $this->uniqueSlug($data['title']);
-        } else {
-            $data['slug'] = $this->uniqueSlug($data['slug']);
-        }
-
-        if ($request->hasFile('featured_image')) {
-            $data['featured_image'] = $request->file('featured_image')->store('articles', 'public');
-        }
-
-        if ($data['status'] === 'published' && empty($data['published_at'])) {
-            $data['published_at'] = now();
-        }
-
-        Article::create($data);
+        $this->articleService->store($data, $request);
 
         return redirect()->route('admin.articles.index')->with('status', 'Artikel berhasil dibuat.');
     }
@@ -100,52 +79,15 @@ class AdminArticleController extends Controller
 
     public function update(Request $request, Article $article)
     {
-        if (!Schema::hasTable('articles')) {
-            return redirect()->route('admin.dashboard')
-                ->with('status', 'Tabel artikel belum tersedia. Jalankan migrasi terlebih dahulu.');
-        }
-
         $data = $this->validateArticle($request, $article->id);
-
-        if (empty($data['slug'])) {
-            $data['slug'] = $this->uniqueSlug($data['title'], $article->id);
-        } else {
-            $data['slug'] = $this->uniqueSlug($data['slug'], $article->id);
-        }
-
-        if ($request->hasFile('featured_image')) {
-            if ($article->featured_image) {
-                Storage::disk('public')->delete($article->featured_image);
-            }
-            $data['featured_image'] = $request->file('featured_image')->store('articles', 'public');
-        }
-
-        if ($data['status'] === 'published' && empty($data['published_at'])) {
-            $data['published_at'] = now();
-        }
-
-        if ($data['status'] === 'draft') {
-            $data['published_at'] = null;
-        }
-
-        $article->update($data);
+        $this->articleService->update($article, $data, $request);
 
         return redirect()->route('admin.articles.index')->with('status', 'Artikel berhasil diperbarui.');
     }
 
     public function destroy(Article $article)
     {
-        if (!Schema::hasTable('articles')) {
-            return redirect()->route('admin.dashboard')
-                ->with('status', 'Tabel artikel belum tersedia. Jalankan migrasi terlebih dahulu.');
-        }
-
-        if ($article->featured_image) {
-            Storage::disk('public')->delete($article->featured_image);
-        }
-
-        $article->delete();
-
+        $this->articleService->delete($article);
         return redirect()->route('admin.articles.index')->with('status', 'Artikel berhasil dihapus.');
     }
 
@@ -155,47 +97,11 @@ class AdminArticleController extends Controller
             'topic' => ['required', 'string', 'max:160'],
         ]);
 
-        $apiKey = config('services.openai.key');
-        $model = config('services.openai.model', 'gpt-4.1-mini');
+        $data = $this->articleService->generateAiDraft($request->input('topic'));
 
-        if (empty($apiKey)) {
+        if (!$data) {
             return response()->json([
-                'message' => 'OPENAI_API_KEY belum diatur. Tambahkan ke .env untuk menggunakan AI.',
-            ], 422);
-        }
-
-        $prompt = trim($request->input('topic'));
-
-        $response = Http::withToken($apiKey)
-            ->timeout(40)
-            ->post('https://api.openai.com/v1/chat/completions', [
-                'model' => $model,
-                'temperature' => 0.6,
-                'messages' => [
-                    [
-                        'role' => 'system',
-                        'content' => 'You are a helpful assistant that drafts Indonesian news articles for a school website. Return a JSON object with: title, subtitle, summary, content_html (HTML with H2/H3 headings and paragraphs).',
-                    ],
-                    [
-                        'role' => 'user',
-                        'content' => "Topik atau kata kunci: {$prompt}",
-                    ],
-                ],
-            ]);
-
-        if (!$response->successful()) {
-            return response()->json([
-                'message' => 'Gagal menghasilkan draft. Silakan coba lagi.',
-            ], 500);
-        }
-
-        $payload = $response->json();
-        $text = data_get($payload, 'choices.0.message.content', '');
-
-        $data = json_decode($text, true);
-        if (!is_array($data)) {
-            return response()->json([
-                'message' => 'Format respons AI tidak valid. Silakan coba lagi.',
+                'message' => 'Gagal menghasilkan draft. Pastikan API KEY sudah benar.',
             ], 422);
         }
 
@@ -224,21 +130,4 @@ class AdminArticleController extends Controller
             'published_at' => ['nullable', 'date'],
         ]);
     }
-
-    protected function uniqueSlug(string $value, ?int $articleId = null): string
-    {
-        $base = Str::slug($value) ?: 'artikel';
-        $slug = $base;
-        $counter = 1;
-
-        while (Article::where('slug', $slug)
-            ->when($articleId, fn ($q) => $q->where('id', '!=', $articleId))
-            ->exists()) {
-            $slug = $base . '-' . $counter;
-            $counter++;
-        }
-
-        return $slug;
-    }
-
 }
