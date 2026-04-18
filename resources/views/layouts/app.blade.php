@@ -293,8 +293,13 @@
                 <a href="{{ route('news.index') }}" data-spa="/spa/berita" data-spa-title="Berita - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('news.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Berita</a>
                 <a href="{{ route('prestasi.index') }}" data-spa="/spa/prestasi" data-spa-title="Prestasi - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('prestasi.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Prestasi</a>
                 <a href="{{ route('gallery.index') }}" data-spa="/spa/gallery" data-spa-title="Galeri - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('gallery.*') ? 'bg-emerald-50 text-blue-600' : '' }}">Galeri</a>
-                <a href="{{ route('ppdb') }}" data-spa="/spa/ppdb" data-spa-title="PPDB - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('ppdb*') ? 'bg-emerald-50 text-blue-600' : '' }}">PPDB</a>
                 <a href="{{ route('contact') }}" data-spa="/spa/contact" data-spa-title="Kontak - SD N 2 Dermolo" class="rounded-full px-3 py-2 text-sm transition hover:bg-blue-50 hover:text-blue-600 {{ request()->routeIs('contact') ? 'bg-emerald-50 text-blue-600' : '' }}">Kontak</a>
+
+                {{-- Prominent PPDB Button --}}
+                <a href="{{ route('ppdb') }}" data-spa="/spa/ppdb" data-spa-title="PPDB - SD N 2 Dermolo" 
+                   class="ml-2 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-amber-500/30 transition-all hover:scale-105 hover:shadow-amber-500/50 active:scale-95">
+                    Info PPDB
+                </a>
             </div>
 
             {{-- Tombol Hamburger (Mobile) --}}
@@ -320,8 +325,11 @@
             <a href="{{ route('news.index') }}" data-spa="/spa/berita" data-spa-title="Berita - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('news.*') ? 'text-blue-600' : '' }}">Berita</a>
             <a href="{{ route('prestasi.index') }}" data-spa="/spa/prestasi" data-spa-title="Prestasi - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('prestasi.*') ? 'text-blue-600' : '' }}">Prestasi</a>
             <a href="{{ route('gallery.index') }}" data-spa="/spa/gallery" data-spa-title="Galeri - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('gallery.*') ? 'text-blue-600' : '' }}">Galeri</a>
-            <a href="{{ route('ppdb') }}" data-spa="/spa/ppdb" data-spa-title="PPDB - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('ppdb*') ? 'text-blue-600' : '' }}">PPDB</a>
             <a href="{{ route('contact') }}" data-spa="/spa/contact" data-spa-title="Kontak - SD N 2 Dermolo" class="block py-2 font-semibold text-slate-600 {{ request()->routeIs('contact') ? 'text-blue-600' : '' }}">Kontak</a>
+            
+            <div class="pt-2 pb-1 border-t border-slate-100 mt-2">
+                <a href="{{ route('ppdb') }}" data-spa="/spa/ppdb" data-spa-title="PPDB - SD N 2 Dermolo" class="block w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-white text-sm font-bold text-center shadow-md">Info PPDB</a>
+            </div>
             
             {{-- Mobile Admin Actions --}}
             @auth
