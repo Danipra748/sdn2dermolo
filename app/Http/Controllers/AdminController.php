@@ -67,7 +67,7 @@ class AdminController extends Controller
             $date = Carbon::now()->subDays($i);
             $days->push($date->format('D'));
             
-            $count = ArticleView::whereDate('viewed_at', $date->toDateString())->count();
+            $count = ArticleView::whereDate('created_at', $date->toDateString())->count();
             $views->push($count);
         }
 
