@@ -178,7 +178,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Hero Slides Management (Multi-Slide System)
     Route::prefix('hero-slides')->name('hero-slides.')->group(function () {
         Route::get('/', [AdminHeroSlideController::class, 'index'])->name('index');
+        Route::get('/create', [AdminHeroSlideController::class, 'create'])->name('create');
         Route::post('/', [AdminHeroSlideController::class, 'store'])->name('store');
+        Route::get('/{heroSlide}/edit', [AdminHeroSlideController::class, 'edit'])->name('edit');
         Route::put('/{heroSlide}', [AdminHeroSlideController::class, 'update'])->name('update');
         Route::delete('/{heroSlide}', [AdminHeroSlideController::class, 'destroy'])->name('destroy');
         Route::post('/reorder', [AdminHeroSlideController::class, 'reorder'])->name('reorder');
