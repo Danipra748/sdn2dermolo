@@ -121,6 +121,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Custom routes for file handling etc. if still needed
     Route::put('program-sekolah/{programSekolah}/hero-background', [AdminProgramController::class, 'updateHeroBackground'])
         ->name('program-sekolah.hero-background.update');
+    Route::get('program-sekolah/{programSekolah}/highlights/edit', [AdminProgramController::class, 'editHighlights'])
+        ->name('program-sekolah.highlights.edit');
+    Route::put('program-sekolah/{programSekolah}/highlights', [AdminProgramController::class, 'updateHighlights'])
+        ->name('program-sekolah.highlights.update');
 
     Route::get('program-sekolah/{programSekolah}/photos', [AdminProgramPhotoController::class, 'index'])
         ->name('program-sekolah.photos.index');
