@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
 @php
-    $isEdit = isset($banner);
+    $isEdit = isset($banner) && $banner->id;
     $title = $isEdit ? 'Edit Banner' : 'Tambah Banner';
 @endphp
 

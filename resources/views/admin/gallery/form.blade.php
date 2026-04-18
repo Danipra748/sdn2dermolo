@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
 @php
-    $isEdit = isset($gallery);
+    $isEdit = isset($gallery) && $gallery->id;
     $title = $isEdit ? 'Edit Foto Galeri' : 'Upload Foto Baru';
 @endphp
 

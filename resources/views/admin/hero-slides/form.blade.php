@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
 @php
-    $isEdit = isset($slide);
+    $isEdit = isset($slide) && $slide->id;
     $title = $isEdit ? 'Edit Slide' : 'Tambah Slide Baru';
 @endphp
 

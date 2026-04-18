@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
 @php
-    $isEdit = isset($program);
+    $isEdit = isset($program) && $program->id;
     $title = $isEdit ? 'Edit Program' : 'Tambah Program';
 @endphp
 
