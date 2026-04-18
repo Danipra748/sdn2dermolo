@@ -76,7 +76,7 @@ Route::prefix('program')->name('program.')->group(function () {
 Route::get('/prestasi', [PrestasiController::class, 'index'])->name('prestasi.index');
 
 // ── FASILITAS ──
-Route::get('/fasilitas', [PageController::class, 'fasilitasIndex'])->name('fasilitas.index');
+Route::get('/fasilitas', [PageController::class, 'fasilitasIndex'])->name('public.fasilitas.index');
 
 // ── GALLERY ──
 Route::get('/galeri', [GalleryController::class, 'index'])->name('gallery.index');

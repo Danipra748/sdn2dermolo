@@ -52,7 +52,7 @@ class SpaController extends Controller
             'spa.partials.sarana-prasarana',
             compact('fasilitas'),
             'Sarana & Prasarana - SD N 2 Dermolo',
-            route('fasilitas.index')
+            route('public.fasilitas.index')
         );
     }
 
