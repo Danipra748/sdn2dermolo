@@ -19,15 +19,16 @@
                     Jadwal & Link PPDB
                 </h2>
                 
-                <form action="{{ route('admin.ppdb.settings.update') }}" method="POST">
+                <form action="{{ route('admin.ppdb.settings.update') }}" method="POST" id="ppdb-settings-form" 
+                      data-ppdb-start="{{ $settings->start_date ? $settings->start_date->toIso8601String() : '' }}"
+                      data-ppdb-end="{{ $settings->end_date ? $settings->end_date->toIso8601String() : '' }}">
                     @csrf
                     <div class="space-y-4">
-                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
-                            <span class="text-sm font-medium text-slate-700">Modul PPDB Aktif</span>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" name="is_active" value="1" class="sr-only peer" {{ $settings->is_active ? 'checked' : '' }}>
-                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                            </label>
+                        <div class="p-3 bg-blue-50 border border-blue-100 rounded-xl">
+                            <p class="text-xs text-blue-600 font-medium leading-relaxed">
+                                <svg class="w-3 h-3 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                Status pendaftaran akan berubah secara otomatis berdasarkan waktu yang Anda tentukan di bawah ini.
+                            </p>
                         </div>
 
                         <div>
@@ -59,21 +60,11 @@
             
             <div class="p-5 bg-blue-50 border border-blue-100 rounded-2xl">
                 <h3 class="text-sm font-bold text-blue-800 mb-2">Status Saat Ini:</h3>
-                @php $status = $settings->getStatus(); @endphp
-                <div class="flex items-center gap-2">
-                    @if($status === 'waiting')
-                        <span class="flex h-3 w-3 rounded-full bg-amber-500"></span>
-                        <span class="text-amber-700 font-bold">Belum Dimulai</span>
-                    @elseif($status === 'open')
-                        <span class="flex h-3 w-3 rounded-full bg-green-500 animate-pulse"></span>
-                        <span class="text-green-700 font-bold">Sedang Berlangsung</span>
-                    @elseif($status === 'closing_soon')
-                        <span class="flex h-3 w-3 rounded-full bg-red-500 animate-pulse"></span>
-                        <span class="text-red-700 font-bold">Hampir Selesai</span>
-                    @else
-                        <span class="flex h-3 w-3 rounded-full bg-slate-500"></span>
-                        <span class="text-slate-700 font-bold">Ditutup</span>
-                    @endif
+                <div id="ppdb-admin-status" class="flex items-center gap-2">
+                    <div class="animate-pulse flex items-center gap-2 text-slate-400 italic text-xs">
+                        <svg class="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        Menghitung status...
+                    </div>
                 </div>
             </div>
         </div>

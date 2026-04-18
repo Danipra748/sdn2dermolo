@@ -11,13 +11,11 @@ class PpdbSetting extends Model
         'start_date',
         'end_date',
         'form_url',
-        'is_active',
     ];
 
     protected $casts = [
         'start_date' => 'datetime',
         'end_date' => 'datetime',
-        'is_active' => 'boolean',
     ];
 
     /**
@@ -25,33 +23,32 @@ class PpdbSetting extends Model
      */
     public static function getInstance()
     {
-        return self::firstOrCreate(['id' => 1], [
-            'is_active' => true,
-        ]);
+        return self::firstOrCreate(['id' => 1]);
     }
 
     /**
-     * Determine the current status of PPDB.
+     * Determine the current status of PPDB based on time.
      * Returns: 'waiting', 'open', 'closing_soon', 'closed'
      */
     public function getStatus()
     {
-        if (!$this->is_active) {
+        // If dates are not set, consider it closed
+        if (!$this->start_date || !$this->end_date) {
             return 'closed';
         }
 
         $now = Carbon::now();
 
-        if ($this->start_date && $now->lt($this->start_date)) {
+        if ($now->lt($this->start_date)) {
             return 'waiting';
         }
 
-        if ($this->end_date && $now->gt($this->end_date)) {
+        if ($now->gt($this->end_date)) {
             return 'closed';
         }
 
-        // If it's within 48 hours of closing
-        if ($this->end_date && $now->diffInHours($this->end_date) <= 48) {
+        // If it's within 24 hours of closing
+        if ($now->diffInHours($this->end_date) <= 24) {
             return 'closing_soon';
         }
 

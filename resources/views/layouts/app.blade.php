@@ -331,7 +331,7 @@
                         <x-heroicon-o-cog-6-tooth class="w-4 h-4 inline mr-2" />
                         Dashboard Admin
                     </a>
-                    <form action="{{ route('logout') }}" method="POST" data-confirm="Yakin ingin logout?">
+                    <form action="{{ route('logout') }}" method="POST" data-confirm="Yakin ingin logout?" data-spa-ignore="true">
                         @csrf
                         <button type="submit" class="block w-full py-2 px-4 rounded-xl border border-red-300 text-red-600 text-sm font-semibold text-center hover:bg-red-50 transition">
                             Logout

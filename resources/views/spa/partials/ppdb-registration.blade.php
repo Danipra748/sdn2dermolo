@@ -5,21 +5,20 @@
         <h1 class="reveal font-display text-[clamp(1.5rem,4vw,2.5rem)] font-black leading-[1.15] tracking-[-0.02em] text-center text-white">
             Formulir Pendaftaran
         </h1>
-        <p class="reveal reveal-delay-1 mt-2 text-white/80 text-sm">Silakan lengkapi data calon siswa di bawah ini.</p>
+        <p class="reveal reveal-delay-1 mt-2 text-white/80 text-sm">
+            @if($status === 'closing_soon')
+                <span class="px-3 py-1 rounded-full bg-red-500 text-white font-bold text-xs animate-pulse mr-2">Hampir Selesai</span>
+            @endif
+            Pendaftaran ditutup pada {{ $settings->end_date->translatedFormat('d F Y, H:i') }} WIB
+        </p>
     </div>
 </section>
 
-<section class="bg-slate-100 min-h-screen relative">
-    {{-- Loading Overlay --}}
-    <div id="form-loader" class="absolute inset-0 z-10 flex items-center justify-center bg-slate-50 transition-opacity duration-500">
-        <div class="text-center">
-            <div class="inline-block w-12 h-12 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-            <p class="text-slate-500 font-bold animate-pulse">Menyiapkan formulir...</p>
-        </div>
-    </div>
+<section class="bg-slate-100 min-h-screen relative" id="ppdb-reg-container"
+         data-ppdb-end="{{ $settings->end_date ? $settings->end_date->toIso8601String() : '' }}">
 
     <div class="max-w-5xl mx-auto py-8 px-4">
-        <div class="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200">
+        <div class="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200" id="iframe-wrapper">
             <div class="w-full relative" style="height: 1200px;">
                 @if($settings->form_url)
                     <iframe 
@@ -30,8 +29,7 @@
                         frameborder="0" 
                         marginheight="0" 
                         marginwidth="0"
-                        class="opacity-0 transition-opacity duration-700"
-                        onload="handleIframeLoad()"
+                        class="w-full h-full"
                     >Memuat…</iframe>
                 @else
                     <div class="flex items-center justify-center h-full text-slate-400">
@@ -50,16 +48,16 @@
     </div>
 </section>
 
-<script>
-    function handleIframeLoad() {
-        const iframe = document.getElementById('ppdb-iframe');
-        const loader = document.getElementById('form-loader');
-        if (iframe && loader) {
-            iframe.classList.remove('opacity-0');
-            loader.classList.add('opacity-0');
-            setTimeout(() => {
-                loader.style.display = 'none';
-            }, 500);
-        }
-    }
-</script>
+{{-- Modal PPDB Ditutup Otomatis --}}
+<div id="ppdb-closed-modal" class="fixed inset-0 z-[110] hidden items-center justify-center p-4 bg-slate-900/90 backdrop-blur-md">
+    <div class="bg-white rounded-[2.5rem] p-8 max-w-md w-full shadow-2xl text-center">
+        <div class="w-24 h-24 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <h3 class="text-2xl font-black text-slate-900 mb-2">Waktu Habis!</h3>
+        <p class="text-slate-600 mb-8">Mohon maaf, pendaftaran PPDB SD N 2 Dermolo telah ditutup secara otomatis karena waktu pendaftaran telah berakhir.</p>
+        <a href="{{ route('ppdb') }}" data-spa="/spa/ppdb" class="block w-full py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-600/30">
+            Kembali ke Halaman PPDB
+        </a>
+    </div>
+</div>
