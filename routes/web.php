@@ -106,23 +106,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         ->except(['show'])
         ->parameters(['fasilitas' => 'fasilita']);
 
-    // Program Sekolah (hanya dokumentasi)
-    Route::get('program-sekolah', [AdminProgramController::class, 'index'])
-        ->name('program-sekolah.index');
-    Route::put('program-sekolah/hero-background', [AdminProgramController::class, 'updateHeroBackground'])
-        ->name('program-sekolah.hero-background.update');
-    Route::put('program-sekolah/{programSekolah}/card-background', [AdminProgramController::class, 'updateCardBackground'])
-        ->name('program-sekolah.card-background.update');
-    Route::put('program-sekolah/{programSekolah}/icon', [AdminProgramController::class, 'updateIcon'])
-        ->name('program-sekolah.icon.update');
+    // Program Sekolah CRUD
+    Route::resource('program-sekolah', AdminProgramController::class)
+        ->except(['show'])
+        ->parameters(['program-sekolah' => 'programSekolah']);
     
-    // Delete individual program files (set to null, don't delete row)
-    Route::delete('program-sekolah/{programSekolah}/foto', [AdminProgramController::class, 'deleteFoto'])
-        ->name('program-sekolah.foto.delete');
-    Route::delete('program-sekolah/{programSekolah}/card-bg', [AdminProgramController::class, 'deleteCardBg'])
-        ->name('program-sekolah.card-bg.delete');
-    Route::delete('program-sekolah/{programSekolah}/logo', [AdminProgramController::class, 'deleteLogo'])
-        ->name('program-sekolah.logo.delete');
+    // Custom routes for file handling etc. if still needed
+    Route::put('program-sekolah/{programSekolah}/hero-background', [AdminProgramController::class, 'updateHeroBackground'])
+        ->name('program-sekolah.hero-background.update');
 
     Route::get('program-sekolah/{programSekolah}/photos', [AdminProgramPhotoController::class, 'index'])
         ->name('program-sekolah.photos.index');

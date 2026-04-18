@@ -81,4 +81,8 @@
             </tr>
         @endforelse
     </x-admin.data-table>
+
+    <div class="mt-8">
+        {{ $programs->links() }}
+    </div>
 @endsection

@@ -23,7 +23,7 @@ class AdminGalleryController extends Controller
                 ->with('status', 'Tabel galeri belum tersedia. Jalankan: php artisan migrate');
         }
 
-        $galleries = Gallery::latest()->get();
+        $galleries = Gallery::latest()->paginate(12);
 
         return view('admin.gallery.index', compact('galleries'));
     }

@@ -23,9 +23,9 @@ class AdminProgramController extends Controller
                 ->with('status', 'Tabel program belum tersedia. Jalankan: php artisan migrate');
         }
 
-        $program = Program::orderBy('id')->get();
+        $programs = Program::orderBy('id')->paginate(10);
 
-        return view('admin.program.index', compact('program'));
+        return view('admin.program.index', compact('programs'));
     }
 
     public function create()
