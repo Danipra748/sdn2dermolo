@@ -607,8 +607,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
         @foreach($banners as $index => $banner)
-            <div class="reveal reveal-delay-{{ ($index % 3) + 1 }} group cursor-pointer" 
-                 onclick="openPosterModal('{{ asset('storage/' . $banner->image_path) }}', '{{ $banner->title ?? 'Poster PPDB' }}')">
+            <div class="reveal reveal-delay-{{ ($index % 3) + 1 }} group">
                 <div class="relative rounded-[2.5rem] overflow-hidden shadow-2xl border-[12px] border-white bg-slate-50 transition-all duration-500 hover:scale-[1.02] hover:shadow-blue-200/50">
                     <img src="{{ asset('storage/' . $banner->image_path) }}" 
                          class="w-full h-auto object-cover" 
@@ -620,13 +619,6 @@
                             <h3 class="font-bold text-xl">{{ $banner->title }}</h3>
                         </div>
                     @endif
-
-                    {{-- Zoom Icon Overlay --}}
-                    <div class="absolute inset-0 bg-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <div class="w-16 h-16 rounded-full bg-white text-blue-600 flex items-center justify-center shadow-xl transform scale-50 group-hover:scale-100 transition-transform duration-500">
-                            <x-heroicon-o-magnifying-glass-plus class="w-8 h-8" />
-                        </div>
-                    </div>
                 </div>
             </div>
             @endforeach
@@ -635,110 +627,7 @@
             </section>
             @endif
 
-            {{-- ═══════════════════════════════════════════
-            PREMIUM POSTER LIGHTBOX (Zoom & Download Support)
-            ══════════════════════════════════════════════ --}}
-            <div id="poster-modal" 
-            class="fixed inset-0 z-[999] hidden flex-col bg-slate-950/98 backdrop-blur-xl transition-opacity duration-300 overflow-hidden"
-            onclick="closePosterModal()">
-
-            {{-- Floating Toolbar --}}
-            <div class="fixed top-0 left-0 right-0 z-[1002] p-4 flex justify-between items-center bg-gradient-to-b from-black/60 to-transparent pointer-events-none">
-                {{-- Left: Caption --}}
-                <div id="modal-caption-container" class="hidden md:flex px-6 py-2.5 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white shadow-2xl pointer-events-auto">
-                    <span id="modal-caption" class="font-bold text-sm tracking-wide"></span>
-                </div>
-
-                {{-- Right: Tools --}}
-                <div class="flex gap-2 pointer-events-auto">
-                    {{-- Zoom Out --}}
-                    <button onclick="event.stopPropagation(); zoomPoster(-0.2)" class="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all border border-white/10" title="Perkecil">
-                        <x-heroicon-o-magnifying-glass-minus class="w-6 h-6" />
-                    </button>
-                    {{-- Reset --}}
-                    <button onclick="event.stopPropagation(); resetPosterZoom()" class="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all border border-white/10" title="Reset Ukuran">
-                        <x-heroicon-o-arrows-pointing-in class="w-6 h-6" />
-                    </button>
-                    {{-- Zoom In --}}
-                    <button onclick="event.stopPropagation(); zoomPoster(0.2)" class="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all border border-white/10" title="Perbesar">
-                        <x-heroicon-o-magnifying-glass-plus class="w-6 h-6" />
-                    </button>
-                    {{-- Download --}}
-                    <a id="modal-download" href="" download class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-all shadow-xl" title="Unduh Poster" onclick="event.stopPropagation()">
-                        <x-heroicon-o-arrow-down-tray class="w-6 h-6" />
-                    </a>
-                    {{-- Close --}}
-                    <button onclick="closePosterModal()" class="w-12 h-12 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-all shadow-xl" title="Tutup">
-                        <x-heroicon-o-x-mark class="w-6 h-6" />
-                    </button>
-                </div>
-            </div>
-
-            {{-- Scrollable Content Area --}}
-            <div id="poster-modal-scroll" class="w-full h-full overflow-auto flex items-start justify-center cursor-zoom-out p-4 md:p-20">
-                <div id="poster-modal-content" class="relative transition-transform duration-300 ease-out origin-top opacity-0 scale-95 pointer-events-none">
-                    <img id="modal-image" src="" alt="Detail Poster" 
-                         class="max-w-[90vw] md:max-w-4xl h-auto rounded-xl shadow-[0_0_100px_rgba(0,0,0,0.8)] border-4 border-white/5 pointer-events-auto"
-                         onclick="event.stopPropagation()">
-                </div>
-            </div>
-            </div>
-
             <script>
-/* ── Poster Modal ────────────────────────────── */
-let currentPosterZoom = 1.0;
-
-window.openPosterModal = function(src, title) {
-    const modal = document.getElementById('poster-modal');
-    const content = document.getElementById('poster-modal-content');
-    const img = document.getElementById('modal-image');
-    const caption = document.getElementById('modal-caption');
-    const downloadBtn = document.getElementById('modal-download');
-    const scrollArea = document.getElementById('poster-modal-scroll');
-
-    img.src = src;
-    downloadBtn.href = src;
-    caption.textContent = title || 'Poster PPDB';
-    
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    scrollArea.scrollTop = 0;
-    resetPosterZoom();
-    
-    // Delay to trigger animation
-    setTimeout(() => {
-        content.classList.remove('opacity-0', 'scale-95');
-        content.classList.add('opacity-100', 'scale-100');
-    }, 10);
-    
-    document.body.style.overflow = 'hidden'; 
-};
-
-window.closePosterModal = function() {
-    const modal = document.getElementById('poster-modal');
-    const content = document.getElementById('poster-modal-content');
-
-    content.classList.remove('opacity-100', 'scale-100');
-    content.classList.add('opacity-0', 'scale-95');
-    
-    setTimeout(() => {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-        document.body.style.overflow = ''; 
-    }, 300);
-};
-
-window.zoomPoster = function(delta) {
-    const content = document.getElementById('poster-modal-content');
-    currentPosterZoom = Math.max(0.5, Math.min(3.0, currentPosterZoom + delta));
-    content.style.transform = `scale(${currentPosterZoom})`;
-};
-
-window.resetPosterZoom = function() {
-    const content = document.getElementById('poster-modal-content');
-    currentPosterZoom = 1.0;
-    content.style.transform = `scale(1)`;
-};
 
 /* ── Countdown Timer ─────────────────────────── */
 (function(){
