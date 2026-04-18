@@ -190,16 +190,6 @@
     </div>
 </section>
 
-{{-- ===== BACK TO HOME BUTTON ===== --}}
-<section class="py-12 px-4 bg-white">
-    <div class="max-w-4xl mx-auto text-center">
-        <a href="{{ route('home') }}" class="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold hover:from-blue-700 hover:to-blue-800 transition shadow-lg hover:shadow-xl">
-            <x-heroicon-o-arrow-left class="w-5 h-5" />
-            Kembali ke Beranda
-        </a>
-    </div>
-</section>
-
 {{-- Photo Modal --}}
 <div id="photo-modal" class="photo-modal" aria-hidden="true">
     <div class="photo-modal-backdrop" data-photo-close></div>

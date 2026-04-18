@@ -77,10 +77,10 @@
 
             {{-- Tombol Aksi --}}
             <div class="reveal reveal-delay-3 mt-8 flex flex-wrap items-center justify-center gap-4">
-                <a href="#tentang" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-[2.2rem] py-[0.9rem] text-base font-bold shadow-[0_8px_30px_rgba(245,158,11,0.4)] transition-all duration-300 hover:-translate-y-[3px] hover:scale-[1.03] hover:shadow-[0_16px_40px_rgba(245,158,11,0.5)]">
+                <a href="{{ route('about') }}" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-[2.2rem] py-[0.9rem] text-base font-bold shadow-[0_8px_30px_rgba(245,158,11,0.4)] transition-all duration-300 hover:-translate-y-[3px] hover:scale-[1.03] hover:shadow-[0_16px_40px_rgba(245,158,11,0.5)]">
                     <x-heroicon-o-book-open class="h-5 w-5" /> Tentang Kami
                 </a>
-                <a href="#kontak" class="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-[2.2rem] py-[0.9rem] text-base font-semibold transition-all duration-300 hover:-translate-y-[3px] hover:bg-white/20 hover:backdrop-blur">
+                <a href="{{ route('contact') }}" class="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-[2.2rem] py-[0.9rem] text-base font-semibold transition-all duration-300 hover:-translate-y-[3px] hover:bg-white/20 hover:backdrop-blur">
                     <x-heroicon-o-phone class="h-5 w-5" /> Hubungi Kami
                 </a>
             </div>
@@ -121,10 +121,10 @@
 
             {{-- Tombol Aksi --}}
             <div class="reveal reveal-delay-3 mt-8 flex flex-wrap items-center justify-center gap-4">
-                <a href="#tentang" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-[2.2rem] py-[0.9rem] text-base font-bold shadow-[0_8px_30px_rgba(245,158,11,0.4)] transition-all duration-300 hover:-translate-y-[3px] hover:scale-[1.03] hover:shadow-[0_16px_40px_rgba(245,158,11,0.5)]">
+                <a href="{{ route('about') }}" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-[2.2rem] py-[0.9rem] text-base font-bold shadow-[0_8px_30px_rgba(245,158,11,0.4)] transition-all duration-300 hover:-translate-y-[3px] hover:scale-[1.03] hover:shadow-[0_16px_40px_rgba(245,158,11,0.5)]">
                     <x-heroicon-o-book-open class="h-5 w-5" /> Tentang Kami
                 </a>
-                <a href="#kontak" class="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-[2.2rem] py-[0.9rem] text-base font-semibold transition-all duration-300 hover:-translate-y-[3px] hover:bg-white/20 hover:backdrop-blur">
+                <a href="{{ route('contact') }}" class="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-[2.2rem] py-[0.9rem] text-base font-semibold transition-all duration-300 hover:-translate-y-[3px] hover:bg-white/20 hover:backdrop-blur">
                     <x-heroicon-o-phone class="h-5 w-5" /> Hubungi Kami
                 </a>
             </div>
@@ -161,7 +161,7 @@
                     <x-heroicon-o-building-library class="h-4 w-4" /> Tentang Kami
                 </div>
                 <h2 class="section-title mb-5 mt-4 font-display text-[clamp(2rem,4vw,3rem)] font-black leading-[1.15] tracking-[-0.02em] text-slate-900">
-                    Sambutan Kepala Sekolah
+                    Sambutan
                 </h2>
                 @php
                     $fullText = $sambutanText ?? '';

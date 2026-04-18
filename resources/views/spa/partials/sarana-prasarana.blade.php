@@ -29,7 +29,7 @@
         </div>
 
         <div class="facility-grid mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            @foreach ($fasilitas as $item)
+            @forelse ($fasilitas as $item)
                 @php
                     $isObj = is_object($item);
                     $nama  = $isObj ? $item->nama : ($item['title'] ?? 'Fasilitas');
@@ -38,7 +38,7 @@
                     $cardBg = $isObj ? ($item->card_bg_image ?? null) : ($item['card_bg_image'] ?? null);
                     $foto = $isObj ? ($item->foto ?? null) : ($item['foto'] ?? null);
                     $bgImg = $cardBg ?: $foto;
-                    
+
                     $warnaDesign = [
                         'blue'   => 'linear-gradient(135deg,#eff6ff,#dbeafe)',
                         'green'  => 'linear-gradient(135deg,#f0fdf4,#dcfce7)',
@@ -73,29 +73,20 @@
                     </div>
                     </div>
                 </button>
-            @endforeach
-        </div>
-    </div>
-</section>
+            @empty
+                <div class="col-span-full text-center py-12">
+                    <div class="bg-white rounded-2xl border border-slate-200 p-12 shadow-xl">
+                        <svg class="w-20 h-20 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        <p class="text-slate-500 text-lg font-semibold">Belum ada data fasilitas</p>
+                        <p class="text-slate-400 text-sm mt-2 mb-8">Informasi sarana dan prasarana akan ditampilkan di sini setelah ditambahkan</p>
 
-<div id="facility-modal" class="fixed inset-0 hidden items-center justify-center p-6 z-[60]" aria-hidden="true">
-    <div class="absolute inset-0 bg-slate-900/60" data-facility-close></div>
-    <div class="relative bg-white rounded-[1.5rem] overflow-hidden max-w-[900px] w-full grid grid-cols-1 md:grid-cols-[1.2fr_1fr] shadow-[0_30px_60px_rgba(15,23,42,0.2)] z-10" role="dialog" aria-modal="true">
-        <button type="button" class="absolute top-[0.75rem] right-[0.75rem] w-[38px] h-[38px] rounded-full bg-white border border-slate-200 inline-flex items-center justify-center shadow-[0_8px_18px_rgba(15,23,42,0.12)] cursor-pointer z-20" data-facility-close aria-label="Tutup">
-            <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-        <div class="bg-slate-200 min-h-[300px]">
-            <img id="facility-modal-image" alt="" class="w-full h-full object-cover" />
+                        <a href="{{ route('home') }}" data-spa="/spa/home" data-spa-title="Beranda - SD N 2 Dermolo" class="group inline-flex items-center gap-3 px-8 py-4 rounded-full text-blue-600 font-bold hover:bg-blue-50 transition shadow-lg text-base">
+                            <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                            Kembali ke Beranda
+                        </a>
+                    </div>
+                </div>
+            @endforelse
         </div>
-        <div class="p-6">
-            <h3 id="facility-modal-title" class="font-black text-[1.35rem] text-slate-900"></h3>
-            <p id="facility-modal-desc" class="mt-[0.75rem] text-slate-500 leading-[1.7]"></p>
         </div>
-    </div>
-</div>
-<div class="flex flex-wrap gap-4 justify-center mb-16">
-    <a href="{{ route('home') }}" class="group inline-flex items-center gap-3 px-8 py-4 rounded-full  text-blue-600 font-bold hover:bg-blue-50 transition shadow-2xl hover:shadow-3xl text-lg">
-                <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                Kembali ke Beranda
-    </a>
-</div>
+        </section>

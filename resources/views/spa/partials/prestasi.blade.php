@@ -50,10 +50,15 @@
                 </button>
             @empty
                 <div class="col-span-full text-center py-12">
-                    <div class="bg-white rounded-2xl border border-slate-200 p-12">
+                    <div class="bg-white rounded-2xl border border-slate-200 p-12 shadow-xl">
                         <svg class="w-20 h-20 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
                         <p class="text-slate-500 text-lg font-semibold">Belum ada prestasi yang dicatat</p>
-                        <p class="text-slate-400 text-sm mt-2">Prestasi akan ditampilkan di sini setelah ditambahkan</p>
+                        <p class="text-slate-400 text-sm mt-2 mb-8">Prestasi akan ditampilkan di sini setelah ditambahkan</p>
+                        
+                        <a href="{{ route('home') }}" data-spa="/spa/home" data-spa-title="Beranda - SD N 2 Dermolo" class="group inline-flex items-center gap-3 px-8 py-4 rounded-full text-blue-600 font-bold hover:bg-blue-50 transition shadow-lg text-base">
+                            <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                            Kembali ke Beranda
+                        </a>
                     </div>
                 </div>
             @endforelse
@@ -76,11 +81,5 @@
             <p id="prestasi-modal-desc" class="mt-[0.75rem] text-slate-500 leading-[1.7]"></p>
         </div>
     </div>
-</div>
-<div class="flex flex-wrap gap-4 justify-center mb-16">
-    <a href="{{ route('home') }}" class="group inline-flex items-center gap-3 px-8 py-4 rounded-full  text-blue-600 font-bold hover:bg-blue-50 transition shadow-2xl hover:shadow-3xl text-lg">
-                <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                Kembali ke Beranda
-    </a>
 </div>
 

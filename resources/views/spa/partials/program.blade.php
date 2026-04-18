@@ -18,7 +18,7 @@
 <section class="py-12 px-4 bg-slate-50">
     <div class="max-w-6xl mx-auto">
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach ($program as $item)
+            @forelse ($program as $item)
                 @php
                     $isObj = is_object($item);
                     $title = $isObj ? $item->title : ($item['title'] ?? 'Program');
@@ -29,11 +29,11 @@
                     $foto  = $isObj ? ($item->foto ?? null) : ($item['foto'] ?? null);
                     $cardBg = $isObj ? ($item->card_bg_image ?? null) : ($item['card_bg_image'] ?? null);
                     $slug  = $isObj ? ($item->slug ?? null) : null;
-                    
+
                     $colorKey = $isObj
                         ? match ($slug) { 'pramuka' => 'blue', 'seni-ukir' => 'green', 'drumband' => 'yellow', default => 'blue' }
                         : ($item['color'] ?? 'blue');
-                    
+
                     $gradients = [
                         'blue' => 'linear-gradient(135deg, #1a56db, #3b82f6)',
                         'green' => 'linear-gradient(135deg, #059669, #34d399)',
@@ -71,13 +71,20 @@
                         <h3 class="font-semibold text-slate-900 text-lg">{{ $title }}</h3>
                     </div>
                 </a>
-            @endforeach
+            @empty
+                <div class="col-span-full text-center py-12">
+                    <div class="bg-white rounded-2xl border border-slate-200 p-12 shadow-xl">
+                        <svg class="w-20 h-20 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                        <p class="text-slate-500 text-lg font-semibold">Belum ada data program</p>
+                        <p class="text-slate-400 text-sm mt-2 mb-8">Program dan ekstrakurikuler akan ditampilkan di sini setelah ditambahkan</p>
+
+                        <a href="{{ route('home') }}" data-spa="/spa/home" data-spa-title="Beranda - SD N 2 Dermolo" class="group inline-flex items-center gap-3 px-8 py-4 rounded-full text-blue-600 font-bold hover:bg-blue-50 transition shadow-lg text-base">
+                            <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                            Kembali ke Beranda
+                        </a>
+                    </div>
+                </div>
+            @endforelse
         </div>
-    </div>
-</section>
-<div class="flex flex-wrap gap-4 justify-center mb-16">
-    <a href="{{ route('home') }}" class="group inline-flex items-center gap-3 px-8 py-4 rounded-full  text-blue-600 font-bold hover:bg-blue-50 transition shadow-2xl hover:shadow-3xl text-lg">
-                <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                Kembali ke Beranda
-    </a>
-</div>
+        </div>
+        </section>
