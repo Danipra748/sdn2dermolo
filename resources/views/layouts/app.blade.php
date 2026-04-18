@@ -284,7 +284,7 @@
                     {{-- Dropdown Menu --}}
                     <div class="absolute left-1/2 top-full mt-0 w-56 -translate-x-1/2 rounded-xl bg-white p-2 text-slate-900 shadow-[0_16px_40px_rgba(15,23,42,0.12)] border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-2 group-hover:translate-y-0">
                         <a href="{{ route('about') }}" data-spa="/spa/about" data-spa-title="Tentang Kami - SD N 2 Dermolo" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition {{ request()->routeIs('about') ? 'bg-blue-50 text-blue-600' : '' }}">Identitas Sekolah</a>
-                        <a href="{{ route('public.fasilitas.index') }}" data-spa="/spa/sarana-prasarana" data-spa-title="Sarana Prasarana - SD N 2 Dermolo" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition {{ request()->routeIs('fasilitas.*') ? 'bg-blue-50 text-blue-600' : '' }}">Sarana Prasarana</a>
+                        <a href="{{ route('fasilitas.index') }}" data-spa="/spa/sarana-prasarana" data-spa-title="Sarana Prasarana - SD N 2 Dermolo" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition {{ request()->routeIs('fasilitas.*') ? 'bg-blue-50 text-blue-600' : '' }}">Sarana Prasarana</a>
                         <a href="{{ route('program.index') }}" data-spa="/spa/program" data-spa-title="Program - SD N 2 Dermolo" class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition {{ request()->routeIs('program.*') ? 'bg-blue-50 text-blue-600' : '' }}">Ekstrakurikuler</a>
                     </div>
                 </div>
@@ -312,7 +312,7 @@
                 <summary class="cursor-pointer font-semibold text-slate-600">Profil</summary>
                 <div class="mt-2 space-y-1">
                     <a href="{{ route('about') }}" data-spa="/spa/about" data-spa-title="Tentang Kami - SD N 2 Dermolo" class="block rounded-lg px-3 py-1.5 text-sm font-medium text-slate-500">Identitas Sekolah</a>
-                    <a href="{{ route('public.fasilitas.index') }}" data-spa="/spa/sarana-prasarana" data-spa-title="Sarana & Prasarana - SD N 2 Dermolo" class="block rounded-lg px-3 py-1.5 text-sm font-medium text-slate-500">Sarana Prasarana</a>
+                    <a href="{{ route('fasilitas.index') }}" data-spa="/spa/sarana-prasarana" data-spa-title="Sarana & Prasarana - SD N 2 Dermolo" class="block rounded-lg px-3 py-1.5 text-sm font-medium text-slate-500">Sarana Prasarana</a>
                     <a href="{{ route('program.index') }}" data-spa="/spa/program" data-spa-title="Program - SD N 2 Dermolo" class="block rounded-lg px-3 py-1.5 text-sm font-medium text-slate-500">Ekstrakurikuler</a>
                 </div>
             </details>
@@ -405,7 +405,7 @@
                         <li><a href="{{ route('gallery.index') }}" data-spa="/spa/gallery" data-spa-title="Galeri - SD N 2 Dermolo" class="spa-nav-link inline-block">Galeri</a></li>
                         <li><a href="{{ route('ppdb') }}" data-spa="/spa/ppdb" data-spa-title="PPDB - SD N 2 Dermolo" class="spa-nav-link inline-block">PPDB Online</a></li>
                         <li><a href="{{ route('news.index') }}" data-spa="/spa/berita" data-spa-title="Berita - SD N 2 Dermolo" class="spa-nav-link inline-block">Berita</a></li>
-                        <li><a href="{{ route('public.fasilitas.index') }}" data-spa="/spa/sarana-prasarana" data-spa-title="Fasilitas - SD N 2 Dermolo" class="spa-nav-link inline-block">Fasilitas</a></li>
+                        <li><a href="{{ route('fasilitas.index') }}" data-spa="/spa/sarana-prasarana" data-spa-title="Fasilitas - SD N 2 Dermolo" class="spa-nav-link inline-block">Fasilitas</a></li>
                         <li><a href="{{ route('contact') }}" data-spa="/spa/contact" data-spa-title="Kontak - SD N 2 Dermolo" class="spa-nav-link inline-block">Kontak</a></li>
                     </ul>
                 </div>

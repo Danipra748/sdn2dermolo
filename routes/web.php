@@ -33,7 +33,7 @@ use App\Http\Controllers\SpaController;
 
 Route::get('/', [PageController::class, 'index'])->name('home');
 Route::get('/program', [PageController::class, 'programIndex'])->name('program.index');
-Route::get('/guru-pendidik', [GuruController::class, 'index'])->name('guru.index');
+Route::get('/guru-pendidik', [PageController::class, 'guruIndex'])->name('guru.index');
 Route::get('/tentang-kami', [AboutController::class, 'index'])->name('about');
 Route::get('/kontak', [PageController::class, 'contactIndex'])->name('contact');
 Route::get('/ppdb', [PageController::class, 'ppdbIndex'])->name('ppdb');
@@ -76,7 +76,7 @@ Route::prefix('program')->name('program.')->group(function () {
 Route::get('/prestasi', [PrestasiController::class, 'index'])->name('prestasi.index');
 
 // ── FASILITAS ──
-Route::get('/fasilitas', [FasilitasController::class, 'index'])->name('public.fasilitas.index');
+Route::get('/fasilitas', [PageController::class, 'fasilitasIndex'])->name('fasilitas.index');
 
 // ── GALLERY ──
 Route::get('/galeri', [GalleryController::class, 'index'])->name('gallery.index');
