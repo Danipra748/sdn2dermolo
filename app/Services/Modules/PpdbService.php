@@ -7,6 +7,7 @@ use App\Models\PpdbBanner;
 use App\Services\Core\FileService;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class PpdbService
 {
@@ -49,6 +50,7 @@ class PpdbService
      */
     public function updateSettings(array $data): PpdbSetting
     {
+        Cache::tags(['ppdb'])->flush();
         $settings = PpdbSetting::getInstance();
         $settings->update($data);
         return $settings;
@@ -59,6 +61,7 @@ class PpdbService
      */
     public function storeBanner(Request $request): PpdbBanner
     {
+        Cache::tags(['ppdb'])->flush();
         $data = $request->only(['title', 'order']);
         if ($request->hasFile('image')) {
             $data['image_path'] = $this->fileService->upload($request, 'image', 'ppdb/banners');
@@ -71,6 +74,7 @@ class PpdbService
      */
     public function updateBanner(Request $request, PpdbBanner $banner): PpdbBanner
     {
+        Cache::tags(['ppdb'])->flush();
         $data = $request->only(['title', 'order']);
         if ($request->hasFile('image')) {
             $data['image_path'] = $this->fileService->replace($banner->image_path, $request, 'image', 'ppdb/banners');
@@ -84,6 +88,7 @@ class PpdbService
      */
     public function deleteBanner(PpdbBanner $banner): bool
     {
+        Cache::tags(['ppdb'])->flush();
         $this->fileService->delete($banner->image_path);
         return $banner->delete();
     }

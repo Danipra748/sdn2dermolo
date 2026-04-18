@@ -29,6 +29,7 @@ class FasilitasService
      */
     public function store(array $validated, Request $request): Fasilitas
     {
+        Cache::tags(['fasilitas'])->flush();
         if ($request->hasFile('foto')) {
             $validated['foto'] = $this->fileService->upload($request, 'foto', 'fasilitas');
         }
@@ -40,47 +41,52 @@ class FasilitasService
      */
     public function update(Fasilitas $fasilitas, array $validated, Request $request): Fasilitas
     {
+        Cache::tags(['fasilitas'])->flush();
         if ($request->boolean('remove_foto')) {
             $validated = array_merge($validated, $this->fileService->handleModelDeletion($fasilitas, 'foto'));
         }
 
         if ($request->hasFile('foto')) {
             $validated = array_merge($validated, $this->fileService->handleModelUpload($fasilitas, 'foto', $request, 'foto', 'fasilitas'));
-        }
+        use App\Models\Fasilitas;
+        use App\Services\Core\FileService;
+        use Illuminate\Http\Request;
+        use Illuminate\Support\Facades\Cache;
 
-        $fasilitas->update($validated);
-        return $fasilitas;
-    }
+        class FasilitasService
+        {
+            protected $fileService;
+        ...
+            /**
+             * Build public data for a facility.
+             */
+            public function buildPublicData(string $nama): array
+            {
+                return Cache::tags(['fasilitas'])->rememberForever('fasilitas_public_' . $nama, function () use ($nama) {
+                    $item = Fasilitas::where('nama', $nama)->first();
+                    $default = $this->getDefaultData($nama);
+                    $data = $default;
 
-    /**
-     * Build public data for a facility.
-     */
-    public function buildPublicData(string $nama): array
-    {
-        $item = Fasilitas::where('nama', $nama)->first();
-        $default = $this->getDefaultData($nama);
-        $data = $default;
-        
-        $kontenValue = $item?->konten;
-        if (is_array($kontenValue)) {
-            $data = array_replace_recursive($data, $kontenValue);
-            $data['konten_html'] = null;
-        } elseif (is_string($kontenValue) && trim($kontenValue) !== '') {
-            $data['konten_html'] = $kontenValue;
-        } else {
-            $data['konten_html'] = null;
-        }
+                    $kontenValue = $item?->konten;
+                    if (is_array($kontenValue)) {
+                        $data = array_replace_recursive($data, $kontenValue);
+                        $data['konten_html'] = null;
+                    } elseif (is_string($kontenValue) && trim($kontenValue) !== '') {
+                        $data['konten_html'] = $kontenValue;
+                    } else {
+                        $data['konten_html'] = null;
+                    }
 
-        $warna = $item?->warna ?? 'blue';
-        $data['title'] = $item?->nama ?? $nama;
-        $data['subtitle'] = ($item && filled($item->deskripsi)) ? $item->deskripsi : ($default['subtitle'] ?? '');
-        $data['card_bg_image'] = $item?->card_bg_image;
-        $data['hero_color'] = self::WARNA_TO_HERO[$warna] ?? self::WARNA_TO_HERO['blue'];
-        
-        return $data;
-    }
+                    $warna = $item?->warna ?? 'blue';
+                    $data['title'] = $item?->nama ?? $nama;
+                    $data['subtitle'] = ($item && filled($item->deskripsi)) ? $item->deskripsi : ($default['subtitle'] ?? '');
+                    $data['card_bg_image'] = $item?->card_bg_image;
+                    $data['hero_color'] = self::WARNA_TO_HERO[$warna] ?? self::WARNA_TO_HERO['blue'];
 
-    /**
+                    return $data;
+                });
+            }
+
      * Get default data for static facilities.
      */
     public function getDefaultData(string $nama): array

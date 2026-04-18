@@ -6,6 +6,7 @@ use App\Models\SchoolProfile;
 use App\Services\Core\FileService;
 use App\Services\Core\ImageProcessorService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class SchoolProfileService
 {
@@ -23,6 +24,7 @@ class SchoolProfileService
      */
     public function updateProfile(Request $request): SchoolProfile
     {
+        Cache::tags(['school_profile'])->flush();
         $profile = SchoolProfile::getOrCreate();
         $validated = $request->validated();
 
@@ -68,6 +70,7 @@ class SchoolProfileService
      */
     public function deleteLogo(): bool
     {
+        Cache::tags(['school_profile'])->flush();
         $profile = SchoolProfile::getOrCreate();
         if ($profile->logo) {
             $this->fileService->delete($profile->logo);
