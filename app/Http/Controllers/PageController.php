@@ -15,6 +15,8 @@ use App\Models\Article;
 use App\Models\HomepageSection;
 use App\Models\SchoolProfile;
 use App\Models\HeroSlide;
+use App\Models\PpdbSetting;
+use App\Models\PpdbBanner;
 use Illuminate\Support\Facades\Schema;
 
 class PageController extends Controller
@@ -129,5 +131,26 @@ class PageController extends Controller
         $mapsOpen = SchoolConfig::mapsOpen();
 
         return view('contact', compact('kontak', 'alamatLines', 'mapsEmbed', 'mapsOpen'));
+    }
+
+    public function ppdbIndex()
+    {
+        $settings = PpdbSetting::getInstance();
+        $banners = PpdbBanner::active()->get();
+        $status = $settings->getStatus();
+
+        return view('ppdb.index', compact('settings', 'banners', 'status'));
+    }
+
+    public function ppdbRegister()
+    {
+        $settings = PpdbSetting::getInstance();
+        $status = $settings->getStatus();
+
+        if ($status === 'waiting' || $status === 'closed') {
+            return redirect()->route('ppdb')->with('error', 'Pendaftaran PPDB sedang tidak dibuka.');
+        }
+
+        return view('ppdb.register', compact('settings', 'status'));
     }
 }

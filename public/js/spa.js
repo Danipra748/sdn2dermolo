@@ -57,6 +57,14 @@
             route: '/spa/contact',
             title: 'Kontak - SD N 2 Dermolo',
         },
+        '/ppdb': {
+            route: '/spa/ppdb',
+            title: 'PPDB Online - SD N 2 Dermolo',
+        },
+        '/ppdb/daftar': {
+            route: '/spa/ppdb/daftar',
+            title: 'Pendaftaran PPDB - SD N 2 Dermolo',
+        },
     };
 
     let currentRoute = null;
@@ -1976,6 +1984,92 @@
             console.error('[SPA] Error updating hero slide text:', error);
         }
     }
+
+    function setupPpdbFeatures() {
+        const countdownEl = document.getElementById('ppdb-countdown');
+        if (countdownEl) {
+            const until = new Date(countdownEl.dataset.until).getTime();
+            
+            const timer = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = until - now;
+                
+                if (distance < 0) {
+                    clearInterval(timer);
+                    countdownEl.innerHTML = "PENDAFTARAN DIBUKA!";
+                    return;
+                }
+                
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                countdownEl.innerHTML = `
+                    <div class="flex flex-col bg-white p-4 rounded-2xl shadow-lg min-w-[80px]">
+                        <span class="text-3xl font-black text-blue-600">${days}</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hari</span>
+                    </div>
+                    <div class="flex flex-col bg-white p-4 rounded-2xl shadow-lg min-w-[80px]">
+                        <span class="text-3xl font-black text-blue-600">${hours}</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Jam</span>
+                    </div>
+                    <div class="flex flex-col bg-white p-4 rounded-2xl shadow-lg min-w-[80px]">
+                        <span class="text-3xl font-black text-blue-600">${minutes}</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Menit</span>
+                    </div>
+                    <div class="flex flex-col bg-white p-4 rounded-2xl shadow-lg min-w-[80px]">
+                        <span class="text-3xl font-black text-blue-600">${seconds}</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Detik</span>
+                    </div>
+                `;
+            }, 1000);
+            
+            cleanup.push(() => clearInterval(timer));
+        }
+
+        // PPDB Carousel
+        const banners = document.querySelectorAll('.ppdb-banner');
+        const dots = document.querySelectorAll('.ppdb-dot');
+        if (banners.length > 1) {
+            let current = 0;
+            const bannerTimer = setInterval(() => {
+                banners[current].classList.replace('opacity-100', 'opacity-0');
+                if (dots[current]) dots[current].classList.remove('bg-white', 'scale-125');
+                
+                current = (current + 1) % banners.length;
+                
+                banners[current].classList.replace('opacity-0', 'opacity-100');
+                if (dots[current]) {
+                    dots[current].classList.add('bg-white', 'scale-125');
+                }
+            }, 5000);
+            
+            cleanup.push(() => clearInterval(bannerTimer));
+
+            dots.forEach(dot => {
+                dot.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    if (index === current) return;
+
+                    banners[current].classList.replace('opacity-100', 'opacity-0');
+                    if (dots[current]) dots[current].classList.remove('bg-white', 'scale-125');
+                    
+                    current = index;
+                    
+                    banners[current].classList.replace('opacity-0', 'opacity-100');
+                    if (dots[current]) dots[current].classList.add('bg-white', 'scale-125');
+                });
+            });
+        }
+    }
+
+    // Call it in the reinitialization too by appending to common places
+    const originalReinit = reinitializeComponents;
+    reinitializeComponents = function() {
+        originalReinit();
+        setupPpdbFeatures();
+    };
 
     window.loadSPAContent = loadContent;
 })();

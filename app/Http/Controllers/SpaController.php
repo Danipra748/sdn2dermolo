@@ -12,6 +12,8 @@ use App\Models\Prestasi;
 use App\Models\Program;
 use App\Models\SchoolProfile;
 use App\Models\SiteSetting;
+use App\Models\PpdbSetting;
+use App\Models\PpdbBanner;
 use App\Support\SchoolConfig;
 use App\Support\SchoolData;
 use Illuminate\Http\JsonResponse;
@@ -218,6 +220,39 @@ class SpaController extends Controller
             compact('kontak', 'alamatLines', 'mapsEmbed', 'mapsOpen'),
             'Kontak - SD N 2 Dermolo',
             route('contact')
+        );
+    }
+
+    public function getPpdbContent(Request $request): JsonResponse|RedirectResponse
+    {
+        $settings = PpdbSetting::getInstance();
+        $banners = PpdbBanner::active()->get();
+        $status = $settings->getStatus();
+
+        return $this->respond(
+            $request,
+            'spa.partials.ppdb',
+            compact('settings', 'banners', 'status'),
+            'PPDB - SD N 2 Dermolo',
+            route('ppdb')
+        );
+    }
+
+    public function getPpdbRegistrationContent(Request $request): JsonResponse|RedirectResponse
+    {
+        $settings = PpdbSetting::getInstance();
+        $status = $settings->getStatus();
+
+        if ($status === 'waiting' || $status === 'closed') {
+            return response()->json(['redirect' => route('ppdb')], 302);
+        }
+
+        return $this->respond(
+            $request,
+            'spa.partials.ppdb-registration',
+            compact('settings', 'status'),
+            'Pendaftaran PPDB - SD N 2 Dermolo',
+            route('ppdb.daftar')
         );
     }
 
