@@ -60,18 +60,22 @@ class AdminPpdbController extends Controller
         $validated = $request->validate([
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
-            'form_url' => 'required|url',
+            'registration_link' => 'required|url',
         ], [
             'start_date.required' => 'Tanggal mulai pendaftaran wajib diisi.',
             'end_date.required' => 'Tanggal selesai pendaftaran wajib diisi.',
             'end_date.after' => 'Tanggal selesai harus setelah tanggal mulai.',
-            'form_url.required' => 'Link Google Form wajib diisi.',
-            'form_url.url' => 'Format Link Google Form tidak valid (harus diawali http:// atau https://).',
+            'registration_link.required' => 'Link Pendaftaran wajib diisi.',
+            'registration_link.url' => 'Format Link tidak valid (harus dimulai http:// atau https://).',
         ]);
 
-        $this->ppdbService->updateSettings($validated);
+        try {
+            $this->ppdbService->updateSettings($validated);
 
-        return redirect()->back()->with('success', 'Pengaturan PPDB berhasil diperbarui.');
+            return redirect()->route('admin.ppdb.index')->with('success', 'Pengaturan PPDB berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menyimpan pengaturan.')->withInput();
+        }
     }
 
     /**
@@ -79,15 +83,23 @@ class AdminPpdbController extends Controller
      */
     public function storeBanner(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'title' => 'nullable|string|max:255',
             'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'order' => 'integer',
+            'order' => 'nullable|integer',
+        ], [
+            'image.required' => 'Gambar banner wajib diupload.',
+            'image.image' => 'File harus berupa gambar.',
+            'image.max' => 'Ukuran gambar maksimal 2MB.',
         ]);
 
-        $this->ppdbService->storeBanner($request);
+        try {
+            $this->ppdbService->storeBanner($request);
 
-        return redirect()->back()->with('success', 'Banner PPDB berhasil ditambahkan.');
+            return redirect()->route('admin.ppdb.index')->with('success', 'Banner PPDB berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menambahkan banner.')->withInput();
+        }
     }
 
     /**
@@ -95,15 +107,19 @@ class AdminPpdbController extends Controller
      */
     public function updateBanner(Request $request, PpdbBanner $banner)
     {
-        $request->validate([
+        $validated = $request->validate([
             'title' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'order' => 'integer',
+            'order' => 'nullable|integer',
         ]);
 
-        $this->ppdbService->updateBanner($request, $banner);
+        try {
+            $this->ppdbService->updateBanner($request, $banner);
 
-        return redirect()->back()->with('success', 'Banner PPDB berhasil diperbarui.');
+            return redirect()->route('admin.ppdb.index')->with('success', 'Banner PPDB berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal memperbarui banner.')->withInput();
+        }
     }
 
     /**

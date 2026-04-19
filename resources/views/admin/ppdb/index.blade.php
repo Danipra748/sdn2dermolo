@@ -16,6 +16,12 @@
         </div>
     @endif
 
+    @if (session('error'))
+        <div class="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-800 text-sm font-bold">
+            {{ session('error') }}
+        </div>
+    @endif
+
         <div class="grid lg:grid-cols-3 gap-8">
         {{-- Settings Form --}}
         <div class="lg:col-span-1">
@@ -25,12 +31,21 @@
                 <h3 class="text-lg font-bold">Jadwal Pendaftaran</h3>
                 <x-admin.form-group label="Tanggal Mulai" name="start_date" required>
                     <input type="date" name="start_date" value="{{ old('start_date', $settings->start_date?->format('Y-m-d')) }}" class="w-full form-input" required>
+                    @error('start_date')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </x-admin.form-group>
                 <x-admin.form-group label="Tanggal Selesai" name="end_date" required>
                     <input type="date" name="end_date" value="{{ old('end_date', $settings->end_date?->format('Y-m-d')) }}" class="w-full form-input" required>
+                    @error('end_date')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </x-admin.form-group>
                 <x-admin.form-group label="Link Pendaftaran" name="registration_link" help="URL formulir pendaftaran (misal: Google Form).">
                     <input type="url" name="registration_link" value="{{ old('registration_link', $settings->registration_link) }}" class="w-full form-input" placeholder="https://">
+                    @error('registration_link')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </x-admin.form-group>
                 <div class="pt-2">
                     <x-admin.button type="submit" variant="primary" size="md" class="w-full">Simpan Jadwal</x-admin.button>

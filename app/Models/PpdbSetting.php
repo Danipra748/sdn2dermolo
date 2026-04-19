@@ -10,7 +10,7 @@ class PpdbSetting extends Model
     protected $fillable = [
         'start_date',
         'end_date',
-        'form_url',
+        'registration_link',
     ];
 
     protected $casts = [

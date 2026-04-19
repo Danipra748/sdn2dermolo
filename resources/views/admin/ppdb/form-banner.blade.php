@@ -21,12 +21,18 @@
             @if($isEdit) @method('PUT') @endif
     
             <div class="glass-card p-6 space-y-6">
-                <x-admin.form-group label="Judul Banner" name="title" required>
-                    <input type="text" name="title" value="{{ old('title', $banner->title ?? '') }}" class="form-input" required>
+                <x-admin.form-group label="Judul Banner" name="title">
+                    <input type="text" name="title" value="{{ old('title', $banner->title ?? '') }}" class="form-input">
+                    @error('title')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </x-admin.form-group>
                 
-                <x-admin.form-group label="Urutan Tampil" name="order" required>
-                    <input type="number" name="order" value="{{ old('order', $banner->order ?? '1') }}" class="form-input w-24" required>
+                <x-admin.form-group label="Urutan Tampil" name="order">
+                    <input type="number" name="order" value="{{ old('order', $banner->order ?? '1') }}" class="form-input w-24">
+                    @error('order')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </x-admin.form-group>
             </div>
     
@@ -34,6 +40,9 @@
                 <h3 class="font-bold text-slate-900 mb-4">File Gambar</h3>
                 <x-admin.form-group label="Upload Gambar Banner" name="image" :required="!$isEdit" help="Ukuran gambar bebas, rasio 16:9 atau 2:1 disarankan.">
                     <input type="file" name="image" class="file-input">
+                    @error('image')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </x-admin.form-group>
             </div>
 
