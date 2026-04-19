@@ -20,10 +20,10 @@
     <div class="max-w-5xl mx-auto py-8 px-4">
         <div class="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200" id="iframe-wrapper">
             <div class="w-full relative" style="height: 1200px;">
-                @if($settings->form_url)
+                @if($settings->registration_link)
                     <iframe
                         id="ppdb-iframe"
-                        src="{{ $settings->form_url }}"
+                        src="{{ $settings->registration_link }}"
                         width="100%"
                         height="100%"
                         frameborder="0"
