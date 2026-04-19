@@ -1,7 +1,8 @@
 @extends('admin.layout')
 
 @php
-    $isEdit = isset($slide);
+    $isEdit = isset($heroSlide);
+    $slide = $heroSlide ?? null;
     $title = $isEdit ? 'Edit Slide' : 'Tambah Slide Baru';
 @endphp
 
@@ -29,17 +30,26 @@
             @if($isEdit) @method('PUT') @endif
     
             <div class="glass-card p-6 space-y-6">
-                <x-admin.form-group label="Judul Slide" name="title" required>
-                    <input type="text" name="title" value="{{ old('title', $slide->title ?? '') }}" class="form-input" required>
+                <x-admin.form-group label="Judul Slide" name="title">
+                    <input type="text" name="title" value="{{ old('title', $slide->title ?? '') }}" class="form-input">
+                    @error('title')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </x-admin.form-group>
                 
                 <x-admin.form-group label="Sub-judul (Opsional)" name="subtitle">
                     <input type="text" name="subtitle" value="{{ old('subtitle', $slide->subtitle ?? '') }}" class="form-input">
+                    @error('subtitle')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </x-admin.form-group>
 
                 <div class="grid md:grid-cols-2 gap-6">
                     <x-admin.form-group label="Urutan Tampil" name="display_order">
                         <input type="number" name="display_order" value="{{ old('display_order', $slide->display_order ?? '99') }}" class="form-input w-24">
+                        @error('display_order')
+                            <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
                     </x-admin.form-group>
                     <x-admin.form-group label="Status" name="is_active">
                         <select name="is_active" class="form-input">
@@ -54,6 +64,9 @@
                 <h3 class="font-bold text-slate-900 mb-4">Gambar Slide</h3>
                 <x-admin.form-group label="Upload Gambar" name="image" :required="!$isEdit" help="Rasio 16:9 (1920x1080) sangat disarankan untuk hasil terbaik.">
                     <input type="file" id="image-input" name="image" class="file-input" accept="image/*">
+                    @error('image')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </x-admin.form-group>
 
                 {{-- Hidden inputs for crop data --}}

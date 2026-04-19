@@ -1,34 +1,34 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PageController;
-use App\Http\Controllers\FasilitasController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\GuruController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\AdminProgramController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FasilitasController;
+use App\Http\Controllers\GuruController;
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\ProgramController;
+use Illuminate\Support\Facades\Route;
 
 // Load migration routes (development only)
 if (file_exists(__DIR__.'/migration.php')) {
     require __DIR__.'/migration.php';
 }
-use App\Http\Controllers\AdminPrestasiController;
-use App\Http\Controllers\PrestasiController;
-use App\Http\Controllers\GalleryController;
-use App\Http\Controllers\AdminGalleryController;
-use App\Http\Controllers\AdminSambutanController;
+use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AdminArticleController;
 use App\Http\Controllers\AdminCategoryController;
-use App\Http\Controllers\AdminProgramPhotoController;
-use App\Http\Controllers\AdminPpdbController;
-use App\Http\Controllers\NewsController;
-use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\AdminContactMessageController;
+use App\Http\Controllers\AdminGalleryController;
 use App\Http\Controllers\AdminHeroSlideController;
-use App\Http\Controllers\AboutController;
+use App\Http\Controllers\AdminPpdbController;
+use App\Http\Controllers\AdminPrestasiController;
+use App\Http\Controllers\AdminProgramPhotoController;
+use App\Http\Controllers\AdminSambutanController;
 use App\Http\Controllers\AdminSchoolProfileController;
 use App\Http\Controllers\AdminSettingsController;
+use App\Http\Controllers\ContactMessageController;
+use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\NewsController;
+use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\SpaController;
 
 Route::get('/', [PageController::class, 'index'])->name('home');
@@ -54,7 +54,6 @@ Route::prefix('spa')->name('spa.')->group(function () {
     Route::get('/ppdb/daftar', [SpaController::class, 'getPpdbRegistrationContent'])->name('ppdb.registration');
 });
 
-
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
@@ -67,9 +66,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->n
 
 // ── PROGRAM ──
 Route::prefix('program')->name('program.')->group(function () {
-    Route::get('/pramuka',    [ProgramController::class, 'pramuka'])->name('pramuka');
-    Route::get('/seni-ukir',  [ProgramController::class, 'seniUkir'])->name('seni-ukir');
-    Route::get('/drumband',   [ProgramController::class, 'drumband'])->name('drumband');
+    Route::get('/pramuka', [ProgramController::class, 'pramuka'])->name('pramuka');
+    Route::get('/seni-ukir', [ProgramController::class, 'seniUkir'])->name('seni-ukir');
+    Route::get('/drumband', [ProgramController::class, 'drumband'])->name('drumband');
 });
 
 // ── PRESTASI ──
@@ -110,7 +109,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::resource('program-sekolah', AdminProgramController::class)
         ->except(['show'])
         ->parameters(['program-sekolah' => 'programSekolah']);
-    
+
     // Custom routes for file handling etc. if still needed
     Route::put('program-sekolah/{programSekolah}/hero-background', [AdminProgramController::class, 'updateHeroBackground'])
         ->name('program-sekolah.hero-background.update');
@@ -153,7 +152,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Hero Slides Management (Multi-Slide System)
     Route::prefix('hero-slides')->name('hero-slides.')->group(function () {
         Route::get('/', [AdminHeroSlideController::class, 'index'])->name('index');
+        Route::get('/create', [AdminHeroSlideController::class, 'create'])->name('create');
         Route::post('/', [AdminHeroSlideController::class, 'store'])->name('store');
+        Route::get('/{heroSlide}/edit', [AdminHeroSlideController::class, 'edit'])->name('edit');
         Route::put('/{heroSlide}', [AdminHeroSlideController::class, 'update'])->name('update');
         Route::delete('/{heroSlide}', [AdminHeroSlideController::class, 'destroy'])->name('destroy');
         Route::post('/reorder', [AdminHeroSlideController::class, 'reorder'])->name('reorder');
@@ -193,11 +194,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     // PPDB Management
     Route::prefix('ppdb')->name('ppdb.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\AdminPpdbController::class, 'index'])->name('index');
-        Route::post('/settings', [\App\Http\Controllers\AdminPpdbController::class, 'updateSettings'])->name('settings.update');
-        Route::post('/banners', [\App\Http\Controllers\AdminPpdbController::class, 'storeBanner'])->name('banners.store');
-        Route::post('/banners/{banner}', [\App\Http\Controllers\AdminPpdbController::class, 'updateBanner'])->name('banners.update');
-        Route::patch('/banners/{banner}/toggle', [\App\Http\Controllers\AdminPpdbController::class, 'toggleBanner'])->name('banners.toggle');
-        Route::delete('/banners/{banner}', [\App\Http\Controllers\AdminPpdbController::class, 'destroyBanner'])->name('banners.destroy');
+        Route::get('/', [AdminPpdbController::class, 'index'])->name('index');
+        Route::post('/settings', [AdminPpdbController::class, 'updateSettings'])->name('settings.update');
+        Route::post('/banners', [AdminPpdbController::class, 'storeBanner'])->name('banners.store');
+        Route::post('/banners/{banner}', [AdminPpdbController::class, 'updateBanner'])->name('banners.update');
+        Route::patch('/banners/{banner}/toggle', [AdminPpdbController::class, 'toggleBanner'])->name('banners.toggle');
+        Route::delete('/banners/{banner}', [AdminPpdbController::class, 'destroyBanner'])->name('banners.destroy');
     });
 });
