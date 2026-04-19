@@ -22,6 +22,12 @@
         </div>
     @endif
 
+    @if (session('error'))
+        <div class="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-800 text-sm font-bold">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <x-admin.data-table 
         :headers="['Foto', 'Judul Prestasi', 'Tipe', 'Tingkat', 'Aksi']"
         searchPlaceholder="Cari prestasi..."

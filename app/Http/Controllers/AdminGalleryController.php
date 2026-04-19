@@ -41,10 +41,14 @@ class AdminGalleryController extends Controller
     public function store(Request $request)
     {
         $data = $this->validateGallery($request);
-        $this->galleryService->store($data, $request);
 
-        return redirect()->route('admin.gallery.index')
-            ->with('status', 'Foto galeri berhasil ditambahkan.');
+        try {
+            $this->galleryService->store($data, $request);
+
+            return redirect()->route('admin.gallery.index')->with('success', 'Foto galeri berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menyimpan foto.')->withInput();
+        }
     }
 
     public function edit(Gallery $gallery)
@@ -60,10 +64,14 @@ class AdminGalleryController extends Controller
     public function update(Request $request, Gallery $gallery)
     {
         $data = $this->validateGallery($request);
-        $this->galleryService->update($gallery, $data, $request);
 
-        return redirect()->route('admin.gallery.index')
-            ->with('status', 'Foto galeri berhasil diperbarui.');
+        try {
+            $this->galleryService->update($gallery, $data, $request);
+
+            return redirect()->route('admin.gallery.index')->with('success', 'Foto galeri berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal memperbarui foto.')->withInput();
+        }
     }
 
     public function destroy(Gallery $gallery)

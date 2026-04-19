@@ -21,8 +21,11 @@
             @if($isEdit) @method('PUT') @endif
     
             <div class="glass-card p-6 space-y-6">
-                <x-admin.form-group label="Judul Foto" name="title" required>
-                    <input type="text" name="title" value="{{ old('title', $gallery->title ?? '') }}" class="form-input" required>
+                <x-admin.form-group label="Judul Foto" name="title">
+                    <input type="text" name="title" value="{{ old('title', $gallery->title ?? '') }}" class="form-input">
+                    @error('title')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </x-admin.form-group>
                 
                 <x-admin.form-group label="Deskripsi (Opsional)" name="description">
@@ -34,6 +37,9 @@
                 <h3 class="font-bold text-slate-900 mb-4">File Gambar</h3>
                 <x-admin.form-group label="Upload Foto" name="foto" :required="!$isEdit">
                     <input type="file" name="foto" class="file-input">
+                    @error('foto')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </x-admin.form-group>
             </div>
 

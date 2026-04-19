@@ -22,8 +22,11 @@
     
             <div class="glass-card p-6">
                 <div class="grid md:grid-cols-2 gap-6">
-                    <x-admin.form-group label="Nama Fasilitas" name="nama" required>
-                        <input type="text" name="nama" value="{{ old('nama', $fasilitas->nama ?? '') }}" class="form-input" required>
+                    <x-admin.form-group label="Nama Fasilitas" name="nama">
+                        <input type="text" name="nama" value="{{ old('nama', $fasilitas->nama ?? '') }}" class="form-input">
+                        @error('nama')
+                            <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
                     </x-admin.form-group>
                     
                     <x-admin.form-group label="Warna Tema" name="warna">
@@ -39,6 +42,9 @@
     
                 <x-admin.form-group label="Deskripsi Singkat" name="deskripsi" class="mt-6">
                     <textarea name="deskripsi" rows="3" class="form-input">{{ old('deskripsi', $fasilitas->deskripsi ?? '') }}</textarea>
+                    @error('deskripsi')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </x-admin.form-group>
             </div>
     
@@ -46,6 +52,9 @@
                 <h3 class="font-bold text-slate-900 mb-4">Gambar</h3>
                 <x-admin.form-group label="Foto Utama" name="foto" help="Gambar utama yang mewakili fasilitas. Rasio 16:9 disarankan.">
                     <input type="file" name="foto" class="file-input">
+                    @error('foto')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </x-admin.form-group>
     
                 @if ($isEdit && $fasilitas->foto)

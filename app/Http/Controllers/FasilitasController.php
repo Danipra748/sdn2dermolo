@@ -45,10 +45,14 @@ class FasilitasController extends Controller
     public function store(Request $request)
     {
         $validated = $this->validateFasilitas($request);
-        $this->fasilitasService->store($validated, $request);
 
-        return redirect()->route('admin.fasilitas.index')
-            ->with('status', 'Data fasilitas berhasil ditambahkan.');
+        try {
+            $this->fasilitasService->store($validated, $request);
+
+            return redirect()->route('admin.fasilitas.index')->with('success', 'Data fasilitas berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menyimpan data.')->withInput();
+        }
     }
 
     // =========================================================
@@ -71,10 +75,14 @@ class FasilitasController extends Controller
     public function update(Request $request, Fasilitas $fasilita)
     {
         $validated = $this->validateFasilitas($request);
-        $this->fasilitasService->update($fasilita, $validated, $request);
 
-        return redirect()->route('admin.fasilitas.index')
-            ->with('status', 'Data fasilitas berhasil diperbarui.');
+        try {
+            $this->fasilitasService->update($fasilita, $validated, $request);
+
+            return redirect()->route('admin.fasilitas.index')->with('success', 'Data fasilitas berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal memperbarui data.')->withInput();
+        }
     }
 
     // =========================================================

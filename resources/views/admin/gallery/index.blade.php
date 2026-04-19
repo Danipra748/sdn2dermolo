@@ -22,6 +22,12 @@
         </div>
     @endif
 
+    @if (session('error'))
+        <div class="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-800 text-sm font-bold">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @forelse($galleries as $gallery)
             <div class="glass-card group overflow-hidden animate-in fade-in zoom-in-95">

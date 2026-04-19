@@ -42,10 +42,14 @@ class AdminPrestasiController extends Controller
     public function store(Request $request)
     {
         $data = $this->validatePrestasi($request);
-        $this->prestasiService->store($data, $request);
 
-        return redirect()->route('admin.prestasi-sekolah.index')
-            ->with('status', 'Data prestasi berhasil ditambahkan.');
+        try {
+            $this->prestasiService->store($data, $request);
+
+            return redirect()->route('admin.prestasi-sekolah.index')->with('success', 'Data prestasi berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menyimpan data.')->withInput();
+        }
     }
 
     public function edit(Prestasi $prestasi)
@@ -61,10 +65,14 @@ class AdminPrestasiController extends Controller
     public function update(Request $request, Prestasi $prestasi)
     {
         $data = $this->validatePrestasi($request);
-        $this->prestasiService->update($prestasi, $data, $request);
 
-        return redirect()->route('admin.prestasi-sekolah.index')
-            ->with('status', 'Data prestasi berhasil diperbarui.');
+        try {
+            $this->prestasiService->update($prestasi, $data, $request);
+
+            return redirect()->route('admin.prestasi-sekolah.index')->with('success', 'Data prestasi berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal memperbarui data.')->withInput();
+        }
     }
 
     public function destroy(Prestasi $prestasi)

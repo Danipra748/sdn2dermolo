@@ -21,22 +21,28 @@
             @if($isEdit) @method('PUT') @endif
     
             <div class="glass-card p-6 space-y-6">
-                <x-admin.form-group label="Judul Prestasi" name="title" required>
-                    <input type="text" name="title" value="{{ old('title', $prestasi->title ?? '') }}" class="form-input" required>
+                <x-admin.form-group label="Judul Prestasi" name="title">
+                    <input type="text" name="title" value="{{ old('title', $prestasi->title ?? '') }}" class="form-input">
+                    @error('title')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </x-admin.form-group>
                 
-                <x-admin.form-group label="Nama Peserta/Tim" name="participant" required>
-                    <input type="text" name="participant" value="{{ old('participant', $prestasi->participant ?? '') }}" class="form-input" required>
+                <x-admin.form-group label="Nama Peserta/Tim" name="participant">
+                    <input type="text" name="participant" value="{{ old('participant', $prestasi->participant ?? '') }}" class="form-input">
+                    @error('participant')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </x-admin.form-group>
 
                 <div class="grid md:grid-cols-2 gap-6">
-                    <x-admin.form-group label="Tipe Prestasi" name="type" required>
+                    <x-admin.form-group label="Tipe Prestasi" name="type">
                         <select name="type" class="form-input">
                             <option value="Akademik" @selected(old('type', $prestasi->type ?? '') == 'Akademik')>Akademik</option>
                             <option value="Non-Akademik" @selected(old('type', $prestasi->type ?? '') == 'Non-Akademik')>Non-Akademik</option>
                         </select>
                     </x-admin.form-group>
-                    <x-admin.form-group label="Tingkat" name="level" required>
+                    <x-admin.form-group label="Tingkat" name="level">
                         <select name="level" class="form-input">
                             @foreach(['Sekolah', 'Kecamatan', 'Kabupaten', 'Provinsi', 'Nasional', 'Internasional'] as $level)
                                 <option value="{{ $level }}" @selected(old('level', $prestasi->level ?? '') == $level)>{{ $level }}</option>
@@ -45,8 +51,11 @@
                     </x-admin.form-group>
                 </div>
 
-                 <x-admin.form-group label="Tanggal Diraih" name="date" required>
+                 <x-admin.form-group label="Tanggal Diraih" name="date">
                     <input type="date" name="date" value="{{ old('date', $prestasi->date ?? now()->format('Y-m-d')) }}" class="form-input">
+                    @error('date')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </x-admin.form-group>
             </div>
     
@@ -54,6 +63,9 @@
                 <h3 class="font-bold text-slate-900 mb-4">Dokumentasi</h3>
                 <x-admin.form-group label="Foto Piagam/Piala" name="foto">
                     <input type="file" name="foto" class="file-input">
+                    @error('foto')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
                 </x-admin.form-group>
             </div>
 
