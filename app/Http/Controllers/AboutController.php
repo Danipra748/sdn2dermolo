@@ -29,7 +29,7 @@ class AboutController extends Controller
 
             return str_contains($jabatan, 'kepala') || str_contains($jabatan, 'kepsek');
         }) ?? $guru->first();
-        
+
         // Get contact info from static config
         $kontak = SchoolConfig::contact();
         $alamatLines = SchoolConfig::addressLines();

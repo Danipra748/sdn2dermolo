@@ -35,7 +35,7 @@ class UpdateSchoolProfileRequest extends FormRequest
 
             // History & Stats
             'history_content' => 'nullable|string',
-            'established_year' => 'nullable|integer|min:1900|max:' . date('Y'),
+            'established_year' => 'nullable|integer|min:1900|max:'.date('Y'),
             'land_area' => 'nullable|string|max:50',
             'total_classes' => 'nullable|integer|min:0',
 

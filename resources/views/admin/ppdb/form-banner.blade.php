@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
 @php
-    $isEdit = isset($banner);
+    $isEdit = isset($banner) && $banner->id;
     $title = $isEdit ? 'Edit Banner' : 'Tambah Banner';
 @endphp
 
@@ -16,7 +16,7 @@
     </x-admin.page-header>
     
     <div class="max-w-4xl mx-auto">
-        <form action="{{ $isEdit ? route('admin.banners.update', $banner) : route('admin.banners.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form action="{{ $isEdit ? route('admin.ppdb.banners.update', $banner) : route('admin.ppdb.banners.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @if($isEdit) @method('PUT') @endif
     

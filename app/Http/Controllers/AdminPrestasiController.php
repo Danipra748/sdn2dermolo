@@ -19,19 +19,20 @@ class AdminPrestasiController extends Controller
 
     public function index()
     {
-        if (!Schema::hasTable('prestasis')) {
+        if (! Schema::hasTable('prestasis')) {
             return redirect()->route('admin.dashboard')
                 ->with('status', 'Tabel prestasi belum tersedia. Jalankan: php artisan migrate');
         }
 
         $prestasi = Prestasi::latest()->get();
+
         return view('admin.prestasi.index', compact('prestasi'));
     }
 
     public function create()
     {
         return view('admin.prestasi.form', [
-            'prestasi' => new Prestasi(),
+            'prestasi' => new Prestasi,
             'action' => route('admin.prestasi-sekolah.store'),
             'method' => 'POST',
             'title' => 'Tambah Prestasi Sekolah',
@@ -69,6 +70,7 @@ class AdminPrestasiController extends Controller
     public function destroy(Prestasi $prestasi)
     {
         $this->prestasiService->delete($prestasi);
+
         return redirect()->route('admin.prestasi-sekolah.index')
             ->with('status', 'Data prestasi berhasil dihapus.');
     }

@@ -12,4 +12,23 @@ class AdminContactMessageController extends Controller
 
         return view('admin.messages.index', compact('messages'));
     }
+
+    /**
+     * Display the specified message.
+     */
+    public function show(ContactMessage $message)
+    {
+        return view('admin.messages.show', compact('message'));
+    }
+
+    /**
+     * Remove the specified message.
+     */
+    public function destroy(ContactMessage $message)
+    {
+        $message->delete();
+
+        return redirect()->route('admin.messages.index')
+            ->with('success', 'Pesan berhasil dihapus.');
+    }
 }

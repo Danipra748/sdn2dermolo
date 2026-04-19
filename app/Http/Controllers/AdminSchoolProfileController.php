@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateSchoolProfileRequest;
 use App\Models\SchoolProfile;
 use App\Services\Modules\SchoolProfileService;
-use App\Http\Requests\UpdateSchoolProfileRequest;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class AdminSchoolProfileController extends Controller
 {
@@ -23,6 +21,7 @@ class AdminSchoolProfileController extends Controller
     public function edit()
     {
         $profile = SchoolProfile::getOrCreate();
+
         return view('admin.school-profile.edit', compact('profile'));
     }
 
@@ -38,10 +37,10 @@ class AdminSchoolProfileController extends Controller
                 ->with('success', 'Profil sekolah berhasil diperbarui!');
 
         } catch (\Exception $e) {
-            \Log::error('School profile update error: ' . $e->getMessage());
+            \Log::error('School profile update error: '.$e->getMessage());
 
             return redirect()->back()
-                ->with('error', 'Terjadi error: ' . $e->getMessage());
+                ->with('error', 'Terjadi error: '.$e->getMessage());
         }
     }
 
@@ -51,6 +50,7 @@ class AdminSchoolProfileController extends Controller
     public function deleteLogo()
     {
         $success = $this->schoolProfileService->deleteLogo();
+
         return response()->json(['success' => $success]);
     }
 }

@@ -4,70 +4,81 @@ namespace App\Services\Modules;
 
 use App\Models\SiteSetting;
 use App\Services\Core\FileService;
-use Illuminate\Http\Request;
+use App\Services\Core\ImageProcessorService;
 use App\Traits\CacheableService;
+use Illuminate\Http\Request;
 
 class SiteSettingService
 {
     use CacheableService;
+
     protected $fileService;
 
-    public function __construct(FileService $fileService)
+    protected $imageProcessor;
+
+    public function __construct(FileService $fileService, ImageProcessorService $imageProcessor)
     {
         $this->fileService = $fileService;
+        $this->imageProcessor = $imageProcessor;
     }
 
     /**
-     * Update principal's greeting.
+     * Update principal's greeting and photo with cropping.
      */
-    public function updateSambutan(array $data, Request $request): void
+    public function updateSambutanAndFoto(array $data, Request $request): void
     {
         $this->clearModuleCache();
-        $existingFoto = SiteSetting::getValue('kepsek_sambutan_foto');
+
+        $sambutanFotoKey = 'kepsek_sambutan_foto';
+        $fotoKepsekKey = 'foto_kepsek';
 
         // Handle deletion
-        if ($request->boolean('remove_foto') && $existingFoto) {
-            $this->fileService->delete($existingFoto);
-            SiteSetting::setValue('kepsek_sambutan_foto', null);
-            $existingFoto = null;
+        if ($request->boolean('remove_foto')) {
+            $this->fileService->delete(SiteSetting::getValue($sambutanFotoKey));
+            $this->fileService->delete(SiteSetting::getValue($fotoKepsekKey));
+            SiteSetting::setValue($sambutanFotoKey, null);
+            SiteSetting::setValue($fotoKepsekKey, null);
         }
 
         // Handle upload
         if ($request->hasFile('foto')) {
-            $path = $this->fileService->replace($existingFoto, $request, 'foto', 'sambutan');
-            SiteSetting::setValue('kepsek_sambutan_foto', $path);
+            // Delete old photos first
+            $this->fileService->delete(SiteSetting::getValue($sambutanFotoKey));
+            $this->fileService->delete(SiteSetting::getValue($fotoKepsekKey));
+
+            $path = null;
+            if ($request->filled(['crop_x', 'crop_y', 'crop_w', 'crop_h'])) {
+                $cropData = [
+                    'x' => $request->input('crop_x'),
+                    'y' => $request->input('crop_y'),
+                    'w' => $request->input('crop_w'),
+                    'h' => $request->input('crop_h'),
+                ];
+
+                $result = $this->imageProcessor->processAndSave(
+                    $request->file('foto'),
+                    $cropData,
+                    'site',
+                    ['w' => 800, 'h' => 1000], // Target 4:5 ratio
+                    'foto-kepsek'
+                );
+
+                if ($result) {
+                    $path = $result['path'];
+                    imagedestroy($result['resource']);
+                }
+            } else {
+                // Fallback for non-cropped upload
+                $path = $this->fileService->upload($request, 'foto', 'site');
+            }
+
+            if ($path) {
+                // Set both keys to the same image
+                SiteSetting::setValue($sambutanFotoKey, $path);
+                SiteSetting::setValue($fotoKepsekKey, $path);
+            }
         }
 
         SiteSetting::setValue('kepsek_sambutan_text', $data['sambutan'] ?? '');
-    }
-
-    /**
-     * Upload principal's official photo.
-     */
-    public function uploadFotoKepsek(Request $request): ?string
-    {
-        $this->clearModuleCache();
-        if ($request->hasFile('foto_kepsek')) {
-            $existing = SiteSetting::getValue('foto_kepsek');
-            $path = $this->fileService->replace($existing, $request, 'foto_kepsek', 'site');
-            SiteSetting::setValue('foto_kepsek', $path);
-            return $path;
-        }
-        return null;
-    }
-
-    /**
-     * Delete principal's official photo.
-     */
-    public function deleteFotoKepsek(): bool
-    {
-        $this->clearModuleCache();
-        $existing = SiteSetting::getValue('foto_kepsek');
-        if ($existing) {
-            $this->fileService->delete($existing);
-            SiteSetting::setValue('foto_kepsek', null);
-            return true;
-        }
-        return false;
     }
 }

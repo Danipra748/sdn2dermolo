@@ -3,13 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Fasilitas;
-use App\Models\Guru;
-use App\Models\Program;
-use App\Models\PpdbSetting;
 use App\Models\PpdbBanner;
+use App\Models\PpdbSetting;
+use App\Models\Program;
+use App\Services\Modules\SpaService;
 use App\Support\SchoolConfig;
 use App\Support\SchoolData;
-use App\Services\Modules\SpaService;
 use Illuminate\Support\Facades\Schema;
 
 class PageController extends Controller
@@ -24,6 +23,7 @@ class PageController extends Controller
     public function index()
     {
         $data = $this->spaService->getHomeData();
+
         return view('home', $data);
     }
 

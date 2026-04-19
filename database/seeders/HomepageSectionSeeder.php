@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\HomepageSection;
+use Illuminate\Database\Seeder;
 
 class HomepageSectionSeeder extends Seeder
 {
@@ -42,7 +42,7 @@ class HomepageSectionSeeder extends Seeder
                     'mission_points' => [
                         'Menyelenggarakan pendidikan berkualitas',
                         'Mengembangkan karakter siswa',
-                        'Menciptakan lingkungan belajar yang nyaman'
+                        'Menciptakan lingkungan belajar yang nyaman',
                     ],
                 ]),
             ],
@@ -59,7 +59,7 @@ class HomepageSectionSeeder extends Seeder
                         ['label' => 'Guru', 'value' => '25', 'icon' => 'heroicon-o-user-group'],
                         ['label' => 'Fasilitas', 'value' => '12', 'icon' => 'heroicon-o-building-library'],
                         ['label' => 'Program', 'value' => '8', 'icon' => 'heroicon-o-light-bulb'],
-                    ]
+                    ],
                 ]),
             ],
             [

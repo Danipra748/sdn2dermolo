@@ -46,7 +46,7 @@ class FasilitasSeeder extends Seeder
 
         foreach ($fasilitas as $item) {
             // Cek apakah sudah ada, jika belum maka insert
-            if (!DB::table('fasilitas')->where('nama', $item['nama'])->exists()) {
+            if (! DB::table('fasilitas')->where('nama', $item['nama'])->exists()) {
                 DB::table('fasilitas')->insert($item);
             }
         }

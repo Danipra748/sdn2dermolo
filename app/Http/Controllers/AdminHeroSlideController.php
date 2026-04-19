@@ -31,7 +31,9 @@ class AdminHeroSlideController extends Controller
      */
     public function create()
     {
-        return view('admin.hero-slides.form');
+        return view('admin.hero-slides.form', [
+            'heroSlide' => new HeroSlide,
+        ]);
     }
 
     /**

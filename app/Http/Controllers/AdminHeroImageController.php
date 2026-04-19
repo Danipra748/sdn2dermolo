@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\SiteSetting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class AdminHeroImageController extends Controller
 {
@@ -14,6 +13,7 @@ class AdminHeroImageController extends Controller
     public function index()
     {
         $heroImage = SiteSetting::getHeroImage();
+
         return view('admin.hero-image.index', compact('heroImage'));
     }
 

@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
 @php
-    $isEdit = isset($guru);
+    $isEdit = isset($guru) && $guru->id;
     $title = $isEdit ? 'Edit Guru' : 'Tambah Guru';
 @endphp
 

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
-use App\Models\Category;
 use App\Models\ArticleView;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Schema;
@@ -13,7 +13,7 @@ class NewsController extends Controller
 {
     public function index(Request $request)
     {
-        if (!Schema::hasTable('articles') || !Schema::hasTable('categories')) {
+        if (! Schema::hasTable('articles') || ! Schema::hasTable('categories')) {
             return view('news.index', [
                 'articles' => $this->emptyPaginator(9),
                 'latest' => collect(),
@@ -44,10 +44,10 @@ class NewsController extends Controller
         $search = $request->string('q');
         if ($search->isNotEmpty()) {
             $query->where(function ($builder) use ($search) {
-                $builder->where('title', 'like', '%' . $search . '%')
-                    ->orWhere('subtitle', 'like', '%' . $search . '%')
-                    ->orWhere('summary', 'like', '%' . $search . '%')
-                    ->orWhere('content', 'like', '%' . $search . '%');
+                $builder->where('title', 'like', '%'.$search.'%')
+                    ->orWhere('subtitle', 'like', '%'.$search.'%')
+                    ->orWhere('summary', 'like', '%'.$search.'%')
+                    ->orWhere('content', 'like', '%'.$search.'%');
             });
         }
 
@@ -83,8 +83,8 @@ class NewsController extends Controller
 
         $article->load(['category', 'author']);
 
-        $sessionKey = 'article_viewed_' . $article->id;
-        if (!$request->session()->has($sessionKey)) {
+        $sessionKey = 'article_viewed_'.$article->id;
+        if (! $request->session()->has($sessionKey)) {
             ArticleView::create([
                 'article_id' => $article->id,
                 'ip' => $request->ip(),
@@ -111,7 +111,7 @@ class NewsController extends Controller
 
     public function category(Category $category, Request $request)
     {
-        if (!Schema::hasTable('articles')) {
+        if (! Schema::hasTable('articles')) {
             return view('news.category', [
                 'category' => $category,
                 'articles' => $this->emptyPaginator(9),
@@ -142,7 +142,7 @@ class NewsController extends Controller
             $selectedType = null;
         }
 
-        if (!Schema::hasTable('articles')) {
+        if (! Schema::hasTable('articles')) {
             return view('news.search', [
                 'articles' => $this->emptyPaginator(9),
                 'query' => $query,
@@ -155,15 +155,15 @@ class NewsController extends Controller
 
         $articles = $searchQuery->when($query, function ($builder) use ($query) {
             $builder->where(function ($q) use ($query) {
-                $q->where('title', 'like', '%' . $query . '%')
-                    ->orWhere('subtitle', 'like', '%' . $query . '%')
-                    ->orWhere('summary', 'like', '%' . $query . '%')
-                    ->orWhere('content', 'like', '%' . $query . '%');
+                $q->where('title', 'like', '%'.$query.'%')
+                    ->orWhere('subtitle', 'like', '%'.$query.'%')
+                    ->orWhere('summary', 'like', '%'.$query.'%')
+                    ->orWhere('content', 'like', '%'.$query.'%');
             });
         })
-        ->latest('published_at')
-        ->paginate(9)
-        ->withQueryString();
+            ->latest('published_at')
+            ->paginate(9)
+            ->withQueryString();
 
         return view('news.search', [
             'articles' => $articles,

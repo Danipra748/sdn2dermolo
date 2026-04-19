@@ -5,12 +5,13 @@ namespace App\Services\Modules;
 use App\Models\Program;
 use App\Models\ProgramPhoto;
 use App\Services\Core\FileService;
-use Illuminate\Http\Request;
 use App\Traits\CacheableService;
+use Illuminate\Http\Request;
 
 class ProgramService
 {
     use CacheableService;
+
     protected $fileService;
 
     public function __construct(FileService $fileService)
@@ -60,6 +61,7 @@ class ProgramService
         }
 
         $program->update($validated);
+
         return $program;
     }
 
@@ -72,6 +74,7 @@ class ProgramService
         $this->fileService->delete($program->foto);
         $this->fileService->delete($program->card_bg_image);
         $this->fileService->delete($program->logo);
+
         return $program->delete();
     }
 
@@ -85,6 +88,7 @@ class ProgramService
         if ($request->hasFile('photo')) {
             $data['photo'] = $this->fileService->upload($request, 'photo', 'program/photos');
         }
+
         return ProgramPhoto::create($data);
     }
 
@@ -101,6 +105,7 @@ class ProgramService
             $data = array_merge($data, $this->fileService->handleModelUpload($photo, 'photo', $request, 'photo', 'program/photos'));
         }
         $photo->update($data);
+
         return $photo;
     }
 
@@ -111,6 +116,7 @@ class ProgramService
     {
         $this->clearModuleCache();
         $this->fileService->delete($photo->photo);
+
         return $photo->delete();
     }
 }

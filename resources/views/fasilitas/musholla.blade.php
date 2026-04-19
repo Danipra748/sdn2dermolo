@@ -135,7 +135,7 @@
     <div class="max-w-4xl mx-auto text-center">
         <h2 class="text-3xl font-bold mb-3">{{ $data['cta_title'] }}</h2>
         <p class="text-xl text-white/80 mb-8">{{ $data['cta_subtitle'] }}</p>
-        <a href="{{ route('fasilitas.index') }}" 
+        <a href="{{ route('public.fasilitas.index') }}" 
            class="inline-flex items-center gap-2 px-8 py-4 bg-white text-indigo-600 font-bold rounded-full hover:bg-indigo-50 transition shadow-lg">
             <x-heroicon-o-arrow-left class="w-5 h-5" />
             {{ $data['back_button_text'] }}

@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
 @php
-    $isEdit = isset($prestasi);
+    $isEdit = $prestasi->exists;
     $title = $isEdit ? 'Edit Prestasi' : 'Tambah Prestasi';
 @endphp
 
@@ -16,7 +16,7 @@
     </x-admin.page-header>
     
     <div class="max-w-4xl mx-auto">
-        <form action="{{ $isEdit ? route('admin.prestasi-sekolah.update', $prestasi) : route('admin.prestasi-sekolah.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form action="{{ $action }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @if($isEdit) @method('PUT') @endif
     

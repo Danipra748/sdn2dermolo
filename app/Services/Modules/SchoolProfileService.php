@@ -5,13 +5,15 @@ namespace App\Services\Modules;
 use App\Models\SchoolProfile;
 use App\Services\Core\FileService;
 use App\Services\Core\ImageProcessorService;
-use Illuminate\Http\Request;
 use App\Traits\CacheableService;
+use Illuminate\Http\Request;
 
 class SchoolProfileService
 {
     use CacheableService;
+
     protected $fileService;
+
     protected $imageProcessor;
 
     public function __construct(FileService $fileService, ImageProcessorService $imageProcessor)
@@ -44,7 +46,7 @@ class SchoolProfileService
             ];
 
             $result = $this->imageProcessor->processAndSave($request->file('logo_raw'), $cropData, 'school-profile', 512, 'logo');
-            
+
             if ($result) {
                 $validated['logo'] = $result['path'];
                 // Generate Favicon
@@ -56,13 +58,14 @@ class SchoolProfileService
 
         // Handle missions
         if ($request->has('mission_items')) {
-            $missions = array_filter($request->input('mission_items'), function($item) {
-                return !empty(trim($item));
+            $missions = array_filter($request->input('mission_items'), function ($item) {
+                return ! empty(trim($item));
             });
             $validated['missions'] = array_values($missions);
         }
 
         $profile->update($validated);
+
         return $profile;
     }
 
@@ -75,8 +78,10 @@ class SchoolProfileService
         $profile = SchoolProfile::getOrCreate();
         if ($profile->logo) {
             $this->fileService->delete($profile->logo);
+
             return $profile->update(['logo' => null]);
         }
+
         return false;
     }
 }

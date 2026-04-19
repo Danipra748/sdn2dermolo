@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SiteSetting;
 use App\Services\Modules\SiteSettingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
@@ -23,7 +22,7 @@ class AdminSambutanController extends Controller
 
     public function update(Request $request)
     {
-        if (!Schema::hasTable('site_settings')) {
+        if (! Schema::hasTable('site_settings')) {
             return redirect()->route('admin.dashboard')
                 ->with('status', 'Tabel site_settings belum tersedia. Jalankan: php artisan migrate');
         }
@@ -32,11 +31,15 @@ class AdminSambutanController extends Controller
             'sambutan' => ['nullable', 'string'],
             'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'remove_foto' => ['nullable', 'boolean'],
+            'crop_x' => ['nullable', 'numeric'],
+            'crop_y' => ['nullable', 'numeric'],
+            'crop_w' => ['nullable', 'numeric'],
+            'crop_h' => ['nullable', 'numeric'],
         ]);
 
-        $this->siteSettingService->updateSambutan($validated, $request);
+        $this->siteSettingService->updateSambutanAndFoto($validated, $request);
 
-        return redirect()->to(route('admin.hidden-settings') . '#sambutan-settings')
+        return redirect()->to(route('admin.hidden-settings').'#sambutan-settings')
             ->with('status', 'Sambutan kepala sekolah berhasil diperbarui.');
     }
 }

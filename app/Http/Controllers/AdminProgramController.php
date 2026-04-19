@@ -31,7 +31,7 @@ class AdminProgramController extends Controller
     public function create()
     {
         return view('admin.program.info', [
-            'program' => new Program(),
+            'program' => new Program,
             'action' => route('admin.program-sekolah.store'),
             'method' => 'POST',
             'title' => 'Tambah Program Sekolah',
@@ -63,7 +63,7 @@ class AdminProgramController extends Controller
     {
         $program = Program::findOrFail($programSekolah);
         $data = $this->validateProgram($request, $program->id);
-        
+
         $this->programService->update($program, $data, $request);
 
         return redirect()->route('admin.program-sekolah.index')
@@ -81,8 +81,13 @@ class AdminProgramController extends Controller
 
     private function validateProgram(Request $request, ?int $ignoreId = null): array
     {
+        $uniqueRule = 'unique:programs,slug';
+        if ($ignoreId) {
+            $uniqueRule .= ',' . $ignoreId;
+        }
+
         return $request->validate([
-            'slug' => ['required', 'in:pramuka,seni-ukir,drumband', 'unique:programs,slug,' . $ignoreId],
+            'slug' => ['required', 'in:pramuka,seni-ukir,drumband', $uniqueRule],
             'title' => ['required', 'string', 'max:255'],
             'desc' => ['nullable', 'string'],
             'emoji' => ['nullable', 'string', 'max:20'],

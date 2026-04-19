@@ -4,14 +4,15 @@ namespace App\Services\Modules;
 
 use App\Models\Article;
 use App\Services\Core\FileService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Http;
 use App\Traits\CacheableService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class ArticleService
 {
     use CacheableService;
+
     protected $fileService;
 
     public function __construct(FileService $fileService)
@@ -60,6 +61,7 @@ class ArticleService
         }
 
         $article->update($data);
+
         return $article;
     }
 
@@ -70,6 +72,7 @@ class ArticleService
     {
         $this->clearModuleCache();
         $this->fileService->delete($article->featured_image);
+
         return $article->delete();
     }
 
@@ -85,7 +88,7 @@ class ArticleService
         while (Article::where('slug', $slug)
             ->when($articleId, fn ($q) => $q->where('id', '!=', $articleId))
             ->exists()) {
-            $slug = $base . '-' . $counter;
+            $slug = $base.'-'.$counter;
             $counter++;
         }
 
@@ -100,7 +103,9 @@ class ArticleService
         $apiKey = config('services.openai.key');
         $model = config('services.openai.model', 'gpt-4o-mini');
 
-        if (empty($apiKey)) return null;
+        if (empty($apiKey)) {
+            return null;
+        }
 
         $response = Http::withToken($apiKey)
             ->timeout(40)
@@ -119,14 +124,16 @@ class ArticleService
                 ],
             ]);
 
-        if (!$response->successful()) return null;
+        if (! $response->successful()) {
+            return null;
+        }
 
         $payload = $response->json();
         $text = data_get($payload, 'choices.0.message.content', '');
-        
+
         // Handle markdown code blocks if AI returns them
         $text = preg_replace('/^```json\s*|```$/m', '', $text);
-        
+
         return json_decode($text, true);
     }
 }

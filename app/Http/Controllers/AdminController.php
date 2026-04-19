@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Fasilitas;
-use App\Support\SchoolData;
-use App\Models\Guru;
-use App\Models\Program;
 use App\Models\Article;
 use App\Models\ArticleView;
 use App\Models\ContactMessage;
-use Illuminate\Support\Facades\Schema;
+use App\Models\Fasilitas;
+use App\Models\Guru;
+use App\Models\Program;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 class AdminController extends Controller
 {
@@ -20,7 +19,7 @@ class AdminController extends Controller
         $fasilitasCount = Schema::hasTable('fasilitas') ? Fasilitas::count() : 0;
         $guruCount = Schema::hasTable('gurus') ? Guru::count() : 0;
         $programCount = Schema::hasTable('programs') ? Program::count() : 0;
-        
+
         $stats = [
             'total_fasilitas' => $fasilitasCount,
             'total_guru' => $guruCount,
@@ -32,7 +31,7 @@ class AdminController extends Controller
             $stats['total_articles'] = Article::count();
             $stats['published_articles'] = Article::where('status', 'published')->count();
             $stats['draft_articles'] = $stats['total_articles'] - $stats['published_articles'];
-            
+
             // Recent Articles
             $recentArticles = Article::latest()->take(5)->get();
         } else {
@@ -53,10 +52,10 @@ class AdminController extends Controller
 
     private function getChartData(): array
     {
-        if (!Schema::hasTable('article_views')) {
+        if (! Schema::hasTable('article_views')) {
             return [
                 'labels' => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                'data' => [0, 0, 0, 0, 0, 0, 0]
+                'data' => [0, 0, 0, 0, 0, 0, 0],
             ];
         }
 
@@ -66,14 +65,14 @@ class AdminController extends Controller
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i);
             $days->push($date->format('D'));
-            
+
             $count = ArticleView::whereDate('created_at', $date->toDateString())->count();
             $views->push($count);
         }
 
         return [
             'labels' => $days->all(),
-            'data' => $views->all()
+            'data' => $views->all(),
         ];
     }
 }

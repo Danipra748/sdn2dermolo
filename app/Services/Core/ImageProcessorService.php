@@ -2,8 +2,8 @@
 
 namespace App\Services\Core;
 
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class ImageProcessorService
 {
@@ -17,7 +17,9 @@ class ImageProcessorService
             $path = $file->getRealPath();
 
             $src = $this->createImageFromPath($path, $extension);
-            if (!$src) return null;
+            if (! $src) {
+                return null;
+            }
 
             // Determine target width and height
             $tw = is_array($targetSize) ? ($targetSize['w'] ?? 512) : $targetSize;
@@ -46,26 +48,27 @@ class ImageProcessorService
             );
 
             // Ensure directory exists
-            if (!Storage::disk('public')->exists($directory)) {
+            if (! Storage::disk('public')->exists($directory)) {
                 Storage::disk('public')->makeDirectory($directory);
             }
 
             // Save as WebP
-            $filename = $filenamePrefix . '_' . time() . '.webp';
-            $fullPath = storage_path('app/public/' . $directory . '/' . $filename);
+            $filename = $filenamePrefix.'_'.time().'.webp';
+            $fullPath = storage_path('app/public/'.$directory.'/'.$filename);
             imagewebp($finalImage, $fullPath, 90);
 
             // Clean up resources that won't be used
             imagedestroy($src);
             imagedestroy($cropped);
-            
+
             return [
-                'path' => $directory . '/' . $filename,
-                'resource' => $finalImage // Keep for further processing like favicon
+                'path' => $directory.'/'.$filename,
+                'resource' => $finalImage, // Keep for further processing like favicon
             ];
 
         } catch (\Exception $e) {
-            \Log::error('Image processing error: ' . $e->getMessage());
+            \Log::error('Image processing error: '.$e->getMessage());
+
             return null;
         }
     }
@@ -107,23 +110,24 @@ class ImageProcessorService
         $favSize = 48;
         $favicon = imagecreatetruecolor($favSize, $favSize);
         $this->handleTransparency($favicon);
-        
+
         imagecopyresampled(
             $favicon, $imageResource,
             0, 0, 0, 0,
             $favSize, $favSize,
             imagesx($imageResource), imagesy($imageResource)
         );
-        
-        $favFilename = 'favicon_' . time() . '.png';
-        $favPath = storage_path('app/public/' . $directory . '/' . $favFilename);
+
+        $favFilename = 'favicon_'.time().'.png';
+        $favPath = storage_path('app/public/'.$directory.'/'.$favFilename);
         imagepng($favicon, $favPath);
-        
+
         // Fixed location for dynamic favicon
         $fixedFavPath = storage_path('app/public/school-profile/favicon-dynamic.png');
         copy($favPath, $fixedFavPath);
-        
+
         imagedestroy($favicon);
-        return $directory . '/' . $favFilename;
+
+        return $directory.'/'.$favFilename;
     }
 }

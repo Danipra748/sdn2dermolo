@@ -16,7 +16,7 @@ class AdminKontakController extends Controller
         }
 
         $location = SiteSetting::getSchoolLocation();
-        
+
         $kontak = [
             'address' => SiteSetting::getValue('school_address', ''),
             'phone' => SiteSetting::getValue('school_phone', ''),
@@ -51,7 +51,7 @@ class AdminKontakController extends Controller
         SiteSetting::setValue('school_phone', $validated['phone'] ?? '');
         SiteSetting::setValue('school_email', $validated['email'] ?? '');
         SiteSetting::setValue('school_maps_url', $validated['maps_url'] ?? '');
-        
+
         // Update coordinates if provided
         if (isset($validated['latitude']) && isset($validated['longitude'])) {
             SiteSetting::updateSchoolLocation(
