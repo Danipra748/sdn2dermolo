@@ -240,15 +240,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // PPDB Management
     Route::prefix('ppdb')->name('ppdb.')->group(function () {
         Route::get('/', [AdminPpdbController::class, 'index'])->name('index');
-        Route::post('/settings', [AdminPpdbController::class, 'updateSettings'])->name('settings.update');
-<<<<<<< HEAD
-        Route::post('/banners', [AdminPpdbController::class, 'storeBanner'])->name('banners.store');
-=======
         Route::put('/settings', [AdminPpdbController::class, 'updateSettings'])->name('settings.update');
         Route::get('/banners/create', [AdminPpdbController::class, 'createBanner'])->name('banners.create');
         Route::post('/banners', [AdminPpdbController::class, 'storeBanner'])->name('banners.store');
         Route::get('/banners/{banner}/edit', [AdminPpdbController::class, 'editBanner'])->name('banners.edit');
->>>>>>> development
         Route::post('/banners/{banner}', [AdminPpdbController::class, 'updateBanner'])->name('banners.update');
         Route::patch('/banners/{banner}/toggle', [AdminPpdbController::class, 'toggleBanner'])->name('banners.toggle');
         Route::delete('/banners/{banner}', [AdminPpdbController::class, 'destroyBanner'])->name('banners.destroy');
