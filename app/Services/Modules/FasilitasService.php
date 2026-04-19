@@ -5,9 +5,14 @@ namespace App\Services\Modules;
 use App\Models\Fasilitas;
 use App\Services\Core\FileService;
 use Illuminate\Http\Request;
+use App\Traits\CacheableService;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class FasilitasService
 {
+    use CacheableService;
+
     protected $fileService;
 
     public function __construct(FileService $fileService)
@@ -29,6 +34,7 @@ class FasilitasService
      */
     public function store(array $validated, Request $request): Fasilitas
     {
+        $this->clearModuleCache(['fasilitas_public_' . ($validated['nama'] ?? '')]);
         if ($request->hasFile('foto')) {
             $validated['foto'] = $this->fileService->upload($request, 'foto', 'fasilitas');
         }
@@ -40,6 +46,7 @@ class FasilitasService
      */
     public function update(Fasilitas $fasilitas, array $validated, Request $request): Fasilitas
     {
+        $this->clearModuleCache(['fasilitas_public_' . $fasilitas->nama, 'fasilitas_public_' . ($validated['nama'] ?? '')]);
         if ($request->boolean('remove_foto')) {
             $validated = array_merge($validated, $this->fileService->handleModelDeletion($fasilitas, 'foto'));
         }
@@ -53,31 +60,35 @@ class FasilitasService
     }
 
     /**
-     * Build public data for a facility.
+     * Build public data for a facility with robust key-based caching.
      */
     public function buildPublicData(string $nama): array
     {
-        $item = Fasilitas::where('nama', $nama)->first();
-        $default = $this->getDefaultData($nama);
-        $data = $default;
-        
-        $kontenValue = $item?->konten;
-        if (is_array($kontenValue)) {
-            $data = array_replace_recursive($data, $kontenValue);
-            $data['konten_html'] = null;
-        } elseif (is_string($kontenValue) && trim($kontenValue) !== '') {
-            $data['konten_html'] = $kontenValue;
-        } else {
-            $data['konten_html'] = null;
-        }
+        $cacheKey = 'fasilitas_public_' . $nama;
 
-        $warna = $item?->warna ?? 'blue';
-        $data['title'] = $item?->nama ?? $nama;
-        $data['subtitle'] = ($item && filled($item->deskripsi)) ? $item->deskripsi : ($default['subtitle'] ?? '');
-        $data['card_bg_image'] = $item?->card_bg_image;
-        $data['hero_color'] = self::WARNA_TO_HERO[$warna] ?? self::WARNA_TO_HERO['blue'];
-        
-        return $data;
+        return Cache::rememberForever($cacheKey, function () use ($nama) {
+            $item = Fasilitas::where('nama', $nama)->first();
+            $default = $this->getDefaultData($nama);
+            $data = $default;
+            
+            $kontenValue = $item?->konten;
+            if (is_array($kontenValue)) {
+                $data = array_replace_recursive($data, $kontenValue);
+                $data['konten_html'] = null;
+            } elseif (is_string($kontenValue) && trim($kontenValue) !== '') {
+                $data['konten_html'] = $kontenValue;
+            } else {
+                $data['konten_html'] = null;
+            }
+
+            $warna = $item?->warna ?? 'blue';
+            $data['title'] = $item?->nama ?? $nama;
+            $data['subtitle'] = ($item && filled($item->deskripsi)) ? $item->deskripsi : ($default['subtitle'] ?? '');
+            $data['card_bg_image'] = $item?->card_bg_image;
+            $data['hero_color'] = self::WARNA_TO_HERO[$warna] ?? self::WARNA_TO_HERO['blue'];
+            
+            return $data;
+        });
     }
 
     /**
@@ -88,20 +99,20 @@ class FasilitasService
         return match ($nama) {
             'Ruang Kelas' => [
                 'subtitle' => 'Ruang kelas yang nyaman, rapi, dan mendukung proses belajar siswa.',
-                'emoji' => '??',
+                'emoji' => '🏫',
                 'border_color' => 'border-blue-500',
                 'back_button_text' => 'Kembali ke Fasilitas',
                 'description_title' => 'Tentang Ruang Kelas Kami',
                 'description_paragraphs' => [
                     'SD N 2 Dermolo memiliki 18 ruang kelas yang dirancang untuk menciptakan suasana belajar yang optimal.',
-                    'Setiap kelas dilengkapi fasilitas belajar modern agar proses belajar mengajar lebih efektif.',
+                    'Every classroom is equipped with modern learning facilities to make the teaching and learning process more effective.',
                 ],
                 'stats_title' => 'Data Ruang Kelas',
                 'stats' => [
-                    ['value' => '18', 'label' => 'Ruang Kelas', 'icon' => '??', 'color' => 'blue'],
-                    ['value' => '30', 'label' => 'Siswa per Kelas', 'icon' => '??', 'color' => 'green'],
-                    ['value' => '63 m2', 'label' => 'Luas Ruang Kelas', 'icon' => '??', 'color' => 'purple'],
-                    ['value' => '100%', 'label' => 'Terawat Baik', 'icon' => '?', 'color' => 'orange'],
+                    ['value' => '18', 'label' => 'Ruang Kelas', 'icon' => '🏫', 'color' => 'blue'],
+                    ['value' => '30', 'label' => 'Siswa per Kelas', 'icon' => '👥', 'color' => 'green'],
+                    ['value' => '63 m2', 'label' => 'Luas Ruang Kelas', 'icon' => '📐', 'color' => 'purple'],
+                    ['value' => '100%', 'label' => 'Terawat Baik', 'icon' => '✨', 'color' => 'orange'],
                 ],
                 'kelas_title' => 'Pembagian Ruang Kelas',
                 'kelas' => [
@@ -114,10 +125,10 @@ class FasilitasService
                 ],
                 'fasilitas_title' => 'Fasilitas dan Kelengkapan Ruang Kelas',
                 'fasilitas_items' => [
-                    ['icon' => '??', 'title' => 'Air Conditioner (AC)', 'desc' => 'Setiap kelas dilengkapi AC untuk kenyamanan belajar.'],
-                    ['icon' => '??', 'title' => 'LCD Proyektor', 'desc' => 'Media visual untuk presentasi dan pembelajaran interaktif.'],
-                    ['icon' => '??', 'title' => 'Rak Buku Kelas', 'desc' => 'Koleksi buku referensi dan bacaan tambahan di kelas.'],
-                    ['icon' => '???', 'title' => 'Papan Tulis Digital', 'desc' => 'Whiteboard dan smart-board untuk pembelajaran modern.'],
+                    ['icon' => '❄️', 'title' => 'Air Conditioner (AC)', 'desc' => 'Setiap kelas dilengkapi AC untuk kenyamanan belajar.'],
+                    ['icon' => '📽️', 'title' => 'LCD Proyektor', 'desc' => 'Media visual untuk presentasi dan pembelajaran interaktif.'],
+                    ['icon' => '📚', 'title' => 'Rak Buku Kelas', 'desc' => 'Koleksi buku referensi dan bacaan tambahan di kelas.'],
+                    ['icon' => '🖊️', 'title' => 'Papan Tulis Digital', 'desc' => 'Whiteboard dan smart-board untuk pembelajaran modern.'],
                 ],
                 'rules_title' => 'Tata Tertib Ruang Kelas',
                 'tata_tertib_boleh' => [
@@ -144,7 +155,7 @@ class FasilitasService
             ],
             'Perpustakaan' => [
                 'subtitle' => 'Pusat literasi siswa dengan koleksi buku fisik dan digital.',
-                'emoji' => '??',
+                'emoji' => '📚',
                 'back_button_text' => 'Kembali ke Fasilitas',
                 'description_title' => 'Tentang Perpustakaan Kami',
                 'description_paragraphs' => [
@@ -153,17 +164,17 @@ class FasilitasService
                 ],
                 'stats_title' => 'Data dan Koleksi',
                 'stats' => [
-                    ['value' => '5.000+', 'label' => 'Koleksi Buku', 'icon' => '??', 'color' => 'emerald'],
-                    ['value' => '10', 'label' => 'E-Book Point', 'icon' => '??', 'color' => 'blue'],
-                    ['value' => '50+', 'label' => 'Pengunjung/Hari', 'icon' => '??', 'color' => 'amber'],
-                    ['value' => 'A', 'label' => 'Akreditasi', 'icon' => '??', 'color' => 'rose'],
+                    ['value' => '5.000+', 'label' => 'Koleksi Buku', 'icon' => '📖', 'color' => 'emerald'],
+                    ['value' => '10', 'label' => 'E-Book Point', 'icon' => '💻', 'color' => 'blue'],
+                    ['value' => '50+', 'label' => 'Pengunjung/Hari', 'icon' => '👣', 'color' => 'amber'],
+                    ['value' => 'A', 'label' => 'Akreditasi', 'icon' => '🥇', 'color' => 'rose'],
                 ],
                 'fasilitas_title' => 'Fasilitas Unggulan',
                 'fasilitas_unggulan' => [
-                    ['icon' => '??', 'title' => 'Area Baca Lesehan', 'desc' => 'Area baca santai yang nyaman untuk siswa.', 'bg' => 'emerald'],
-                    ['icon' => '??', 'title' => 'Katalog Digital (OPAC)', 'desc' => 'Pencarian buku lebih cepat dan mandiri.', 'bg' => 'blue'],
-                    ['icon' => '??', 'title' => 'Pojok Kreativitas', 'desc' => 'Ruang kegiatan literasi dan kreativitas.', 'bg' => 'amber'],
-                    ['icon' => '?', 'title' => 'Sirkulasi Cepat', 'desc' => 'Peminjaman dan pengembalian buku lebih ringkas.', 'bg' => 'teal'],
+                    ['icon' => '🛋️', 'title' => 'Area Baca Lesehan', 'desc' => 'Area baca santai yang nyaman untuk siswa.', 'bg' => 'emerald'],
+                    ['icon' => '🖥️', 'title' => 'Katalog Digital (OPAC)', 'desc' => 'Pencarian buku lebih cepat dan mandiri.', 'bg' => 'blue'],
+                    ['icon' => '🎨', 'title' => 'Pojok Kreativitas', 'desc' => 'Ruang kegiatan literasi dan kreativitas.', 'bg' => 'amber'],
+                    ['icon' => '⚡', 'title' => 'Sirkulasi Cepat', 'desc' => 'Peminjaman dan pengembalian buku lebih ringkas.', 'bg' => 'teal'],
                 ],
                 'rules_title' => 'Tata Tertib Perpustakaan',
                 'tata_tertib_boleh' => [
@@ -180,7 +191,7 @@ class FasilitasService
             ],
             'Musholla' => [
                 'subtitle' => 'Pusat kegiatan ibadah dan pembinaan karakter siswa.',
-                'emoji' => '??',
+                'emoji' => '🕌',
                 'back_button_text' => 'Kembali ke Fasilitas',
                 'description_title' => 'Fasilitas Musholla',
                 'description_paragraphs' => [
@@ -189,10 +200,10 @@ class FasilitasService
                 ],
                 'stats_title' => 'Kapasitas dan Inventaris',
                 'stats' => [
-                    ['value' => '1', 'label' => 'Unit Musholla', 'icon' => '??', 'color' => 'indigo'],
-                    ['value' => '120+', 'label' => 'Kapasitas Jamaah', 'icon' => '??', 'color' => 'purple'],
-                    ['value' => '2', 'label' => 'Tempat Wudhu', 'icon' => '??', 'color' => 'pink'],
-                    ['value' => '100%', 'label' => 'Ruang Bersih', 'icon' => '?', 'color' => 'orange'],
+                    ['value' => '1', 'label' => 'Unit Musholla', 'icon' => '🕌', 'color' => 'indigo'],
+                    ['value' => '120+', 'label' => 'Kapasitas Jamaah', 'icon' => '👥', 'color' => 'purple'],
+                    ['value' => '2', 'label' => 'Tempat Wudhu', 'icon' => '🚰', 'color' => 'pink'],
+                    ['value' => '100%', 'label' => 'Ruang Bersih', 'icon' => '✨', 'color' => 'orange'],
                 ],
                 'program_title' => 'Kegiatan Ibadah',
                 'program' => [
@@ -217,7 +228,7 @@ class FasilitasService
             ],
             'Lapangan Olahraga' => [
                 'subtitle' => 'Lapangan multifungsi untuk aktivitas olahraga dan pembinaan fisik siswa.',
-                'emoji' => '??',
+                'emoji' => '⚽',
                 'back_button_text' => 'Kembali ke Fasilitas',
                 'description_title' => 'Fasilitas Lapangan Utama',
                 'description_paragraphs' => [
@@ -226,10 +237,10 @@ class FasilitasService
                 ],
                 'stats_title' => 'Inventaris Olahraga',
                 'stats' => [
-                    ['value' => '2 Set', 'label' => 'Gawang Futsal', 'icon' => '??', 'color' => 'indigo'],
-                    ['value' => '2 Unit', 'label' => 'Ring Basket', 'icon' => '??', 'color' => 'purple'],
-                    ['value' => '1 Set', 'label' => 'Tiang Voli', 'icon' => '??', 'color' => 'pink'],
-                    ['value' => '30+', 'label' => 'Alat Peraga PJOK', 'icon' => '??', 'color' => 'orange'],
+                    ['value' => '2 Set', 'label' => 'Gawang Futsal', 'icon' => '⚽', 'color' => 'indigo'],
+                    ['value' => '2 Unit', 'label' => 'Ring Basket', 'icon' => '🏀', 'color' => 'purple'],
+                    ['value' => '1 Set', 'label' => 'Tiang Voli', 'icon' => '🏐', 'color' => 'pink'],
+                    ['value' => '30+', 'label' => 'Alat Peraga PJOK', 'icon' => '🎾', 'color' => 'orange'],
                 ],
                 'program_title' => 'Program Olahraga',
                 'program' => [
@@ -252,7 +263,7 @@ class FasilitasService
             ],
             default => [
                 'subtitle' => '',
-                'emoji' => '??',
+                'emoji' => '🏢',
                 'back_button_text' => 'Kembali ke Fasilitas',
                 'description_title' => 'Tentang Fasilitas',
                 'description_paragraphs' => [],

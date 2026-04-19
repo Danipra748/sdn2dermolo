@@ -6,9 +6,11 @@ use App\Models\SchoolProfile;
 use App\Services\Core\FileService;
 use App\Services\Core\ImageProcessorService;
 use Illuminate\Http\Request;
+use App\Traits\CacheableService;
 
 class SchoolProfileService
 {
+    use CacheableService;
     protected $fileService;
     protected $imageProcessor;
 
@@ -23,6 +25,7 @@ class SchoolProfileService
      */
     public function updateProfile(Request $request): SchoolProfile
     {
+        $this->clearModuleCache();
         $profile = SchoolProfile::getOrCreate();
         $validated = $request->validated();
 
@@ -68,6 +71,7 @@ class SchoolProfileService
      */
     public function deleteLogo(): bool
     {
+        $this->clearModuleCache();
         $profile = SchoolProfile::getOrCreate();
         if ($profile->logo) {
             $this->fileService->delete($profile->logo);

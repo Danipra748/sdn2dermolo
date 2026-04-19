@@ -5,9 +5,11 @@ namespace App\Services\Modules;
 use App\Models\SiteSetting;
 use App\Services\Core\FileService;
 use Illuminate\Http\Request;
+use App\Traits\CacheableService;
 
 class SiteSettingService
 {
+    use CacheableService;
     protected $fileService;
 
     public function __construct(FileService $fileService)
@@ -20,6 +22,7 @@ class SiteSettingService
      */
     public function updateSambutan(array $data, Request $request): void
     {
+        $this->clearModuleCache();
         $existingFoto = SiteSetting::getValue('kepsek_sambutan_foto');
 
         // Handle deletion
@@ -43,6 +46,7 @@ class SiteSettingService
      */
     public function uploadFotoKepsek(Request $request): ?string
     {
+        $this->clearModuleCache();
         if ($request->hasFile('foto_kepsek')) {
             $existing = SiteSetting::getValue('foto_kepsek');
             $path = $this->fileService->replace($existing, $request, 'foto_kepsek', 'site');
@@ -57,6 +61,7 @@ class SiteSettingService
      */
     public function deleteFotoKepsek(): bool
     {
+        $this->clearModuleCache();
         $existing = SiteSetting::getValue('foto_kepsek');
         if ($existing) {
             $this->fileService->delete($existing);

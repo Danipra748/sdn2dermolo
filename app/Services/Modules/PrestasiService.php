@@ -6,9 +6,11 @@ use App\Models\Prestasi;
 use App\Models\SiteSetting;
 use App\Services\Core\FileService;
 use Illuminate\Http\Request;
+use App\Traits\CacheableService;
 
 class PrestasiService
 {
+    use CacheableService;
     protected $fileService;
 
     public function __construct(FileService $fileService)
@@ -21,6 +23,7 @@ class PrestasiService
      */
     public function store(array $data, Request $request): Prestasi
     {
+        $this->clearModuleCache();
         if ($request->hasFile('foto')) {
             $data['foto'] = $this->fileService->upload($request, 'foto', 'prestasi');
         }
@@ -32,6 +35,7 @@ class PrestasiService
      */
     public function update(Prestasi $prestasi, array $data, Request $request): Prestasi
     {
+        $this->clearModuleCache();
         if ($request->hasFile('foto')) {
             $data['foto'] = $this->fileService->replace($prestasi->foto, $request, 'foto', 'prestasi');
         }
@@ -44,6 +48,7 @@ class PrestasiService
      */
     public function delete(Prestasi $prestasi): bool
     {
+        $this->clearModuleCache();
         $this->fileService->delete($prestasi->foto);
         return $prestasi->delete();
     }
@@ -53,6 +58,7 @@ class PrestasiService
      */
     public function updateSummary(string $text): void
     {
+        $this->clearModuleCache();
         $lines = collect(preg_split('/\r\n|\r|\n/', $text))
             ->map(fn ($line) => trim($line))
             ->filter()
