@@ -113,20 +113,20 @@
             margin-right: 8px;
         }
 
-        /* Sidebar styles - Navy theme */
+        /* Sidebar styles - Modern Navy theme */
         .sidebar {
-            background: #1E293B;
-            border-right: 1px solid #334155;
+            background: #0F172A; /* Deeper navy */
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .sidebar-label {
-            font-size: 0.7rem;
-            letter-spacing: 0.15em;
+            font-size: 0.65rem;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: #94A3B8;
-            font-weight: 600;
-            padding: 0 0.75rem;
-            margin-bottom: 0.5rem;
+            color: #64748B;
+            font-weight: 700;
+            padding: 1.5rem 1rem 0.5rem;
         }
 
         .sidebar-summary {
@@ -135,60 +135,108 @@
             justify-content: space-between;
             gap: 0.75rem;
             padding: 0.75rem 1rem;
-            border-radius: 10px;
-            color: #CBD5E1;
+            border-radius: 12px;
+            color: #94A3B8;
             font-weight: 500;
             transition: all 0.2s ease;
             cursor: pointer;
+            user-select: none;
         }
         .sidebar-summary:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: #FFFFFF;
+            background: rgba(255, 255, 255, 0.03);
+            color: #F8FAFC;
         }
-        .sidebar-summary svg {
-            width: 1rem;
-            height: 1rem;
-            transition: transform 0.2s ease;
+        .sidebar-summary svg:last-child {
+            width: 0.9rem;
+            height: 0.9rem;
+            transition: transform 0.3s ease;
+            color: #475569;
         }
         .sidebar-summary::-webkit-details-marker { display: none; }
         summary.sidebar-summary::marker { content: ""; }
-        details[open] > .sidebar-summary svg {
+        details[open] > .sidebar-summary {
+            color: #F8FAFC;
+        }
+        details[open] > .sidebar-summary svg:last-child {
             transform: rotate(180deg);
+            color: #0EA5E9;
         }
 
         .sidebar-link {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0.7rem 1rem;
-            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
             color: #94A3B8;
             font-weight: 500;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             text-decoration: none;
+            margin: 0.1rem 0;
+            position: relative;
         }
         .sidebar-link:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: #FFFFFF;
+            background: rgba(255, 255, 255, 0.05);
+            color: #F8FAFC;
+            transform: translateX(4px);
         }
         .sidebar-link.is-active {
+            background: rgba(14, 165, 233, 0.1);
+            color: #0EA5E9;
+            font-weight: 600;
+        }
+        .sidebar-link.is-active::before {
+            content: "";
+            position: absolute;
+            left: -1rem;
+            top: 0.75rem;
+            bottom: 0.75rem;
+            width: 4px;
             background: #0EA5E9;
-            color: #FFFFFF;
-            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+            border-radius: 0 4px 4px 0;
+            box-shadow: 0 0 12px rgba(14, 165, 233, 0.5);
         }
 
         .sidebar-sub {
             display: flex;
             flex-direction: column;
-            gap: 0.35rem;
-            padding: 0.5rem 0.5rem 0.75rem 0.5rem;
+            gap: 0.15rem;
+            padding: 0.25rem 0.5rem 0.5rem 1.25rem;
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
+            margin-left: 1.5rem;
+            margin-top: 0.25rem;
+            margin-bottom: 0.5rem;
         }
 
-        /* Topbar styling */
+        /* Topbar styling - Modern Dark */
         .topbar {
-            background: #1E293B;
-            border-bottom: 1px solid #334155;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: #0F172A;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+
+        /* Mobile sidebar overlay */
+        #mobile-overlay {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(4px);
+            z-index: 45;
+        }
+
+        /* Custom Scrollbar for Sidebar */
+        .sidebar-nav::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .sidebar-nav::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
 
         /* Button styles */
@@ -449,331 +497,219 @@
     <link rel="stylesheet" href="{{ asset('css/drop-zone.css') }}">
 </head>
 <body class="admin-bg text-slate-700 min-h-screen">
+    {{-- Mobile Sidebar Overlay --}}
+    <div id="mobile-overlay" class="fixed inset-0 lg:hidden hidden" onclick="toggleSidebar()"></div>
+
     <div class="min-h-screen flex">
-        <aside class="hidden lg:flex w-72 sidebar">
-            <div class="w-full p-6 flex flex-col gap-6">
-                <a href="{{ route('home') }}" class="flex items-center gap-3 group">
-                    @php
-                        // Di sini lokasi penyimpanan path logonya.
-                        $logoMatches = glob(storage_path('app/public/logos/sd-negeri-2-dermolo.*')) ?: [];
-                        $logoPath = $logoMatches[0] ?? null;
-                        $logoExists = $logoPath !== null;
-                        $logoAsset = $logoExists ? asset('storage/logos/' . basename($logoPath)) : null;
-                    @endphp
+        {{-- Sidebar --}}
+        <aside id="sidebar" class="fixed inset-y-0 left-0 w-72 sidebar lg:static lg:translate-x-0 -translate-x-full z-50 flex flex-col">
+            <div class="p-6 flex flex-col h-full">
+                {{-- Logo & Brand --}}
+                <div class="mb-8 px-2">
+                    <a href="{{ route('home') }}" class="flex items-center gap-3 group">
+                        @php
+                            $logoMatches = glob(storage_path('app/public/logos/sd-negeri-2-dermolo.*')) ?: [];
+                            $logoPath = $logoMatches[0] ?? null;
+                            $logoExists = $logoPath !== null;
+                            $logoAsset = $logoExists ? asset('storage/logos/' . basename($logoPath)) : null;
+                        @endphp
 
-                    @if($logoExists)
-                        <img src="{{ $logoAsset }}"
-                             alt="Logo SD N 2 Dermolo"
-                             class="w-12 h-12 rounded-xl object-contain bg-white p-1.5 shadow-sm group-hover:shadow-md transition">
-                    @else
-                        <div class="w-12 h-12 rounded-xl bg-cyan text-white flex items-center justify-center font-bold text-sm group-hover:bg-cyan-light transition">SD</div>
-                    @endif
+                        @if($logoExists)
+                            <img src="{{ $logoAsset }}"
+                                 alt="Logo SD N 2 Dermolo"
+                                 class="w-10 h-10 rounded-xl object-contain bg-white p-1 shadow-sm group-hover:shadow-md transition duration-300">
+                        @else
+                            <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-lg group-hover:bg-blue-500 transition duration-300">SD</div>
+                        @endif
 
-                    <div>
-                        <p class="text-base font-semibold text-white group-hover:text-cyan-light transition">Admin Panel</p>
-                        <p class="text-xs text-slate-400">SD N 2 Dermolo</p>
-                    </div>
-                </a>
+                        <div>
+                            <p class="text-sm font-bold text-white group-hover:text-blue-400 transition">Admin Panel</p>
+                            <p class="text-[10px] text-slate-500 uppercase tracking-widest">SD N 2 Dermolo</p>
+                        </div>
+                    </a>
+                </div>
 
                 @php
-                    $ringkasanOpen = request()->routeIs('admin.dashboard');
-                    $kontenOpen = request()->routeIs('admin.fasilitas.*')
-                        || request()->routeIs('admin.guru.*')
-                        || request()->routeIs('admin.program-sekolah.*')
-                        || request()->routeIs('admin.prestasi-sekolah.*')
-                        || request()->routeIs('admin.gallery.*')
-                        || request()->routeIs('admin.articles.*')
-                        || request()->routeIs('admin.categories.*')
-                        || request()->routeIs('admin.messages.*')
-                        || request()->routeIs('admin.hero-slides.*');
-
-                    // Submenu open states
-                    $galeriPrestasiOpen = request()->routeIs('admin.prestasi-sekolah.*') || request()->routeIs('admin.gallery.*');
-                    $manajemenBeritaOpen = request()->routeIs('admin.articles.*') || request()->routeIs('admin.categories.*');
-                    
-                    // Check if current page has file upload forms
-                    $hasFileUpload = request()->routeIs('admin.gallery.*')
-                        || request()->routeIs('admin.prestasi-sekolah.*')
-                        || request()->routeIs('admin.fasilitas.*')
-                        || request()->routeIs('admin.guru.*')
-                        || request()->routeIs('admin.program-sekolah.*')
-                        || request()->routeIs('admin.articles.*');
+                    // Helper to check active groups
+                    $isInfoOpen = request()->routeIs('admin.school-profile.*') || request()->routeIs('admin.hero-slides.*') || request()->routeIs('admin.hidden-settings') || request()->routeIs('admin.sambutan-kepsek.*');
+                    $isAkademikOpen = request()->routeIs('admin.guru.*') || request()->routeIs('admin.program-sekolah.*') || request()->routeIs('admin.ppdb.*');
+                    $isMediaOpen = request()->routeIs('admin.articles.*') || request()->routeIs('admin.categories.*') || request()->routeIs('admin.gallery.*') || request()->routeIs('admin.prestasi-sekolah.*') || request()->routeIs('admin.fasilitas.*');
                 @endphp
 
-                <nav class="flex flex-col gap-5 text-sm overflow-y-auto flex-1">
-                    <div class="flex flex-col gap-2">
-                        <div class="sidebar-label">Ringkasan</div>
-                        <details class="rounded-xl" {{ $ringkasanOpen ? 'open' : '' }}>
+                <nav class="flex-1 sidebar-nav overflow-y-auto pr-1">
+                    {{-- Section: General --}}
+                    <div class="mb-4">
+                        <a href="{{ route('admin.dashboard') }}"
+                           class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">
+                            <div class="flex items-center gap-3">
+                                <x-heroicon-o-home class="w-5 h-5" />
+                                <span>Dashboard</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    {{-- Section: Informasi Sekolah --}}
+                    <div class="mb-2">
+                        <div class="sidebar-label">Informasi Sekolah</div>
+                        <details class="group" {{ $isInfoOpen ? 'open' : '' }}>
                             <summary class="sidebar-summary">
-                                <div class="flex items-center gap-2.5">
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                                    </svg>
-                                    <span>Dashboard</span>
+                                <div class="flex items-center gap-3">
+                                    <x-heroicon-o-building-office-2 class="w-5 h-5" />
+                                    <span>Profil & Banner</span>
                                 </div>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                                </svg>
+                                <x-heroicon-o-chevron-down class="w-4 h-4" />
                             </summary>
                             <div class="sidebar-sub">
-                                <a href="{{ route('admin.dashboard') }}"
-                                   class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">
-                                    <div class="flex items-center gap-2.5">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                                        </svg>
-                                        <span>Dashboard</span>
-                                    </div>
-                                    @if (request()->routeIs('admin.dashboard'))
-                                        <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full">Utama</span>
-                                    @endif
+                                <a href="{{ route('admin.school-profile.edit') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.school-profile.*') ? 'is-active' : '' }}">
+                                    <span>Identitas Sekolah</span>
+                                </a>
+                                <a href="{{ route('admin.hero-slides.index') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.hero-slides.*') ? 'is-active' : '' }}">
+                                    <span>Hero Slideshow</span>
+                                </a>
+                                <a href="{{ route('admin.sambutan-kepsek.edit') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.sambutan-kepsek.*') ? 'is-active' : '' }}">
+                                    <span>Sambutan Kepsek</span>
+                                </a>
+                                <a href="{{ route('admin.hidden-settings') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.hidden-settings') ? 'is-active' : '' }}">
+                                    <span>Foto Pejabat</span>
                                 </a>
                             </div>
                         </details>
                     </div>
 
-                    <div class="flex flex-col gap-2">
-                        <div class="sidebar-label">Konten Publik</div>
-                        <details class="rounded-xl" {{ $kontenOpen ? 'open' : '' }}>
+                    {{-- Section: Akademik --}}
+                    <div class="mb-2">
+                        <div class="sidebar-label">Akademik</div>
+                        <details class="group" {{ $isAkademikOpen ? 'open' : '' }}>
                             <summary class="sidebar-summary">
-                                <div class="flex items-center gap-2.5">
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
-                                    </svg>
-                                    <span>Kelola Konten</span>
+                                <div class="flex items-center gap-3">
+                                    <x-heroicon-o-academic-cap class="w-5 h-5" />
+                                    <span>Pendidikan</span>
                                 </div>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                                </svg>
+                                <x-heroicon-o-chevron-down class="w-4 h-4" />
                             </summary>
                             <div class="sidebar-sub">
-                                <a href="{{ route('admin.hero-slides.index') }}"
-                                   class="sidebar-link {{ request()->routeIs('admin.hero-slides.*') ? 'is-active' : '' }}">
-                                    <div class="flex items-center gap-2.5">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                        </svg>
-                                        <span>Hero Slides</span>
-                                    </div>
-                                </a>
-
-                                <a href="{{ route('admin.ppdb.index') }}"
-                                   class="sidebar-link {{ request()->routeIs('admin.ppdb.*') ? 'is-active' : '' }}">
-                                    <div class="flex items-center gap-2.5">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                        </svg>
-                                        <span>Manajemen PPDB</span>
-                                    </div>
-                                </a>
-
-                                <a href="{{ route('admin.school-profile.edit') }}"
-                                   class="sidebar-link {{ request()->routeIs('admin.school-profile.*') ? 'is-active' : '' }}">
-                                    <div class="flex items-center gap-2.5">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                        </svg>
-                                        <span>Profil Sekolah</span>
-                                    </div>
-                                </a>
-                                <a href="{{ route('admin.fasilitas.index') }}"
-                                   class="sidebar-link {{ request()->routeIs('admin.fasilitas.*') ? 'is-active' : '' }}">
-                                    <div class="flex items-center gap-2.5">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                        </svg>
-                                        <span>Data Fasilitas</span>
-                                    </div>
-                                </a>
                                 <a href="{{ route('admin.guru.index') }}"
                                    class="sidebar-link {{ request()->routeIs('admin.guru.*') ? 'is-active' : '' }}">
-                                    <div class="flex items-center gap-2.5">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M4.262 14.414C2.478 16.848 2.882 17.323 5.448 17.792c6.112 1.12 11.296-2.328 13.324-5.424 1.38-2.107 1.033-3.087-1.148-4.324-.68-.386-1.387-.72-2.11-1.002m-3.864-1.292c-2.98-.89-5.97-.536-6.842 1.34-.872 1.877.857 4.62 3.837 5.51 2.98.888 5.97.535 6.842-1.342.872-1.876-.857-4.62-3.837-5.508z" stroke-linecap="round" stroke-linejoin="round"/>
-                                        </svg>
-                                        <span>Data Guru</span>
-                                    </div>
+                                    <span>Data Guru & Staff</span>
                                 </a>
                                 <a href="{{ route('admin.program-sekolah.index') }}"
                                    class="sidebar-link {{ request()->routeIs('admin.program-sekolah.*') ? 'is-active' : '' }}">
-                                    <div class="flex items-center gap-2.5">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                                        </svg>
-                                        <span>Program Sekolah</span>
-                                    </div>
+                                    <span>Program Sekolah</span>
                                 </a>
-
-                                {{-- Submenu: Galeri & Prestasi --}}
-                                <details class="rounded-xl" {{ $galeriPrestasiOpen ? 'open' : '' }}>
-                                    <summary class="sidebar-summary">
-                                        <div class="flex items-center gap-2.5">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                            </svg>
-                                            <span>Galeri & Prestasi</span>
-                                        </div>
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                                        </svg>
-                                    </summary>
-                                    <div class="sidebar-sub">
-                                        <a href="{{ route('admin.prestasi-sekolah.index') }}"
-                                           class="sidebar-link {{ request()->routeIs('admin.prestasi-sekolah.*') ? 'is-active' : '' }}">
-                                            <div class="flex items-center gap-2.5">
-                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
-                                                </svg>
-                                                <span>Prestasi Sekolah</span>
-                                            </div>
-                                        </a>
-                                        <a href="{{ route('admin.gallery.index') }}"
-                                           class="sidebar-link {{ request()->routeIs('admin.gallery.*') ? 'is-active' : '' }}">
-                                            <div class="flex items-center gap-2.5">
-                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                </svg>
-                                                <span>Galeri Foto</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                </details>
-
-                                {{-- Submenu: Manajemen Berita --}}
-                                <details class="rounded-xl" {{ $manajemenBeritaOpen ? 'open' : '' }}>
-                                    <summary class="sidebar-summary">
-                                        <div class="flex items-center gap-2.5">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
-                                            </svg>
-                                            <span>Manajemen Berita</span>
-                                        </div>
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                                        </svg>
-                                    </summary>
-                                    <div class="sidebar-sub">
-                                        <a href="{{ route('admin.articles.index') }}"
-                                           class="sidebar-link {{ request()->routeIs('admin.articles.*') ? 'is-active' : '' }}">
-                                            <div class="flex items-center gap-2.5">
-                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                                </svg>
-                                                <span>Artikel & News</span>
-                                            </div>
-                                        </a>
-                                        <a href="{{ route('admin.categories.index') }}"
-                                           class="sidebar-link {{ request()->routeIs('admin.categories.*') ? 'is-active' : '' }}">
-                                            <div class="flex items-center gap-2.5">
-                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                                                </svg>
-                                                <span>Kategori Artikel</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                </details>
-
-                                <a href="{{ route('admin.messages.index') }}"
-                                   class="sidebar-link {{ request()->routeIs('admin.messages.*') ? 'is-active' : '' }}">
-                                    <div class="flex items-center gap-2.5">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                                        </svg>
-                                        <span>Pesan Masuk</span>
-                                    </div>
+                                <a href="{{ route('admin.ppdb.index') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.ppdb.*') ? 'is-active' : '' }}">
+                                    <span>Penerimaan Siswa (PPDB)</span>
                                 </a>
                             </div>
                         </details>
                     </div>
 
-                    <div class="flex flex-col gap-2">
-                        <div class="sidebar-label">Sistem</div>
-                        <details class="rounded-xl">
+                    {{-- Section: Media & Konten --}}
+                    <div class="mb-2">
+                        <div class="sidebar-label">Media & Konten</div>
+                        <details class="group" {{ $isMediaOpen ? 'open' : '' }}>
                             <summary class="sidebar-summary">
-                                <div class="flex items-center gap-2.5">
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                    <span>Pengaturan</span>
+                                <div class="flex items-center gap-3">
+                                    <x-heroicon-o-photo class="w-5 h-5" />
+                                    <span>Publikasi</span>
                                 </div>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                                </svg>
+                                <x-heroicon-o-chevron-down class="w-4 h-4" />
                             </summary>
                             <div class="sidebar-sub">
-                                <a href="{{ route('admin.hidden-settings') }}"
-                                   class="sidebar-link {{ request()->routeIs('admin.hidden-settings') ? 'is-active' : '' }}">
-                                    <div class="flex items-center gap-2.5">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                        </svg>
-                                        <span>Foto Kepala Sekolah</span>
-                                    </div>
+                                <a href="{{ route('admin.articles.index') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.articles.*') ? 'is-active' : '' }}">
+                                    <span>Berita & Artikel</span>
                                 </a>
-
-                                <a href="{{ route('admin.sambutan-kepsek.edit') }}"
-                                   class="sidebar-link {{ request()->routeIs('admin.sambutan-kepsek.*') ? 'is-active' : '' }}">
-                                    <div class="flex items-center gap-2.5">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                                        </svg>
-                                        <span>Pengaturan Sambutan</span>
-                                    </div>
+                                <a href="{{ route('admin.categories.index') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.categories.*') ? 'is-active' : '' }}">
+                                    <span>Kategori Berita</span>
                                 </a>
-
-                                <form action="{{ route('logout') }}" method="POST" data-confirm="Yakin ingin logout?">
-                                    @csrf
-                                    <button type="submit" class="sidebar-link w-full text-left">
-                                        <div class="flex items-center gap-2.5">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                                            </svg>
-                                            <span>Logout</span>
-                                        </div>
-                                    </button>
-                                </form>
+                                <a href="{{ route('admin.gallery.index') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.gallery.*') ? 'is-active' : '' }}">
+                                    <span>Galeri Foto</span>
+                                </a>
+                                <a href="{{ route('admin.prestasi-sekolah.index') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.prestasi-sekolah.*') ? 'is-active' : '' }}">
+                                    <span>Prestasi Siswa</span>
+                                </a>
+                                <a href="{{ route('admin.fasilitas.index') }}"
+                                   class="sidebar-link {{ request()->routeIs('admin.fasilitas.*') ? 'is-active' : '' }}">
+                                    <span>Sarana Prasarana</span>
+                                </a>
                             </div>
                         </details>
                     </div>
 
-                    <a href="{{ route('home') }}" class="sidebar-link mt-2 border border-slate-600/50 border-dashed" target="_blank">
-                        <div class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            </svg>
-                            <span>Lihat Website</span>
-                        </div>
-                    </a>
+                    {{-- Section: Komunikasi --}}
+                    <div class="mb-4">
+                        <div class="sidebar-label">Komunikasi</div>
+                        <a href="{{ route('admin.messages.index') }}"
+                           class="sidebar-link {{ request()->routeIs('admin.messages.*') ? 'is-active' : '' }}">
+                            <div class="flex items-center gap-3">
+                                <x-heroicon-o-chat-bubble-left-right class="w-5 h-5" />
+                                <span>Pesan Masuk</span>
+                            </div>
+                        </a>
+                    </div>
                 </nav>
 
-                <div class="mt-auto pt-6">
-                    <div class="rounded-xl border border-dashed border-slate-600 p-4 text-xs text-slate-400">
-                        Status Sistem
-                        <p class="mt-2 font-semibold text-slate-300 badge-dot">Aktif</p>
-                        <p class="mt-2">Terakhir diperbarui: {{ date('d M Y') }}</p>
+                {{-- Sidebar Footer --}}
+                <div class="mt-auto pt-6 border-t border-white/5">
+                    <div class="mb-4">
+                        <a href="{{ route('home') }}" target="_blank" class="sidebar-link group/link hover:bg-blue-600/10">
+                            <div class="flex items-center gap-3">
+                                <x-heroicon-o-globe-alt class="w-5 h-5 text-slate-500 group-hover/link:text-blue-400" />
+                                <span class="text-sm">Lihat Website</span>
+                            </div>
+                            <x-heroicon-o-arrow-top-right-on-square class="w-3.5 h-3.5 opacity-0 group-hover/link:opacity-100 transition" />
+                        </a>
+                    </div>
+
+                    <div class="bg-slate-800/30 rounded-2xl p-4 border border-white/5">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Sistem</span>
+                            <span class="flex h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                        </div>
+                        <form action="{{ route('logout') }}" method="POST" id="logout-form">
+                            @csrf
+                            <button type="button" 
+                                    onclick="confirmLogout()"
+                                    class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-400/10 transition group/logout">
+                                <x-heroicon-o-power class="w-5 h-5 group-hover/logout:scale-110 transition duration-300" />
+                                <span class="text-sm font-semibold">Logout</span>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col">
+        <main class="flex-1 flex flex-col min-w-0">
             <header class="topbar">
-                <div class="px-6 lg:px-10 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div>
-                        <p class="text-xs uppercase tracking-[0.2em] text-slate-400 mb-1">Panel Admin</p>
-                        <h1 class="text-2xl md:text-3xl font-semibold text-white">@yield('heading', 'Dashboard')</h1>
-                    </div>
+                <div class="px-6 lg:px-10 py-5 flex items-center justify-between gap-4">
                     <div class="flex items-center gap-4">
-                        <div class="text-right">
-                            <p class="text-sm font-semibold text-white">{{ auth()->user()->name }}</p>
-                            <p class="text-xs text-slate-400">{{ auth()->user()->email }}</p>
+                        <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white transition">
+                            <x-heroicon-o-bars-3-bottom-left class="w-7 h-7" />
+                        </button>
+                        <div>
+                            <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500 mb-0.5">Administrator</p>
+                            <h1 class="text-xl md:text-2xl font-bold text-white truncate">@yield('heading', 'Dashboard')</h1>
                         </div>
-                        <div class="w-12 h-12 rounded-full bg-cyan text-white flex items-center justify-center font-semibold text-base shadow-lg">
-                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    </div>
+                    
+                    <div class="flex items-center gap-3 md:gap-6">
+                        <div class="hidden md:block text-right">
+                            <p class="text-sm font-bold text-white">{{ auth()->user()->name }}</p>
+                            <p class="text-[10px] text-slate-500 truncate">{{ auth()->user()->email }}</p>
+                        </div>
+                        <div class="relative group">
+                            <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-bold text-base shadow-lg group-hover:shadow-blue-500/20 transition duration-300 ring-2 ring-white/5 group-hover:ring-blue-500/50">
+                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -817,6 +753,29 @@
     </div>
 
     <script>
+        // Toggle Sidebar for Mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+        }
+
+        // Logout Confirmation
+        function confirmLogout() {
+            if (confirm('Yakin ingin keluar dari sistem?')) {
+                document.getElementById('logout-form').submit();
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             const modal = document.getElementById('confirm-modal');
             const message = document.getElementById('confirm-message');
