@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SiteSetting;
-use App\Services\Modules\SambutanService;
+use App\Services\Modules\SiteSettingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
 class AdminSambutanController extends Controller
 {
-    protected $sambutanService;
+    protected $siteSettingService;
 
-    public function __construct(SambutanService $sambutanService)
+    public function __construct(SiteSettingService $siteSettingService)
     {
-        $this->sambutanService = $sambutanService;
+        $this->siteSettingService = $siteSettingService;
     }
 
     public function edit()
@@ -34,7 +33,7 @@ class AdminSambutanController extends Controller
             'remove_foto' => ['nullable', 'boolean'],
         ]);
 
-        $this->sambutanService->updateSambutan($validated, $request);
+        $this->siteSettingService->updateSambutan($validated, $request);
 
         return redirect()->to(route('admin.hidden-settings') . '#sambutan-settings')
             ->with('status', 'Sambutan kepala sekolah berhasil diperbarui.');
