@@ -130,22 +130,6 @@ class SpaController extends Controller
         );
     }
 
-    public function getBeritaContent(Request $request): JsonResponse|RedirectResponse
-    {
-        $news = $this->spaService->getPublishedNews();
-        $categories = Schema::hasTable('categories')
-            ? Category::orderBy('name')->get()
-            : collect();
-
-        return $this->respond(
-            $request,
-            'spa.partials.berita',
-            compact('news', 'categories'),
-            'Berita - SD N 2 Dermolo',
-            route('news.index')
-        );
-    }
-
     public function getProgramContent(Request $request): JsonResponse|RedirectResponse
     {
         $program = Schema::hasTable('programs')

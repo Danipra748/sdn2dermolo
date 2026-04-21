@@ -47,7 +47,6 @@ Route::prefix('spa')->name('spa.')->group(function () {
     Route::get('/prestasi', [SpaController::class, 'getPrestasiContent'])->name('prestasi');
     Route::get('/gallery', [SpaController::class, 'getGalleryContent'])->name('gallery');
     Route::get('/about', [SpaController::class, 'getAboutContent'])->name('about');
-    Route::get('/berita', [SpaController::class, 'getBeritaContent'])->name('berita');
     Route::get('/program', [SpaController::class, 'getProgramContent'])->name('program');
     Route::get('/contact', [SpaController::class, 'getContactContent'])->name('contact');
     Route::get('/ppdb', [SpaController::class, 'getPpdbContent'])->name('ppdb');

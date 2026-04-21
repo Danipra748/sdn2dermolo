@@ -55,4 +55,28 @@ class Article extends Model
         return $query->where('status', 'published')
             ->whereNotNull('published_at');
     }
+
+    public function scopeFilter($query, array $filters)
+    {
+        $query->when($filters['q'] ?? false, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('subtitle', 'like', '%' . $search . '%')
+                    ->orWhere('summary', 'like', '%' . $search . '%')
+                    ->orWhere('content', 'like', '%' . $search . '%');
+            });
+        });
+
+        $query->when($filters['category'] ?? false, function ($query, $category) {
+            $query->whereHas('category', function ($query) use ($category) {
+                $query->where('slug', $category);
+            });
+        });
+
+        $query->when($filters['type'] ?? false, function ($query, $type) {
+            if (in_array($type, ['berita', 'artikel'], true) && \Illuminate\Support\Facades\Schema::hasColumn('articles', 'type')) {
+                $query->where('type', $type);
+            }
+        });
+    }
 }

@@ -24,53 +24,38 @@ class NewsController extends Controller
             ]);
         }
 
-        $selectedType = $request->string('type')->toString();
+        $filters = $request->only(['q', 'category', 'type']);
+        $selectedType = $filters['type'] ?? null;
         if (! in_array($selectedType, ['berita', 'artikel'], true)) {
             $selectedType = null;
         }
 
-        $query = Article::with(['category', 'author'])
-            ->published();
-        $query = $this->applyArticleTypeFilter($query, $selectedType);
+        $articles = Article::with(['category', 'author'])
+            ->published()
+            ->filter($filters)
+            ->latest('published_at')
+            ->paginate(9)
+            ->withQueryString();
 
         $selectedCategory = null;
         if ($request->filled('category')) {
             $selectedCategory = Category::where('slug', $request->string('category'))->first();
-            if ($selectedCategory) {
-                $query->where('category_id', $selectedCategory->id);
-            }
         }
 
-        $search = $request->string('q');
-        if ($search->isNotEmpty()) {
-            $query->where(function ($builder) use ($search) {
-                $builder->where('title', 'like', '%' . $search . '%')
-                    ->orWhere('subtitle', 'like', '%' . $search . '%')
-                    ->orWhere('summary', 'like', '%' . $search . '%')
-                    ->orWhere('content', 'like', '%' . $search . '%');
-            });
-        }
-
-        $articles = $query->latest('published_at')
-            ->paginate(9)
-            ->withQueryString();
-
-        $latestQuery = Article::published();
-        $latestQuery = $this->applyArticleTypeFilter($latestQuery, $selectedType);
-        if ($selectedCategory) {
-            $latestQuery->where('category_id', $selectedCategory->id);
-        }
-
-        $latest = $latestQuery->latest('published_at')
+        $latest = Article::published()
+            ->filter($request->only(['category', 'type']))
+            ->latest('published_at')
             ->take(3)
             ->get();
 
         $categories = Category::withCount(['articles' => function ($q) use ($selectedType) {
             $q->published();
-            $this->applyArticleTypeFilter($q, $selectedType);
+            if ($selectedType && Schema::hasColumn('articles', 'type')) {
+                $q->where('type', $selectedType);
+            }
         }])->orderBy('name')->get();
 
-        $queryText = (string) $search;
+        $queryText = (string) ($filters['q'] ?? '');
 
         return view('news.index', compact('articles', 'latest', 'categories', 'selectedCategory', 'selectedType', 'queryText'));
     }
@@ -111,64 +96,12 @@ class NewsController extends Controller
 
     public function category(Category $category, Request $request)
     {
-        if (!Schema::hasTable('articles')) {
-            return view('news.category', [
-                'category' => $category,
-                'articles' => $this->emptyPaginator(9),
-            ]);
-        }
-
-        $selectedType = $request->string('type')->toString();
-        if (! in_array($selectedType, ['berita', 'artikel'], true)) {
-            $selectedType = null;
-        }
-
-        $categoryQuery = $category->articles()
-            ->published();
-        $this->applyArticleTypeFilter($categoryQuery, $selectedType);
-
-        $articles = $categoryQuery->latest('published_at')
-            ->paginate(9)
-            ->withQueryString();
-
-        return view('news.category', compact('category', 'articles'));
+        return redirect()->route('news.index', array_merge($request->query(), ['category' => $category->slug]));
     }
 
     public function search(Request $request)
     {
-        $query = $request->string('q');
-        $selectedType = $request->string('type')->toString();
-        if (! in_array($selectedType, ['berita', 'artikel'], true)) {
-            $selectedType = null;
-        }
-
-        if (!Schema::hasTable('articles')) {
-            return view('news.search', [
-                'articles' => $this->emptyPaginator(9),
-                'query' => $query,
-            ]);
-        }
-
-        $searchQuery = Article::with(['category', 'author'])
-            ->published();
-        $this->applyArticleTypeFilter($searchQuery, $selectedType);
-
-        $articles = $searchQuery->when($query, function ($builder) use ($query) {
-            $builder->where(function ($q) use ($query) {
-                $q->where('title', 'like', '%' . $query . '%')
-                    ->orWhere('subtitle', 'like', '%' . $query . '%')
-                    ->orWhere('summary', 'like', '%' . $query . '%')
-                    ->orWhere('content', 'like', '%' . $query . '%');
-            });
-        })
-        ->latest('published_at')
-        ->paginate(9)
-        ->withQueryString();
-
-        return view('news.search', [
-            'articles' => $articles,
-            'query' => $query,
-        ]);
+        return redirect()->route('news.index', $request->query());
     }
 
     protected function emptyPaginator(int $perPage): LengthAwarePaginator
